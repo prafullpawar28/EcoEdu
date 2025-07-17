@@ -1,7 +1,11 @@
 package com.ecoedu;
+import com.ecoedu.Home.Home;
 
-public class Main {
+import javafx.application.Application;
+
+public class Main  {
     public static void main(String[] args) {
-        System.out.println("Hello ecoedu");
+       Application.launch(Home.class,args);
     }
 }
+

@@ -1,0 +1,198 @@
+package com.ecoedu.dailytasks;
+
+import java.time.LocalDate;
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class DailyTaskManager {
+    private static DailyTaskManager instance;
+    private List<DailyTask> allTasks;
+    private List<DailyTask> currentDailyTasks;
+    private LocalDate lastTaskGeneration;
+    private int totalPointsEarned;
+    private int streakDays;
+
+    private DailyTaskManager() {
+        this.allTasks = new ArrayList<>();
+        this.currentDailyTasks = new ArrayList<>();
+        this.lastTaskGeneration = LocalDate.now().minusDays(1);
+        this.totalPointsEarned = 0;
+        this.streakDays = 0;
+        initializeTaskPool();
+    }
+
+    public static DailyTaskManager getInstance() {
+        if (instance == null) {
+            instance = new DailyTaskManager();
+        }
+        return instance;
+    }
+
+    private void initializeTaskPool() {
+        // Recycling Tasks
+        allTasks.add(new DailyTask(1, "Sort Your Recycling", 
+            "Separate paper, plastic, and glass into proper recycling bins", 50, DailyTask.TaskCategory.RECYCLING));
+        allTasks.add(new DailyTask(2, "Compost Kitchen Waste", 
+            "Start composting fruit peels and vegetable scraps", 75, DailyTask.TaskCategory.RECYCLING));
+        allTasks.add(new DailyTask(3, "Use Reusable Shopping Bag", 
+            "Bring your own bag instead of using plastic bags", 30, DailyTask.TaskCategory.RECYCLING));
+
+        // Energy Tasks
+        allTasks.add(new DailyTask(4, "Turn Off Unused Lights", 
+            "Switch off lights in empty rooms", 25, DailyTask.TaskCategory.ENERGY));
+        allTasks.add(new DailyTask(5, "Unplug Electronics", 
+            "Unplug chargers and devices when not in use", 40, DailyTask.TaskCategory.ENERGY));
+        allTasks.add(new DailyTask(6, "Use Natural Light", 
+            "Open curtains and use sunlight instead of artificial lighting", 35, DailyTask.TaskCategory.ENERGY));
+
+        // Water Tasks
+        allTasks.add(new DailyTask(7, "Take Shorter Showers", 
+            "Reduce shower time by 2 minutes", 45, DailyTask.TaskCategory.WATER));
+        allTasks.add(new DailyTask(8, "Fix a Leaky Faucet", 
+            "Repair or report any dripping taps", 60, DailyTask.TaskCategory.WATER));
+        allTasks.add(new DailyTask(9, "Use a Water Bottle", 
+            "Drink from a reusable water bottle instead of disposable cups", 30, DailyTask.TaskCategory.WATER));
+
+        // Transportation Tasks
+        allTasks.add(new DailyTask(10, "Walk or Bike", 
+            "Use active transportation for short trips", 80, DailyTask.TaskCategory.TRANSPORTATION));
+        allTasks.add(new DailyTask(11, "Use Public Transport", 
+            "Take bus, train, or carpool instead of driving alone", 70, DailyTask.TaskCategory.TRANSPORTATION));
+        allTasks.add(new DailyTask(12, "Plan Efficient Routes", 
+            "Combine multiple errands into one trip", 40, DailyTask.TaskCategory.TRANSPORTATION));
+
+        // Waste Tasks
+        allTasks.add(new DailyTask(13, "Use Reusable Containers", 
+            "Pack lunch in reusable containers instead of disposable ones", 50, DailyTask.TaskCategory.WASTE));
+        allTasks.add(new DailyTask(14, "Avoid Single-Use Items", 
+            "Choose reusable alternatives to disposable products", 55, DailyTask.TaskCategory.WASTE));
+        allTasks.add(new DailyTask(15, "Repair Instead of Replace", 
+            "Fix a broken item instead of throwing it away", 65, DailyTask.TaskCategory.WASTE));
+
+        // Education Tasks
+        allTasks.add(new DailyTask(16, "Learn About Local Wildlife", 
+            "Research native plants and animals in your area", 45, DailyTask.TaskCategory.EDUCATION));
+        allTasks.add(new DailyTask(17, "Share Eco Tips", 
+            "Teach someone about an environmental topic", 60, DailyTask.TaskCategory.EDUCATION));
+        allTasks.add(new DailyTask(18, "Read Environmental News", 
+            "Read an article about environmental issues", 40, DailyTask.TaskCategory.EDUCATION));
+    }
+
+    public void generateDailyTasks() {
+        LocalDate today = LocalDate.now();
+        
+        // Only generate new tasks if it's a new day
+        if (today.isAfter(lastTaskGeneration)) {
+            currentDailyTasks.clear();
+            Random random = new Random();
+            
+            // Generate 3 random tasks for the day
+            List<DailyTask> availableTasks = new ArrayList<>(allTasks);
+            for (int i = 0; i < 3 && !availableTasks.isEmpty(); i++) {
+                int randomIndex = random.nextInt(availableTasks.size());
+                DailyTask selectedTask = availableTasks.get(randomIndex);
+                
+                // Create a new instance with today's date
+                DailyTask dailyTask = new DailyTask(
+                    selectedTask.getId(),
+                    selectedTask.getTitle(),
+                    selectedTask.getDescription(),
+                    selectedTask.getPoints(),
+                    selectedTask.getCategory()
+                );
+                dailyTask.setAssignedDate(today);
+                
+                currentDailyTasks.add(dailyTask);
+                availableTasks.remove(randomIndex);
+            }
+            
+            lastTaskGeneration = today;
+        }
+    }
+
+    public List<DailyTask> getCurrentDailyTasks() {
+        generateDailyTasks(); // Ensure tasks are generated
+        return new ArrayList<>(currentDailyTasks);
+    }
+
+    public void markTaskComplete(int taskId) {
+        for (DailyTask task : currentDailyTasks) {
+            if (task.getId() == taskId && !task.isCompleted()) {
+                task.setCompleted(true);
+                totalPointsEarned += task.getPoints();
+                updateStreak();
+                break;
+            }
+        }
+    }
+
+    public void markTaskIncomplete(int taskId) {
+        for (DailyTask task : currentDailyTasks) {
+            if (task.getId() == taskId && task.isCompleted()) {
+                task.setCompleted(false);
+                totalPointsEarned -= task.getPoints();
+                break;
+            }
+        }
+    }
+
+    private void updateStreak() {
+        // Simple streak logic - if all tasks are completed today, increment streak
+        boolean allCompleted = currentDailyTasks.stream().allMatch(DailyTask::isCompleted);
+        if (allCompleted) {
+            streakDays++;
+        }
+    }
+
+    public int getCompletedTasksCount() {
+        return (int) currentDailyTasks.stream().filter(DailyTask::isCompleted).count();
+    }
+
+    public int getTotalTasksCount() {
+        return currentDailyTasks.size();
+    }
+
+    public int getTotalPointsEarned() {
+        return totalPointsEarned;
+    }
+
+    public int getStreakDays() {
+        return streakDays;
+    }
+
+    public int getTodayPoints() {
+        return currentDailyTasks.stream()
+                .filter(DailyTask::isCompleted)
+                .mapToInt(DailyTask::getPoints)
+                .sum();
+    }
+
+    public double getCompletionPercentage() {
+        if (currentDailyTasks.isEmpty()) return 0.0;
+        return (double) getCompletedTasksCount() / getTotalTasksCount() * 100;
+    }
+
+    public List<DailyTask> getTasksByCategory(DailyTask.TaskCategory category) {
+        return currentDailyTasks.stream()
+                .filter(task -> task.getCategory() == category)
+                .collect(Collectors.toList());
+    }
+
+    public void resetDailyTasks() {
+        currentDailyTasks.clear();
+        lastTaskGeneration = LocalDate.now().minusDays(1);
+        generateDailyTasks();
+    }
+
+    public boolean isTaskCompleted(int taskId) {
+        return currentDailyTasks.stream()
+                .anyMatch(task -> task.getId() == taskId && task.isCompleted());
+    }
+
+    public DailyTask getTaskById(int taskId) {
+        return currentDailyTasks.stream()
+                .filter(task -> task.getId() == taskId)
+                .findFirst()
+                .orElse(null);
+    }
+} 
