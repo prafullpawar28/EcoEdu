@@ -1,7 +1,10 @@
 package com.ecoedu.Home;
 
-import com.ecoedu.auth.LoginPage;
-import com.ecoedu.auth.SignupPage;
+import com.ecoedu.dashboard.StudentDashboard;
+import com.ecoedu.dashboard.StudentLoginPage;
+import com.ecoedu.dashboard.StudentSignupPage;
+import com.ecoedu.dashboard.AdminLoginPage;
+import com.ecoedu.dashboard.AdminSignupPage;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -11,14 +14,22 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.scene.image.Image;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundImage;
+import javafx.scene.layout.BackgroundPosition;
+import javafx.scene.layout.BackgroundRepeat;
+import javafx.scene.layout.BackgroundSize;
+import javafx.scene.text.Font;
 
 public class Home extends Application{
 
     @Override
     public void start(Stage primaryStage) throws Exception {
         VBox root = new VBox(30);
-        root.setAlignment(Pos.CENTER);
-        root.setStyle("-fx-background-color: linear-gradient(to bottom right, #e0f7fa, #fffde7); -fx-padding: 50;");
+        root.setAlignment(Pos.TOP_CENTER);
+        // Use a solid color or gradient background instead of an image
+        root.setStyle("-fx-background-color: linear-gradient(to bottom right, #e0f7fa, #fffde7);");
 
         // Mascot or logo placeholder
         ImageView imageView = new ImageView();
@@ -33,29 +44,52 @@ public class Home extends Application{
         Label subtitle = new Label("Learn. Play. Save the Planet!");
         subtitle.setStyle("-fx-font-size: 18px; -fx-text-fill: #388e3c;");
 
-        HBox buttonBox = new HBox(20);
-        buttonBox.setAlignment(Pos.CENTER);
-        Button loginBtn = new Button("Login");
-        loginBtn.setStyle("-fx-background-color: #00796b; -fx-text-fill: white; -fx-font-size: 18px; -fx-background-radius: 20; -fx-padding: 10 30;");
-        loginBtn.setOnAction(e -> {
-            com.ecoedu.auth.LoginPage.show(primaryStage);
-        });
-        Button signupBtn = new Button("Sign Up");
-        signupBtn.setStyle("-fx-background-color: #fbc02d; -fx-text-fill: #fffde7; -fx-font-size: 18px; -fx-background-radius: 20; -fx-padding: 10 30;");
-        signupBtn.setOnAction(e -> {
-            com.ecoedu.auth.SignupPage.show(primaryStage);
-        });
-        buttonBox.getChildren().addAll(loginBtn, signupBtn);
+        // --- Student Section ---
+        VBox studentBox = new VBox(10);
+        studentBox.setAlignment(Pos.CENTER);
+        Label studentLabel = new Label("👦 Student");
+        studentLabel.setFont(Font.font("Comic Sans MS", 20));
+        HBox studentBtnBox = new HBox(16);
+        studentBtnBox.setAlignment(Pos.CENTER);
+        Button studentLoginBtn = new Button("Login");
+        studentLoginBtn.setStyle("-fx-background-color: #00796b; -fx-text-fill: white; -fx-font-size: 16px; -fx-background-radius: 20; -fx-padding: 8 24;");
+        studentLoginBtn.setOnAction(e -> StudentLoginPage.show(primaryStage));
+        Button studentSignupBtn = new Button("Sign Up");
+        studentSignupBtn.setStyle("-fx-background-color: #fbc02d; -fx-text-fill: #fffde7; -fx-font-size: 16px; -fx-background-radius: 20; -fx-padding: 8 24;");
+        studentSignupBtn.setOnAction(e -> StudentSignupPage.show(primaryStage));
+        studentBtnBox.getChildren().addAll(studentLoginBtn, studentSignupBtn);
+        studentBox.getChildren().addAll(studentLabel, studentBtnBox);
 
-        Label footer = new Label("© 2024 EcoEdu | For young eco heroes (Ages 8–14)");
-        footer.setStyle("-fx-font-size: 12px; -fx-text-fill: #888;");
+        // --- Admin Section ---
+        VBox adminBox = new VBox(10);
+        adminBox.setAlignment(Pos.CENTER);
+        Label adminLabel = new Label("🧑‍💼 Admin");
+        adminLabel.setFont(Font.font("Comic Sans MS", 20));
+        HBox adminBtnBox = new HBox(16);
+        adminBtnBox.setAlignment(Pos.CENTER);
+        Button adminLoginBtn = new Button("Login");
+        adminLoginBtn.setStyle("-fx-background-color: #6a1b9a; -fx-text-fill: white; -fx-font-size: 16px; -fx-background-radius: 20; -fx-padding: 8 24;");
+        adminLoginBtn.setOnAction(e -> AdminLoginPage.show(primaryStage));
+        Button adminSignupBtn = new Button("Sign Up");
+        adminSignupBtn.setStyle("-fx-background-color: #ffd54f; -fx-text-fill: #6a1b9a; -fx-font-size: 16px; -fx-background-radius: 20; -fx-padding: 8 24;");
+        adminSignupBtn.setOnAction(e -> AdminSignupPage.show(primaryStage));
+        adminBtnBox.getChildren().addAll(adminLoginBtn, adminSignupBtn);
+        adminBox.getChildren().addAll(adminLabel, adminBtnBox);
 
-        root.getChildren().addAll(imageView, title, subtitle, buttonBox, footer);
+        VBox userBox = new VBox(24, studentBox, adminBox);
+        userBox.setAlignment(Pos.CENTER);
+
+        root.getChildren().addAll(imageView, title, subtitle, userBox);
 
         Scene scene = new Scene(root, 900, 700);
         primaryStage.setScene(scene);
         primaryStage.setTitle("EcoEdu - Home");
         primaryStage.show();
+    }
+
+    // After login/signup, show the student dashboard
+    public static void showStudentDashboard(Stage primaryStage) {
+        StudentDashboard.show(primaryStage);
     }
     
 }

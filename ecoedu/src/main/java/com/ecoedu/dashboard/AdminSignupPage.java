@@ -1,56 +1,62 @@
-package com.ecoedu.auth;
+package com.ecoedu.dashboard;
 
-import com.ecoedu.Home.Dashboard;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
-public class SignupPage extends VBox {
+public class AdminSignupPage extends VBox {
     private Stage primaryStage;
     private TextField emailField;
     private PasswordField passwordField;
     private PasswordField confirmPasswordField;
     private Label messageLabel;
 
-    public SignupPage(Stage primaryStage) {
+    public AdminSignupPage(Stage primaryStage) {
         this.primaryStage = primaryStage;
-        setSpacing(20);
-        setPadding(new Insets(40));
+        setSpacing(24);
+        setPadding(new Insets(48, 48, 48, 48));
         setAlignment(Pos.CENTER);
-        setStyle("-fx-background-color: linear-gradient(to bottom right, #fffde7, #e3f2fd);");
+        setStyle("-fx-background-color: linear-gradient(to bottom right, #fffde7, #ede7f6);");
 
-        Label title = new Label("Sign Up for EcoEdu");
-        title.setStyle("-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #388e3c;");
+        Label title = new Label("🧑‍💼 Admin Sign Up");
+        title.setFont(Font.font("Comic Sans MS", FontWeight.BOLD, 32));
+        title.setTextFill(Color.web("#6a1b9a"));
+        getChildren().add(title);
 
         emailField = new TextField();
         emailField.setPromptText("Email");
-        emailField.setStyle("-fx-font-size: 16px; -fx-background-radius: 12;");
+        emailField.setFont(Font.font("Comic Sans MS", 16));
+        emailField.setMaxWidth(300);
 
         passwordField = new PasswordField();
         passwordField.setPromptText("Password");
-        passwordField.setStyle("-fx-font-size: 16px; -fx-background-radius: 12;");
+        passwordField.setFont(Font.font("Comic Sans MS", 16));
+        passwordField.setMaxWidth(300);
 
         confirmPasswordField = new PasswordField();
         confirmPasswordField.setPromptText("Confirm Password");
-        confirmPasswordField.setStyle("-fx-font-size: 16px; -fx-background-radius: 12;");
+        confirmPasswordField.setFont(Font.font("Comic Sans MS", 16));
+        confirmPasswordField.setMaxWidth(300);
 
         Button signupBtn = new Button("Sign Up");
-        signupBtn.setStyle("-fx-background-color: #388e3c; -fx-text-fill: white; -fx-font-size: 18px; -fx-background-radius: 20; -fx-padding: 10 30;");
+        signupBtn.setFont(Font.font("Comic Sans MS", FontWeight.BOLD, 18));
+        signupBtn.setStyle("-fx-background-color: #6a1b9a; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 10 36;");
         signupBtn.setOnAction(e -> handleSignup());
 
         Hyperlink loginLink = new Hyperlink("Already have an account? Login");
-        loginLink.setOnAction(e -> LoginPage.show(primaryStage));
-
-        Button backBtn = new Button("Back to Dashboard");
-        backBtn.setOnAction(e -> com.ecoedu.Home.Dashboard.show(primaryStage));
+        loginLink.setOnAction(e -> AdminLoginPage.show(primaryStage));
 
         messageLabel = new Label("");
-        messageLabel.setStyle("-fx-text-fill: #d32f2f; -fx-font-size: 14px;");
+        messageLabel.setTextFill(Color.web("#d32f2f"));
+        messageLabel.setFont(Font.font("Comic Sans MS", 14));
 
-        getChildren().addAll(title, emailField, passwordField, confirmPasswordField, signupBtn, loginLink, messageLabel);
+        getChildren().addAll(emailField, passwordField, confirmPasswordField, signupBtn, loginLink, messageLabel);
     }
 
     private void handleSignup() {
@@ -66,21 +72,20 @@ public class SignupPage extends VBox {
             messageLabel.setText("Passwords do not match.");
             return;
         }
-        // TODO: Add Firebase Authentication logic here
-        // Example: if (FirebaseAuth.signUp(email, password)) { ... }
-        boolean signupSuccess = true; // Replace with actual Firebase result
+        // TODO: Add real signup logic here
+        boolean signupSuccess = true; // Replace with real check
         if (signupSuccess) {
-            Dashboard.show(primaryStage);
+            AdminDashboard.show(primaryStage);
         } else {
             messageLabel.setText("Signup failed. Try a different email.");
         }
     }
 
     public static void show(Stage primaryStage) {
-        SignupPage signupPage = new SignupPage(primaryStage);
-        Scene scene = new Scene(signupPage, 900, 700);
+        AdminSignupPage page = new AdminSignupPage(primaryStage);
+        Scene scene = new Scene(page, 500, 550);
         primaryStage.setScene(scene);
-        primaryStage.setTitle("EcoEdu - Sign Up");
+        primaryStage.setTitle("Admin Sign Up");
         primaryStage.show();
     }
 } 

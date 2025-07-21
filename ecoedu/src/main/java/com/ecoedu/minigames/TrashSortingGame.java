@@ -67,7 +67,7 @@ public class TrashSortingGame extends VBox {
         getChildren().add(trashGrid);
 
         Button backBtn = new Button("Back to Dashboard");
-        backBtn.setOnAction(e -> com.ecoedu.Home.Dashboard.show(primaryStage));
+        backBtn.setOnAction(e -> com.ecoedu.dashboard.StudentDashboard.show(primaryStage));
         getChildren().add(backBtn);
 
         resetGame();
@@ -170,6 +170,27 @@ public class TrashSortingGame extends VBox {
         gameOver.setFont(Font.font("Comic Sans MS", FontWeight.BOLD, 24));
         gameOver.setTextFill(Color.web("#d84315"));
         getChildren().add(gameOver);
+        Button playAgainBtn = new Button("🔄 Play Again");
+        playAgainBtn.setStyle("-fx-background-color: #388e3c; -fx-text-fill: white; -fx-font-size: 18px; -fx-background-radius: 20; -fx-padding: 10 32; -fx-effect: dropshadow(gaussian, #388e3c, 8, 0.2, 0, 2);");
+        playAgainBtn.setOnAction(e -> {
+            getChildren().remove(gameOver);
+            getChildren().remove(playAgainBtn);
+            // Remove back button if present
+            getChildren().removeIf(node -> node instanceof Button && ((Button)node).getText().contains("Back to Minigames"));
+            resetGame();
+        });
+        getChildren().removeIf(node -> node instanceof Button && ((Button)node).getText().contains("Play Again"));
+        getChildren().add(playAgainBtn);
+        // Add Back to Minigames button
+        Button backBtn = new Button("← Back to Minigames");
+        backBtn.setStyle("-fx-background-color: #0288d1; -fx-text-fill: white; -fx-font-size: 16px; -fx-background-radius: 20; -fx-padding: 8 24; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, #0288d1, 4, 0.2, 0, 1);");
+        backBtn.setOnAction(e -> {
+            javafx.stage.Stage stage = (javafx.stage.Stage) getScene().getWindow();
+            com.ecoedu.minigames.MinigamesPage.show(stage);
+        });
+        // Remove any existing back button before adding
+        getChildren().removeIf(node -> node instanceof Button && ((Button)node).getText().contains("Back to Minigames"));
+        getChildren().add(backBtn);
     }
 
     public static void show(Stage primaryStage) {

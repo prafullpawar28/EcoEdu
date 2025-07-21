@@ -141,7 +141,7 @@ public class AvatarCustomizer extends Application {
         HBox backBtnBox = new HBox();
         Button backBtn = new Button("← Back to Dashboard");
         backBtn.setStyle("-fx-background-color: #0288d1; -fx-text-fill: white; -fx-font-size: 14px; -fx-background-radius: 20; -fx-padding: 8 16; -fx-cursor: hand;");
-        backBtn.setOnAction(e -> com.ecoedu.Home.Dashboard.show(primaryStage));
+        backBtn.setOnAction(e -> com.ecoedu.dashboard.StudentDashboard.show(primaryStage));
         backBtnBox.setAlignment(Pos.TOP_LEFT);
         backBtnBox.getChildren().add(backBtn);
         backBtnBox.setPadding(new Insets(0, 0, 10, 0));

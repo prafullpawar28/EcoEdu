@@ -1,0 +1,103 @@
+/* EcoEdu Theme CSS */
+
+.root {
+    -fx-font-family: 'Quicksand', 'Nunito', 'Comic Sans MS', sans-serif;
+    -fx-background-color: linear-gradient(to bottom right, #A8E6CF, #DCEDC1);
+}
+
+.eco-card {
+    -fx-background-color: rgba(255,255,255,0.95);
+    -fx-background-radius: 24;
+    -fx-effect: dropshadow(gaussian, #A8E6CF, 12, 0.2, 0, 4);
+    -fx-padding: 32 32 32 32;
+}
+
+.eco-title {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #388E3C;
+    -fx-padding: 0 0 16 0;
+}
+
+.eco-field {
+    -fx-background-radius: 16;
+    -fx-border-radius: 16;
+    -fx-border-color: #A8E6CF;
+    -fx-border-width: 1.5;
+    -fx-padding: 10 16 10 40;
+    -fx-font-size: 16px;
+    -fx-background-color: #fff;
+}
+
+.eco-btn {
+    -fx-background-color: linear-gradient(to right, #A8E6CF, #FFD3B6);
+    -fx-text-fill: #388E3C;
+    -fx-background-radius: 20;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-padding: 10 36;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, #A8E6CF, 6, 0.1, 0, 2);
+    -fx-transition: all 0.2s;
+}
+
+.eco-btn:hover {
+    -fx-background-color: linear-gradient(to right, #DCEDC1, #FFAAA5);
+    -fx-text-fill: #00695C;
+}
+
+.eco-link {
+    -fx-text-fill: #388E3C;
+    -fx-underline: true;
+    -fx-font-size: 15px;
+    -fx-cursor: hand;
+}
+
+.eco-link:hover {
+    -fx-text-fill: #00796B;
+}
+
+.eco-error {
+    -fx-text-fill: #FF5252;
+    -fx-font-size: 14px;
+    -fx-padding: 8 0 0 0;
+}
+
+.eco-icon {
+    -fx-font-size: 18px;
+    -fx-text-fill: #388E3C;
+    -fx-padding: 0 8 0 0;
+}
+
+.eco-dropdown {
+    -fx-background-radius: 16;
+    -fx-border-radius: 16;
+    -fx-border-color: #A8E6CF;
+    -fx-border-width: 1.5;
+    -fx-padding: 10 16;
+    -fx-font-size: 16px;
+    -fx-background-color: #fff;
+}
+
+/* Dark theme toggle styles (optional) */
+.root.dark {
+    -fx-background-color: linear-gradient(to bottom right, #388E3C, #00695C);
+}
+
+.root.dark .eco-card {
+    -fx-background-color: rgba(34, 49, 63, 0.98);
+}
+
+.root.dark .eco-title, .root.dark .eco-link, .root.dark .eco-icon {
+    -fx-text-fill: #A8E6CF;
+}
+
+.root.dark .eco-btn {
+    -fx-background-color: linear-gradient(to right, #388E3C, #00695C);
+    -fx-text-fill: #A8E6CF;
+}
+
+.root.dark .eco-btn:hover {
+    -fx-background-color: linear-gradient(to right, #00695C, #388E3C);
+    -fx-text-fill: #FFD3B6;
+} 

@@ -1,86 +1,48 @@
 package com.ecoedu.quiz;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class QuizData {
+    private static final Map<String, List<Question>> quizMap = new LinkedHashMap<>();
+    static {
+        // General Eco Quiz
+        List<Question> ecoQuiz = new ArrayList<>();
+        ecoQuiz.add(new Question("What is the main cause of global warming?", new String[]{"Deforestation", "Greenhouse gases", "Overfishing", "Plastic waste"}, 1));
+        ecoQuiz.add(new Question("Which of these is a renewable energy source?", new String[]{"Coal", "Oil", "Solar", "Natural Gas"}, 2));
+        ecoQuiz.add(new Question("What can you do to save water?", new String[]{"Leave the tap running", "Take shorter showers", "Water the garden at noon", "Ignore leaks"}, 1));
+        ecoQuiz.add(new Question("Which of these is NOT recyclable?", new String[]{"Glass bottle", "Plastic bag", "Aluminum can", "Newspaper"}, 1));
+        ecoQuiz.add(new Question("What is composting?", new String[]{"Burning waste", "Burying plastic", "Turning organic waste into soil", "Throwing trash in the ocean"}, 2));
+        quizMap.put("🌱 General Eco Quiz", ecoQuiz);
+
+        // Recycling Quiz
+        List<Question> recyclingQuiz = new ArrayList<>();
+        recyclingQuiz.add(new Question("Which bin should you put glass bottles in?", new String[]{"Compost", "Recycling", "Landfill", "Hazardous"}, 1));
+        recyclingQuiz.add(new Question("What does the recycling symbol mean?", new String[]{"Trash", "Reuse", "Recycle", "Compost"}, 2));
+        recyclingQuiz.add(new Question("Which of these is NOT recyclable?", new String[]{"Plastic bag", "Aluminum can", "Paper", "Glass jar"}, 0));
+        recyclingQuiz.add(new Question("What color is the recycling bin usually?", new String[]{"Blue", "Red", "Green", "Yellow"}, 0));
+        recyclingQuiz.add(new Question("What should you do before recycling a bottle?", new String[]{"Break it", "Rinse it", "Throw cap away", "Burn it"}, 1));
+        quizMap.put("♻️ Recycling Quiz", recyclingQuiz);
+
+        // Water Conservation Quiz
+        List<Question> waterQuiz = new ArrayList<>();
+        waterQuiz.add(new Question("What is a simple way to save water at home?", new String[]{"Take longer showers", "Fix leaks", "Water lawn at noon", "Leave tap running"}, 1));
+        waterQuiz.add(new Question("Which of these uses the most water?", new String[]{"Shower", "Toilet", "Dishwasher", "Washing hands"}, 1));
+        waterQuiz.add(new Question("What is greywater?", new String[]{"Dirty water from factories", "Reusable household water", "Ocean water", "Rainwater"}, 1));
+        waterQuiz.add(new Question("Why should you turn off the tap while brushing teeth?", new String[]{"Save water", "No reason", "Make noise", "It’s fun"}, 0));
+        waterQuiz.add(new Question("What is a rain barrel used for?", new String[]{"Collecting rainwater", "Throwing trash", "Storing oil", "Feeding pets"}, 0));
+        quizMap.put("💧 Water Conservation Quiz", waterQuiz);
+    }
+
+    public static List<String> getQuizList() {
+        return new ArrayList<>(quizMap.keySet());
+    }
+
+    public static List<Question> getQuestionsForQuiz(String quizTitle) {
+        return quizMap.getOrDefault(quizTitle, Collections.emptyList());
+    }
+
+    // For backward compatibility
     public static List<Question> getQuestions() {
-        List<Question> questions = new ArrayList<>();
-        questions.add(new Question(
-            "What is the main cause of global warming?",
-            new String[]{"Deforestation", "Greenhouse gases", "Overfishing", "Plastic waste"},
-            1
-        ));
-        questions.add(new Question(
-            "Which of these is a renewable energy source?",
-            new String[]{"Coal", "Oil", "Solar", "Natural Gas"},
-            2
-        ));
-        questions.add(new Question(
-            "What can you do to save water?",
-            new String[]{"Leave the tap running", "Take shorter showers", "Water the garden at noon", "Ignore leaks"},
-            1
-        ));
-        questions.add(new Question(
-            "Which of these is NOT recyclable?",
-            new String[]{"Glass bottle", "Plastic bag", "Aluminum can", "Newspaper"},
-            1
-        ));
-        questions.add(new Question(
-            "What is composting?",
-            new String[]{"Burning waste", "Burying plastic", "Turning organic waste into soil", "Throwing trash in the ocean"},
-            2
-        ));
-        questions.add(new Question(
-            "Which gas do trees absorb from the atmosphere?",
-            new String[]{"Oxygen", "Carbon Dioxide", "Nitrogen", "Methane"},
-            1
-        ));
-        questions.add(new Question(
-            "What is the best way to reduce plastic pollution?",
-            new String[]{"Use more plastic", "Recycle plastic", "Use single-use plastics", "Burn plastic"},
-            1
-        ));
-        questions.add(new Question(
-            "Which of these helps save energy at home?",
-            new String[]{"Leaving lights on", "Using LED bulbs", "Running water constantly", "Open fridge often"},
-            1
-        ));
-        questions.add(new Question(
-            "What is the effect of oil spills in the ocean?",
-            new String[]{"Clean water", "Harm to marine life", "Faster fish growth", "More oxygen"},
-            1
-        ));
-        questions.add(new Question(
-            "Which of these is a benefit of planting trees?",
-            new String[]{"More pollution", "Less oxygen", "Cleaner air", "More plastic"},
-            2
-        ));
-        questions.add(new Question(
-            "What is the 3R principle?",
-            new String[]{"Reduce, Reuse, Recycle", "Read, Run, Rest", "Rain, River, Road", "Red, Rose, Rock"},
-            0
-        ));
-        questions.add(new Question(
-            "Which animal is most affected by plastic in the ocean?",
-            new String[]{"Elephants", "Sea turtles", "Lions", "Cows"},
-            1
-        ));
-        questions.add(new Question(
-            "What is an eco-friendly way to travel short distances?",
-            new String[]{"Drive alone", "Walk or bike", "Take a plane", "Use a speedboat"},
-            1
-        ));
-        questions.add(new Question(
-            "Which of these is a greenhouse gas?",
-            new String[]{"Helium", "Carbon Dioxide", "Argon", "Neon"},
-            1
-        ));
-        questions.add(new Question(
-            "What should you do with e-waste (old electronics)?",
-            new String[]{"Throw in trash", "Recycle at special centers", "Burn it", "Bury in garden"},
-            1
-        ));
-        return questions;
+        return getQuestionsForQuiz(getQuizList().get(0));
     }
 } 

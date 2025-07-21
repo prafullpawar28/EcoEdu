@@ -57,8 +57,8 @@ public class DailyChallengePage extends VBox {
         backBtn.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14px; " +
                         "-fx-background-radius: 20; -fx-padding: 8 16; -fx-cursor: hand;");
         backBtn.setOnAction(e -> {
-            // Return to dashboard
-            com.ecoedu.Home.Dashboard.show(primaryStage);
+            // Return to student dashboard
+            com.ecoedu.dashboard.StudentDashboard.show(primaryStage);
         });
 
         // Title
