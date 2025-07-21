@@ -9,8 +9,8 @@ public class Main  {
        Application.launch(Home.class,args);
     }
 
-    // public static void applyEcoEduTheme(Scene scene) {
-    //     scene.getStylesheets().add(Main.class.getResource("/css/ecoedu-theme.css").toExternalForm());
-    // }
+    public static void applyEcoEduTheme(Scene scene) {
+        scene.getStylesheets().add(Main.class.getResource("/css/ecoedu-theme.css").toExternalForm());
+    }
 }
 

@@ -6,6 +6,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
@@ -16,6 +17,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
+import javafx.scene.layout.Region;
 
 public class StudentDashboard extends VBox {
     private Stage primaryStage;
@@ -27,19 +29,32 @@ public class StudentDashboard extends VBox {
         setAlignment(Pos.TOP_CENTER);
         setStyle("-fx-background-color: linear-gradient(to bottom right, #e1f5fe 60%, #fffde7 100%);");
 
+        // --- Header with Settings Icon ---
+        HBox header = new HBox();
+        header.setAlignment(Pos.CENTER_RIGHT);
+        header.setPadding(new Insets(0, 0, 10, 0));
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        Button settingsBtn = new Button();
+        ImageView settingsIcon = new ImageView(new Image(getClass().getResource("").toExternalForm()));
+        settingsIcon.setFitWidth(32);
+        settingsIcon.setFitHeight(32);
+        settingsBtn.setGraphic(settingsIcon);
+        settingsBtn.setStyle("-fx-background-color: transparent; -fx-cursor: hand;");
+        settingsBtn.setOnAction(e -> StudentSettingsView.show(primaryStage));
+        header.getChildren().addAll(spacer, settingsBtn);
+        getChildren().add(header);
+
         // --- Playful Animated Eco-Themed Header ---
         HBox playfulHeader = new HBox(18);
         playfulHeader.setAlignment(Pos.CENTER_LEFT);
         playfulHeader.setPadding(new Insets(0, 0, 0, 0));
-        // Mascot/avatar (placeholder: earth emoji)
-        Label mascot = new Label("🌎");
-        mascot.setFont(Font.font("Comic Sans MS", FontWeight.BOLD, 44));
-        // Animated sun/cloud (simple emoji for now)
-        Label sun = new Label("☀️");
-        sun.setFont(Font.font("Comic Sans MS", 32));
-        // Personalized greeting
+        Label mascot = new Label("\uD83C\uDF0E");
+        mascot.setFont(Font.font("Quicksand", FontWeight.BOLD, 44));
+        Label sun = new Label("\u2600\uFE0F");
+        sun.setFont(Font.font("Quicksand", 32));
         Label greeting = new Label("Welcome back, Eco Hero!");
-        greeting.setFont(Font.font("Comic Sans MS", FontWeight.BOLD, 26));
+        greeting.setFont(Font.font("Quicksand", FontWeight.BOLD, 26));
         greeting.setTextFill(Color.web("#0288d1"));
         playfulHeader.getChildren().addAll(mascot, greeting, sun);
         getChildren().add(playfulHeader);
@@ -49,44 +64,35 @@ public class StudentDashboard extends VBox {
         infoBar.setAlignment(Pos.CENTER_LEFT);
         infoBar.setPadding(new Insets(10, 0, 10, 0));
         infoBar.setStyle("-fx-background-color: linear-gradient(to right, #b2ff59, #81d4fa); -fx-background-radius: 16; -fx-effect: dropshadow(gaussian, #b2ff59, 8, 0.1, 0, 2);");
-        Label infoLabel = new Label("🌱 Tip: Every small eco-action counts! Try a new module today.");
-        infoLabel.setFont(Font.font("Comic Sans MS", FontWeight.BOLD, 16));
+        Label infoLabel = new Label("\uD83C\uDF31 Tip: Every small eco-action counts! Try a new module today.");
+        infoLabel.setFont(Font.font("Quicksand", FontWeight.BOLD, 16));
         infoLabel.setTextFill(Color.web("#388e3c"));
         infoBar.getChildren().add(infoLabel);
         getChildren().add(infoBar);
 
-        // --- Header with Logout Button ---
-        HBox header = new HBox();
-        header.setAlignment(Pos.CENTER_RIGHT);
-        header.setPadding(new Insets(0, 0, 10, 0));
-        Button logoutBtn = new Button("⎋ Logout");
-        logoutBtn.setFont(Font.font("Comic Sans MS", FontWeight.BOLD, 16));
-        logoutBtn.setStyle("-fx-background-color: #e57373; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 8 24; -fx-cursor: hand;");
-        logoutBtn.setOnAction(e -> com.ecoedu.Home.Home.showStudentDashboard(primaryStage));
-        header.getChildren().add(logoutBtn);
-        getChildren().add(header);
-
         // --- Dashboard Title ---
-        Label title = new Label("👦 Student Dashboard");
-        title.setFont(Font.font("Comic Sans MS", FontWeight.BOLD, 36));
+        Label title = new Label("\uD83D\uDC66 Student Dashboard");
+        title.setFont(Font.font("Quicksand", FontWeight.BOLD, 36));
         title.setTextFill(Color.web("#0288d1"));
         title.setStyle("-fx-font-weight: bold;");
         getChildren().add(title);
 
-        // --- Card Grid ---
+        // --- Card Grid with Scroll ---
         GridPane cardGrid = new GridPane();
-        cardGrid.setHgap(30);
-        cardGrid.setVgap(30);
-        cardGrid.setAlignment(Pos.CENTER);
-
-        cardGrid.add(makeCard("📚 Modules", "Learn eco topics!", "#81c784", "/Assets/Images/module.png", true, () -> openModules()), 0, 0);
-        cardGrid.add(makeCard("🧩 Quiz & Puzzles", "Test your eco skills!", "#ffd54f", "/Assets/Images/quiz.png", false, () -> openQuiz()), 1, 0);
-        cardGrid.add(makeCard("🧑‍🎨 Avatar Customization", "Style your eco hero!", "#4fc3f7", "/Assets/Images/avatar.png", false, () -> openAvatar()), 0, 1);
-        cardGrid.add(makeCard("🏆 Leaderboard & Badges", "See your rank and achievements!", "#ffd54f", "/Assets/Images/leaderboard.png", true, () -> openLeaderboardAndBadges()), 1, 1);
-        cardGrid.add(makeCard("🎮 Minigames", "Play & learn!", "#ff8a65", "/Assets/Images/minigames.png", false, () -> openMinigamesPage()), 0, 2);
-        cardGrid.add(makeCard("🌱 Daily Challenge", "New eco tasks!", "#a1887f", "/Assets/Images/daily.png", false, () -> openDaily()), 1, 2);
-
-        getChildren().add(cardGrid);
+        cardGrid.setHgap(40);
+        cardGrid.setVgap(40);
+        cardGrid.setAlignment(Pos.TOP_CENTER);
+        cardGrid.add(makeCard("\uD83D\uDCDA Modules", "Learn eco topics!", "#81c784", "/Assets/Images/module.png", true, () -> openModules()), 0, 0);
+        cardGrid.add(makeCard("\uD83E\uDDE9 Quiz & Puzzles", "Test your eco skills!", "#ffd54f", "/Assets/Images/quiz.png", false, () -> openQuiz()), 1, 0);
+        cardGrid.add(makeCard("\uD83E\uDDD1\u200D\uD83C\uDFA8 Avatar Customization", "Style your eco hero!", "#4fc3f7", "/Assets/Images/avatar.png", false, () -> openAvatar()), 0, 1);
+        cardGrid.add(makeCard("\uD83C\uDFC6 Leaderboard & Badges", "See your rank and achievements!", "#ffd54f", "/Assets/Images/leaderboard.png", true, () -> openLeaderboardAndBadges()), 1, 1);
+        cardGrid.add(makeCard("\uD83C\uDFAE Minigames", "Play & learn!", "#ff8a65", "/Assets/Images/minigames.png", false, () -> openMinigamesPage()), 0, 2);
+        cardGrid.add(makeCard("\uD83C\uDF31 Daily Challenge", "New eco tasks!", "#a1887f", "/Assets/Images/daily.png", false, () -> openDaily()), 1, 2);
+        ScrollPane scrollPane = new ScrollPane(cardGrid);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setPrefHeight(500);
+        scrollPane.setStyle("-fx-background: transparent; -fx-background-color: transparent;");
+        getChildren().add(scrollPane);
 
         // --- Footer with Motivational Quote ---
         HBox footer = new HBox();
@@ -94,41 +100,39 @@ public class StudentDashboard extends VBox {
         footer.setPadding(new Insets(18, 0, 0, 0));
         footer.setStyle("-fx-background-color: transparent;");
         Label quote = new Label("\"The Earth is what we all have in common.\" – Wendell Berry");
-        quote.setFont(Font.font("Comic Sans MS", FontWeight.BOLD, 16));
+        quote.setFont(Font.font("Quicksand", FontWeight.BOLD, 16));
         quote.setTextFill(Color.web("#388e3c"));
         footer.getChildren().add(quote);
         getChildren().add(footer);
     }
 
-    // Enhanced makeCard with badge and more expressive hover
+    // Enhanced makeCard with increased width, spacing, and expressive hover
     private VBox makeCard(String title, String subtitle, String color, String iconPath, boolean isNew, Runnable onClick) {
         VBox card = new VBox(10);
         card.setAlignment(Pos.CENTER);
-        card.setPrefSize(220, 180);
+        card.setPrefSize(340, 220);
         card.setStyle("-fx-background-color: linear-gradient(to bottom right, " + color + ", #fffde7 80%); -fx-background-radius: 28; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, #bdbdbd, 16, 0.2, 0, 4);");
-        // Icon
         ImageView icon = new ImageView();
         try {
             icon.setImage(new Image(getClass().getResourceAsStream(iconPath)));
         } catch (Exception e) {
             icon.setImage(null);
         }
-        icon.setFitWidth(64);
-        icon.setFitHeight(64);
-        icon.setStyle("-fx-background-color: #fffde7; -fx-background-radius: 32; -fx-border-radius: 32; -fx-border-color: #fff; -fx-border-width: 2; -fx-effect: dropshadow(gaussian, #fffde7, 8, 0.2, 0, 2);");
+        icon.setFitWidth(72);
+        icon.setFitHeight(72);
+        icon.setStyle("-fx-background-color: #fffde7; -fx-background-radius: 36; -fx-border-radius: 36; -fx-border-color: #fff; -fx-border-width: 2; -fx-effect: dropshadow(gaussian, #fffde7, 8, 0.2, 0, 2);");
         Label titleLabel = new Label(title);
-        titleLabel.setFont(Font.font("Comic Sans MS", 22));
+        titleLabel.setFont(Font.font("Quicksand", 22));
         titleLabel.setTextFill(Color.web("#263238"));
         titleLabel.setStyle("-fx-font-weight: bold;");
         Label subtitleLabel = new Label(subtitle);
-        subtitleLabel.setFont(Font.font("Comic Sans MS", 14));
+        subtitleLabel.setFont(Font.font("Quicksand", 14));
         subtitleLabel.setTextFill(Color.web("#424242"));
-        // Badge for new features
         HBox badgeBox = new HBox();
         badgeBox.setAlignment(Pos.CENTER);
         if (isNew) {
             Label badge = new Label("NEW");
-            badge.setFont(Font.font("Comic Sans MS", FontWeight.BOLD, 12));
+            badge.setFont(Font.font("Quicksand", FontWeight.BOLD, 12));
             badge.setTextFill(Color.WHITE);
             badge.setStyle("-fx-background-color: #ff5252; -fx-background-radius: 10; -fx-padding: 2 10; -fx-effect: dropshadow(gaussian, #ff5252, 4, 0.2, 0, 1);");
             badgeBox.getChildren().add(badge);

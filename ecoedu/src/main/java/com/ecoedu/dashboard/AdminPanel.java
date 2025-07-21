@@ -120,7 +120,7 @@ public class AdminPanel extends BorderPane {
     public static void show(Stage primaryStage) {
         AdminPanel panel = new AdminPanel(primaryStage);
         Scene scene = new Scene(panel, 1100, 750);
-        // com.ecoedu.Main.applyEcoEduTheme(scene);
+        com.ecoedu.Main.applyEcoEduTheme(scene);
         primaryStage.setScene(scene);
         primaryStage.setTitle("EcoEdu - Admin Panel");
         primaryStage.show();

@@ -15,12 +15,20 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
+// Add a static ProfileData class for demo purposes
+class ProfileData {
+    public static String name = "";
+    public static String email = "";
+    public static String avatarPath = null;
+}
+
 public class StudentSignupPage extends VBox {
     private Stage primaryStage;
     private TextField emailField;
     private PasswordField passwordField;
     private PasswordField confirmPasswordField;
     private Label messageLabel;
+    private TextField nameField; // Make nameField a class field
 
     public StudentSignupPage(Stage primaryStage) {
         this.primaryStage = primaryStage;
@@ -51,7 +59,7 @@ public class StudentSignupPage extends VBox {
         HBox nameBox = new HBox(8);
         Label nameIcon = new Label("\uD83C\uDF33"); // Tree emoji as icon
         nameIcon.getStyleClass().add("eco-icon");
-        TextField nameField = new TextField();
+        nameField = new TextField();
         nameField.setPromptText("Full Name");
         nameField.getStyleClass().add("eco-field");
         nameBox.setAlignment(Pos.CENTER_LEFT);
@@ -113,8 +121,9 @@ public class StudentSignupPage extends VBox {
         String email = emailField.getText();
         String password = passwordField.getText();
         String confirmPassword = confirmPasswordField.getText();
+        String name = nameField.getText();
         messageLabel.setText("");
-        if (email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
+        if (email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() || name.isEmpty()) {
             messageLabel.setText("Please fill all fields.");
             return;
         }
@@ -122,10 +131,13 @@ public class StudentSignupPage extends VBox {
             messageLabel.setText("Passwords do not match.");
             return;
         }
-        // TODO: Add real signup logic here
+        // Save to ProfileData
+        ProfileData.name = name;
+        ProfileData.email = email;
+        // TODO: Save to Firebase in the future
         boolean signupSuccess = true; // Replace with real check
         if (signupSuccess) {
-            StudentDashboard.show(primaryStage);
+            com.ecoedu.dashboard.ProfilePage.show(primaryStage, false);
         } else {
             messageLabel.setText("Signup failed. Try a different email.");
         }

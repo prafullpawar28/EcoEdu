@@ -18,6 +18,9 @@ import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.List;
+import javafx.animation.ScaleTransition;
+import javafx.animation.FadeTransition;
+import javafx.util.Duration;
 
 public class AvatarCustomizer extends Application {
     private ComboBox<String> hairStyleBox;
@@ -113,6 +116,18 @@ public class AvatarCustomizer extends Application {
         resetBtn.setOnAction(e -> resetSelections());
         addHoverEffect(resetBtn);
 
+        Button randomBtn = new Button("Randomize!");
+        randomBtn.setFont(Font.font("Comic Sans MS", FontWeight.BOLD, 16));
+        randomBtn.setStyle("-fx-background-color: #A8E6CF; -fx-text-fill: #388E3C; -fx-background-radius: 15; -fx-padding: 8 24;");
+        randomBtn.setOnAction(e -> randomizeAvatar());
+        addHoverEffect(randomBtn);
+
+        Button saveBtn = new Button("Save Avatar");
+        saveBtn.setFont(Font.font("Comic Sans MS", FontWeight.BOLD, 16));
+        saveBtn.setStyle("-fx-background-color: #43a047; -fx-text-fill: white; -fx-background-radius: 15; -fx-padding: 8 24;");
+        saveBtn.setOnAction(e -> showSaveFeedback());
+        addHoverEffect(saveBtn);
+
         summaryLabel = new Label("");
         summaryLabel.setFont(Font.font("Comic Sans MS", 16));
         summaryLabel.setTextFill(Color.web("#4a148c"));
@@ -133,7 +148,7 @@ public class AvatarCustomizer extends Application {
         grid.add(new Label("Eye Color:"), 0, 3);
         grid.add(eyeColorBox, 1, 3);
 
-        HBox buttonBox = new HBox(20, showBtn, resetBtn);
+        HBox buttonBox = new HBox(20, showBtn, resetBtn, randomBtn, saveBtn);
         buttonBox.setAlignment(Pos.CENTER);
         VBox mainBox = new VBox(14, title, avatarPreview, grid, accessoriesLabel, accessoriesBox, buttonBox, summaryLabel);
         mainBox.setAlignment(Pos.TOP_CENTER);
@@ -146,7 +161,13 @@ public class AvatarCustomizer extends Application {
         backBtnBox.getChildren().add(backBtn);
         backBtnBox.setPadding(new Insets(0, 0, 10, 0));
         root.getChildren().addAll(backBtnBox, mainBox);
-
+        // Eco-themed animated background
+        FadeTransition bgFade = new FadeTransition(Duration.seconds(2), root);
+        bgFade.setFromValue(0.8);
+        bgFade.setToValue(1.0);
+        bgFade.setCycleCount(FadeTransition.INDEFINITE);
+        bgFade.setAutoReverse(true);
+        bgFade.play();
         Scene scene = new Scene(root, 900, 700);
         primaryStage.setScene(scene);
         primaryStage.setTitle("EcoEdu Avatar Customization");
@@ -269,6 +290,13 @@ public class AvatarCustomizer extends Application {
                 }
             }
         }
+        // Animate avatar preview on update
+        ScaleTransition st = new ScaleTransition(Duration.millis(300), avatarPreview);
+        st.setFromX(1.1);
+        st.setFromY(1.1);
+        st.setToX(1.0);
+        st.setToY(1.0);
+        st.play();
     }
 
     private void showSummary() {
@@ -309,6 +337,27 @@ public class AvatarCustomizer extends Application {
         }
         summaryLabel.setText("");
         updateAvatarPreview();
+    }
+
+    private void randomizeAvatar() {
+        // Randomly select options for all fields
+        hairStyleBox.getSelectionModel().select((int)(Math.random() * hairStyleBox.getItems().size()));
+        hairColorBox.getSelectionModel().select((int)(Math.random() * hairColorBox.getItems().size()));
+        skinToneBox.getSelectionModel().select((int)(Math.random() * skinToneBox.getItems().size()));
+        eyeColorBox.getSelectionModel().select((int)(Math.random() * eyeColorBox.getItems().size()));
+        for (CheckBox cb : accessoryChecks) {
+            cb.setSelected(Math.random() < 0.4); // 40% chance for each accessory
+        }
+        updateAvatarPreview();
+        summaryLabel.setText("Randomized! Try another or save your favorite.");
+    }
+
+    private void showSaveFeedback() {
+        summaryLabel.setText("✅ Avatar saved! (Ready for future integration)");
+        FadeTransition ft = new FadeTransition(Duration.millis(800), summaryLabel);
+        ft.setFromValue(0.3);
+        ft.setToValue(1.0);
+        ft.play();
     }
 
     private void addHoverEffect(Control control) {

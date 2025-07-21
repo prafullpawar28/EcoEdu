@@ -21,67 +21,44 @@ import javafx.scene.layout.BackgroundPosition;
 import javafx.scene.layout.BackgroundRepeat;
 import javafx.scene.layout.BackgroundSize;
 import javafx.scene.text.Font;
+import javafx.scene.layout.Region;
+import javafx.scene.text.Text;
+import javafx.scene.control.Alert;
+import com.ecoedu.dashboard.AdminDashboard;
 
 public class Home extends Application{
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        VBox root = new VBox(30);
-        root.setAlignment(Pos.TOP_CENTER);
-        // Use a solid color or gradient background instead of an image
-        root.setStyle("-fx-background-color: linear-gradient(to bottom right, #e0f7fa, #fffde7);");
+        VBox root = new VBox(40);
+        root.setAlignment(Pos.CENTER);
+        root.setStyle("-fx-background-color: linear-gradient(to bottom right, #A8E6CF, #DCEDC1);");
 
         // Mascot or logo placeholder
         ImageView imageView = new ImageView();
         imageView.setFitWidth(120);
         imageView.setFitHeight(120);
         imageView.setStyle("-fx-background-color: #b2dfdb; -fx-background-radius: 60; -fx-border-radius: 60; -fx-effect: dropshadow(gaussian, #b2dfdb, 10, 0, 0, 2);");
-        // You can set mascot.setImage(new Image("/images/mascot.png")); when you add your asset
 
-        Label title = new Label("Welcome to EcoEdu!");
-        title.setStyle("-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #00796b;");
+        Label title = new Label("EcoEdu");
+        title.setStyle("-fx-font-size: 36px; -fx-font-weight: bold; -fx-text-fill: #00796b; -fx-font-family: 'Quicksand', 'Nunito', sans-serif;");
+        Label subtitle = new Label("Learn. Play. Grow. Save the Planet!");
+        subtitle.setStyle("-fx-font-size: 18px; -fx-text-fill: #388e3c; -fx-font-family: 'Quicksand', 'Nunito', sans-serif;");
 
-        Label subtitle = new Label("Learn. Play. Save the Planet!");
-        subtitle.setStyle("-fx-font-size: 18px; -fx-text-fill: #388e3c;");
+        Button loginBtn = new Button("Login");
+        loginBtn.setStyle("-fx-background-color: #388E3C; -fx-text-fill: white; -fx-font-size: 18px; -fx-background-radius: 20; -fx-padding: 10 36; -fx-cursor: hand;");
+        loginBtn.setOnAction(e -> StudentLoginPage.show(primaryStage));
+        Button signupBtn = new Button("Sign Up");
+        signupBtn.setStyle("-fx-background-color: #FFD3B6; -fx-text-fill: #388E3C; -fx-font-size: 18px; -fx-background-radius: 20; -fx-padding: 10 36; -fx-cursor: hand;");
+        signupBtn.setOnAction(e -> StudentSignupPage.show(primaryStage));
 
-        // --- Student Section ---
-        VBox studentBox = new VBox(10);
-        studentBox.setAlignment(Pos.CENTER);
-        Label studentLabel = new Label("👦 Student");
-        studentLabel.setFont(Font.font("Comic Sans MS", 20));
-        HBox studentBtnBox = new HBox(16);
-        studentBtnBox.setAlignment(Pos.CENTER);
-        Button studentLoginBtn = new Button("Login");
-        studentLoginBtn.setStyle("-fx-background-color: #00796b; -fx-text-fill: white; -fx-font-size: 16px; -fx-background-radius: 20; -fx-padding: 8 24;");
-        studentLoginBtn.setOnAction(e -> StudentLoginPage.show(primaryStage));
-        Button studentSignupBtn = new Button("Sign Up");
-        studentSignupBtn.setStyle("-fx-background-color: #fbc02d; -fx-text-fill: #fffde7; -fx-font-size: 16px; -fx-background-radius: 20; -fx-padding: 8 24;");
-        studentSignupBtn.setOnAction(e -> StudentSignupPage.show(primaryStage));
-        studentBtnBox.getChildren().addAll(studentLoginBtn, studentSignupBtn);
-        studentBox.getChildren().addAll(studentLabel, studentBtnBox);
+        VBox btnBox = new VBox(20, loginBtn, signupBtn);
+        btnBox.setAlignment(Pos.CENTER);
 
-        // --- Admin Section ---
-        VBox adminBox = new VBox(10);
-        adminBox.setAlignment(Pos.CENTER);
-        Label adminLabel = new Label("🧑‍💼 Admin");
-        adminLabel.setFont(Font.font("Comic Sans MS", 20));
-        HBox adminBtnBox = new HBox(16);
-        adminBtnBox.setAlignment(Pos.CENTER);
-        Button adminLoginBtn = new Button("Login");
-        adminLoginBtn.setStyle("-fx-background-color: #6a1b9a; -fx-text-fill: white; -fx-font-size: 16px; -fx-background-radius: 20; -fx-padding: 8 24;");
-        adminLoginBtn.setOnAction(e -> AdminLoginPage.show(primaryStage));
-        Button adminSignupBtn = new Button("Sign Up");
-        adminSignupBtn.setStyle("-fx-background-color: #ffd54f; -fx-text-fill: #6a1b9a; -fx-font-size: 16px; -fx-background-radius: 20; -fx-padding: 8 24;");
-        adminSignupBtn.setOnAction(e -> AdminSignupPage.show(primaryStage));
-        adminBtnBox.getChildren().addAll(adminLoginBtn, adminSignupBtn);
-        adminBox.getChildren().addAll(adminLabel, adminBtnBox);
-
-        VBox userBox = new VBox(24, studentBox, adminBox);
-        userBox.setAlignment(Pos.CENTER);
-
-        root.getChildren().addAll(imageView, title, subtitle, userBox);
+        root.getChildren().addAll(imageView, title, subtitle, btnBox);
 
         Scene scene = new Scene(root, 900, 700);
+        com.ecoedu.Main.applyEcoEduTheme(scene);
         primaryStage.setScene(scene);
         primaryStage.setTitle("EcoEdu - Home");
         primaryStage.show();
@@ -89,7 +66,21 @@ public class Home extends Application{
 
     // After login/signup, show the student dashboard
     public static void showStudentDashboard(Stage primaryStage) {
+        System.out.println("Navigating to StudentDashboard on stage: " + primaryStage);
         StudentDashboard.show(primaryStage);
+    }
+    // Add a method to return to Home
+    public static void showHome(Stage primaryStage) {
+        try {
+            System.out.println("Navigating to Home on stage: " + primaryStage);
+            new Home().start(primaryStage);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    public static void showAdminDashboard(Stage primaryStage) {
+        System.out.println("Navigating to AdminDashboard on stage: " + primaryStage);
+        AdminDashboard.show(primaryStage);
     }
     
 }

@@ -13,6 +13,10 @@ import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import javafx.animation.FadeTransition;
 import javafx.scene.shape.Circle;
+import com.ecoedu.dashboard.FeedbackSupportPage;
+import com.ecoedu.dashboard.SystemLogsPage;
+import com.ecoedu.dashboard.RealTimeUserManagementPage;
+import com.ecoedu.dashboard.StudentDashboardWithBack;
 
 public class AdminDashboard extends BorderPane {
     private Stage primaryStage;
@@ -77,6 +81,10 @@ public class AdminDashboard extends BorderPane {
         sidebar.getChildren().add(makeSidebarButton("📚 Manage Modules", this::showManageModules));
         sidebar.getChildren().add(makeSidebarButton("📝 Review Quizzes", this::showReviewQuizzes));
         sidebar.getChildren().add(makeSidebarButton("🏆 Leaderboard & Badges", this::showLeaderboardAndBadges));
+        sidebar.getChildren().add(makeSidebarButton("🔄 Real-Time User Management", this::showRealTimeUserManagement));
+        sidebar.getChildren().add(makeSidebarButton("📝 System Logs", this::showSystemLogs));
+        sidebar.getChildren().add(makeSidebarButton("💬 Feedback & Support", this::showFeedbackSupport));
+        sidebar.getChildren().add(makeSidebarButton("🔀 Switch to Student Dashboard", this::switchToStudentDashboard));
         setLeft(sidebar);
 
         // --- Notifications Area ---
@@ -153,6 +161,22 @@ public class AdminDashboard extends BorderPane {
     private void showLeaderboardAndBadges() {
         headerTitle.setText("Leaderboard & Badges");
         mainContent.getChildren().setAll(new com.ecoedu.leaderboard.LeaderboardAndBadgesPage(primaryStage));
+    }
+    private void showRealTimeUserManagement() {
+        headerTitle.setText("Real-Time User Management");
+        mainContent.getChildren().setAll(new RealTimeUserManagementPage(primaryStage));
+    }
+    private void showSystemLogs() {
+        headerTitle.setText("System Logs");
+        mainContent.getChildren().setAll(new SystemLogsPage(primaryStage));
+    }
+    private void showFeedbackSupport() {
+        headerTitle.setText("Feedback & Support");
+        mainContent.getChildren().setAll(new FeedbackSupportPage(primaryStage));
+    }
+    private void switchToStudentDashboard() {
+        headerTitle.setText("Student Dashboard (Admin View)");
+        mainContent.getChildren().setAll(new StudentDashboardWithBack(primaryStage));
     }
 
     public static void show(Stage primaryStage) {
