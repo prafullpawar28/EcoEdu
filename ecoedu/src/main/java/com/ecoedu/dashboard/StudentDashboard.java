@@ -323,7 +323,7 @@ public class StudentDashboard extends VBox {
 
     public static void show(Stage primaryStage) {
         // Mock providers for demonstration
-        StudentProfile profile = new StudentProfile("Eco Kid", "/Assets/Images/avatar.png", "Eco Explorer", 0.65, 4);
+        
         List<DashboardCard> cards = List.of(
             new DashboardCard("\uD83D\uDCDA Modules", "3 new modules!", "#81c784", "/Assets/Images/module.png", () -> {
                 try {
@@ -350,21 +350,9 @@ public class StudentDashboard extends VBox {
             new DashboardCard("\uD83E\uDDD1\u200D\uD83C\uDFA8 Avatar Customization", "Style your eco hero!", "#4fc3f7", "/Assets/Images/avatar.png", () -> {
                 try {
                     com.ecoedu.avatar.AvatarCustomizer customizer = new com.ecoedu.avatar.AvatarCustomizer();
-                    javafx.scene.control.Button backBtn = new javafx.scene.control.Button("Back to Dashboard");
-                    backBtn.setFont(javafx.scene.text.Font.font("Quicksand", javafx.scene.text.FontWeight.BOLD, 16));
-                    backBtn.setStyle("-fx-background-color: #43e97b; -fx-text-fill: white; -fx-background-radius: 18; -fx-padding: 10 36; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, #43e97b, 8, 0.2, 0, 2);");
-                    backBtn.setOnAction(ev -> StudentDashboard.show(primaryStage));
-                    if (customizer.getChildren().size() > 0 && customizer.getChildren().get(customizer.getChildren().size()-1) instanceof javafx.scene.layout.VBox) {
-                        ((javafx.scene.layout.VBox)customizer.getChildren().get(customizer.getChildren().size()-1)).getChildren().add(backBtn);
-                    } else {
-                        customizer.getChildren().add(backBtn);
-                    }
-                    Scene scene = new Scene(customizer, 1366, 768);
-                    primaryStage.setScene(scene);
-                    primaryStage.setTitle("EcoEdu - Avatar Customization");
-                    primaryStage.show();
+                    customizer.start(primaryStage);
                 } catch (Exception e) {
-                    e.printStackTrace(); // Print the real error to the console
+                    e.printStackTrace();
                     Alert alert = new Alert(Alert.AlertType.INFORMATION);
                     alert.setTitle("Coming Soon");
                     alert.setHeaderText(null);

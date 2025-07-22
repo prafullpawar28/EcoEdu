@@ -13,6 +13,30 @@ public class LeaderboardService {
         return instance;
     }
 
+    public LeaderboardService() {
+        // Demo data for a more realistic leaderboard
+        userStats.put("Eco Kid", new UserStats("Eco Kid"));
+        userStats.put("Green Guru", new UserStats("Green Guru"));
+        userStats.put("Planet Pro", new UserStats("Planet Pro"));
+        userStats.put("Recycle Ranger", new UserStats("Recycle Ranger"));
+        userStats.put("Nature Ninja", new UserStats("Nature Ninja"));
+        userStats.get("Eco Kid").score = 120;
+        userStats.get("Eco Kid").badges.addAll(Arrays.asList("Quiz Master", "Minigame Master"));
+        userStats.get("Green Guru").score = 150;
+        userStats.get("Green Guru").badges.addAll(Arrays.asList("Quiz Master", "Quiz Master", "Minigame Master"));
+        userStats.get("Planet Pro").score = 90;
+        userStats.get("Planet Pro").badges.addAll(Arrays.asList("Quiz Master"));
+        userStats.get("Recycle Ranger").score = 70;
+        userStats.get("Recycle Ranger").badges.addAll(Arrays.asList("Minigame Master"));
+        userStats.get("Nature Ninja").score = 60;
+        userStats.get("Nature Ninja").badges.addAll(Arrays.asList("Quiz Master"));
+        activityFeed.add(new Activity("Eco Kid", "completed quiz: Eco Basics", new Date(System.currentTimeMillis() - 1000 * 60 * 2)));
+        activityFeed.add(new Activity("Green Guru", "completed minigame: Ocean Cleanup", new Date(System.currentTimeMillis() - 1000 * 60 * 5)));
+        activityFeed.add(new Activity("Planet Pro", "earned badge: Quiz Master", new Date(System.currentTimeMillis() - 1000 * 60 * 10)));
+        activityFeed.add(new Activity("Recycle Ranger", "completed quiz: Recycling", new Date(System.currentTimeMillis() - 1000 * 60 * 15)));
+        activityFeed.add(new Activity("Nature Ninja", "earned badge: Minigame Master", new Date(System.currentTimeMillis() - 1000 * 60 * 20)));
+    }
+
     public void setCurrentUser(String name) { currentUser = name; }
     public String getCurrentUser() { return currentUser; }
 

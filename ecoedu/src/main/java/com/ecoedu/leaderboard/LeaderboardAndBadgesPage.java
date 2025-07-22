@@ -16,6 +16,7 @@ import javafx.stage.Stage;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import com.ecoedu.leaderboard.LeaderboardService;
+import javafx.scene.layout.Region;
 
 public class LeaderboardAndBadgesPage extends VBox {
     public LeaderboardAndBadgesPage(Stage primaryStage) {
@@ -24,25 +25,32 @@ public class LeaderboardAndBadgesPage extends VBox {
         setAlignment(Pos.TOP_CENTER);
         setStyle("-fx-background-color: linear-gradient(to bottom right, #e1f5fe 60%, #fffde7 100%);");
 
-        // Back button
-        HBox topBar = new HBox();
-        topBar.setAlignment(Pos.TOP_LEFT);
-        Button backBtn = new Button("← Back to Dashboard");
-        backBtn.setStyle("-fx-background-color: #0288d1; -fx-text-fill: white; -fx-font-size: 15px; -fx-background-radius: 20; -fx-padding: 8 24; -fx-cursor: hand;");
-        backBtn.setOnAction(e -> com.ecoedu.dashboard.StudentDashboard.show(primaryStage));
-        topBar.getChildren().add(backBtn);
-        getChildren().add(topBar);
-
+        // Modern Header
+        HBox header = new HBox();
+        header.setAlignment(Pos.CENTER_LEFT);
+        header.setSpacing(18);
+        header.setStyle("-fx-background-radius: 0 0 32 32; -fx-background-color: linear-gradient(to right, #43e97b 0%, #38f9d7 100%); -fx-effect: dropshadow(gaussian, #43e97b, 12, 0.2, 0, 4);");
+        Label icon = new Label("🏆");
+        icon.setFont(Font.font("Quicksand", FontWeight.BOLD, 40));
         Label title = new Label("Leaderboard & Badges");
         title.setFont(Font.font("Quicksand", FontWeight.BOLD, 32));
-        title.setTextFill(Color.web("#0288d1"));
-        getChildren().add(title);
+        title.setTextFill(Color.web("#fffde7"));
+        Button backBtn = new Button("← Back to Dashboard");
+        backBtn.setStyle("-fx-background-color: #fffde7; -fx-text-fill: #43e97b; -fx-font-size: 15px; -fx-background-radius: 20; -fx-padding: 8 24; -fx-cursor: hand;");
+        backBtn.setOnAction(e -> com.ecoedu.dashboard.StudentDashboard.show(primaryStage));
+        Region headerSpacer = new Region();
+        HBox.setHgrow(headerSpacer, javafx.scene.layout.Priority.ALWAYS);
+        Button refreshBtn = new Button("⟳ Refresh");
+        refreshBtn.setStyle("-fx-background-color: #43e97b; -fx-text-fill: white; -fx-background-radius: 16; -fx-padding: 8 24; -fx-cursor: hand;");
+        refreshBtn.setOnAction(e -> com.ecoedu.leaderboard.LeaderboardAndBadgesPage.show(primaryStage));
+        header.getChildren().addAll(icon, title, headerSpacer, refreshBtn, backBtn);
+        getChildren().add(header);
 
         // Leaderboard
         VBox leaderboardBox = new VBox(10);
         leaderboardBox.setAlignment(Pos.CENTER);
         leaderboardBox.setPadding(new Insets(16));
-        Label lbTitle = new Label("🏆 Top Eco Heroes");
+        Label lbTitle = new Label("🏅 Top Eco Heroes");
         lbTitle.setFont(Font.font("Quicksand", FontWeight.BOLD, 22));
         lbTitle.setTextFill(Color.web("#43a047"));
         leaderboardBox.getChildren().add(lbTitle);
@@ -52,14 +60,14 @@ public class LeaderboardAndBadgesPage extends VBox {
             LeaderboardService.UserStats stats = leaderboard.get(i);
             HBox row = new HBox(18);
             row.setAlignment(Pos.CENTER_LEFT);
-            row.setPadding(new Insets(6));
+            row.setPadding(new Insets(8));
             Label rank = new Label("#" + (i + 1));
-            rank.setFont(Font.font("Quicksand", FontWeight.BOLD, 18));
+            rank.setFont(Font.font("Quicksand", FontWeight.BOLD, 20));
             Label name = new Label(stats.name);
-            name.setFont(Font.font("Quicksand", FontWeight.BOLD, 18));
+            name.setFont(Font.font("Quicksand", FontWeight.BOLD, 20));
             name.setTextFill(stats.name.equals(currentUser) ? Color.web("#ffb300") : Color.web("#263238"));
             Label score = new Label("Score: " + stats.score);
-            score.setFont(Font.font("Quicksand", 16));
+            score.setFont(Font.font("Quicksand", 17));
             // Show quizzes and minigames stats
             Label quizStat = new Label("📝 Quizzes: " + stats.badges.stream().filter(b -> b.contains("Quiz Master")).count());
             quizStat.setFont(Font.font("Quicksand", 15));
@@ -68,11 +76,11 @@ public class LeaderboardAndBadgesPage extends VBox {
             HBox badges = new HBox(4);
             for (String badge : stats.badges) {
                 Label badgeIcon = new Label(badge.contains("Quiz") ? "🏅" : "🎖");
-                badgeIcon.setFont(Font.font(20));
+                badgeIcon.setFont(Font.font(22));
                 badges.getChildren().add(badgeIcon);
             }
             row.getChildren().addAll(rank, name, score, quizStat, gameStat, badges);
-            row.setStyle(stats.name.equals(currentUser) ? "-fx-background-color: #fffde7; -fx-background-radius: 16; -fx-effect: dropshadow(gaussian, #ffd54f, 8, 0.1, 0, 2);" : "");
+            row.setStyle(stats.name.equals(currentUser) ? "-fx-background-color: #fffde7; -fx-background-radius: 18; -fx-effect: dropshadow(gaussian, #ffd54f, 10, 0.15, 0, 3);" : "-fx-background-radius: 18;");
             leaderboardBox.getChildren().add(row);
         }
         getChildren().add(leaderboardBox);
@@ -89,8 +97,8 @@ public class LeaderboardAndBadgesPage extends VBox {
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
         for (int i = 0; i < Math.min(10, activityFeed.size()); i++) {
             LeaderboardService.Activity act = activityFeed.get(i);
-            String icon = act.action.contains("quiz") ? "📝" : (act.action.contains("minigame") ? "🎮" : " 389");
-            Label actLabel = new Label(icon + " " + sdf.format(act.date) + " - " + act.user + " " + act.action);
+            String iconStr = act.action.contains("quiz") ? "📝" : (act.action.contains("minigame") ? "🎮" : "🏅");
+            Label actLabel = new Label(iconStr + " " + sdf.format(act.date) + " - " + act.user + " " + act.action);
             actLabel.setFont(Font.font("Quicksand", 15));
             actLabel.setTextFill(Color.web("#388e3c"));
             activityBox.getChildren().add(actLabel);
@@ -116,7 +124,7 @@ public class LeaderboardAndBadgesPage extends VBox {
         HBox myBadges = new HBox(4);
         for (String badge : me.badges) {
             Label badgeIcon = new Label(badge.contains("Quiz") ? "🏅" : "🎖");
-            badgeIcon.setFont(Font.font(20));
+            badgeIcon.setFont(Font.font(22));
             myBadges.getChildren().add(badgeIcon);
         }
         myBox.getChildren().add(myBadges);
