@@ -43,7 +43,7 @@ public class StudentProfileDialog {
         HBox badgesBox = new HBox(4);
         badgesBox.setAlignment(Pos.CENTER);
         for (int i = 0; i < profile.getBadges(); i++) {
-            Label badge = new Label("🏅");
+            Label badge = new Label("\ud83c\udfc5");
             badge.setFont(Font.font(22));
             badgesBox.getChildren().add(badge);
         }
@@ -51,7 +51,7 @@ public class StudentProfileDialog {
         closeBtn.setStyle("-fx-background-color: #81c784; -fx-text-fill: white; -fx-font-size: 16px; -fx-background-radius: 16; -fx-padding: 8 32; -fx-cursor: hand;");
         closeBtn.setOnAction(e -> dialog.close());
         root.getChildren().addAll(avatarImg, nameLabel, levelLabel, badgesBox, closeBtn);
-        Scene scene = new Scene(root, 340, 340);
+        Scene scene = new Scene(root, 1366, 768);
         dialog.setScene(scene);
         dialog.showAndWait();
     }

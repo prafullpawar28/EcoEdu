@@ -361,7 +361,7 @@ public class DailyChallengePage extends VBox {
     // --- Utility to launch daily challenge page ---
     public static void show(Stage primaryStage) {
         DailyChallengePage page = new DailyChallengePage(primaryStage);
-        Scene scene = new Scene(page, 900, 700);
+        Scene scene = new Scene(page, 1366, 768);
         primaryStage.setScene(scene);
         primaryStage.setTitle("EcoEdu - Daily Challenges");
         primaryStage.show();

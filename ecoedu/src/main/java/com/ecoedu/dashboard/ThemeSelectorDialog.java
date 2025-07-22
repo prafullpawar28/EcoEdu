@@ -37,7 +37,7 @@ public class ThemeSelectorDialog {
             dialog.close();
         });
         root.getChildren().addAll(btnBox, applyBtn);
-        Scene scene = new Scene(root, 320, 180);
+        Scene scene = new Scene(root, 1366, 768);
         dialog.setScene(scene);
         dialog.showAndWait();
     }

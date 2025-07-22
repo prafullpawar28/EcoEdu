@@ -125,7 +125,7 @@ public class LeaderboardAndBadgesPage extends VBox {
 
     public static void show(Stage primaryStage) {
         LeaderboardAndBadgesPage page = new LeaderboardAndBadgesPage(primaryStage);
-        Scene scene = new Scene(page, 900, 700);
+        Scene scene = new Scene(page, 1366, 768);
         primaryStage.setScene(scene);
         primaryStage.setTitle("EcoEdu - Leaderboard & Badges");
         primaryStage.show();

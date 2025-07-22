@@ -14,12 +14,25 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
+import java.util.ArrayList;
+import java.util.List;
 
 // Add a static ProfileData class for demo purposes
 class ProfileData {
     public static String name = "";
     public static String email = "";
     public static String avatarPath = null;
+    // Simulate a user database
+    public static List<User> users = new ArrayList<>();
+    public static class User {
+        public String name, email, password, role;
+        public User(String name, String email, String password, String role) {
+            this.name = name;
+            this.email = email;
+            this.password = password;
+            this.role = role;
+        }
+    }
 }
 
 public class StudentSignupPage extends VBox {
@@ -36,25 +49,38 @@ public class StudentSignupPage extends VBox {
         setAlignment(Pos.CENTER);
         getStyleClass().add("root");
 
-        StackPane background = new StackPane();
-        background.setStyle("-fx-background-color: linear-gradient(to bottom right, #A8E6CF, #FFD3B6);");
-        background.setPrefSize(500, 650);
+        // Background image
+        StackPane root = new StackPane();
+        ImageView bgImage = new ImageView();
+        try {
+            bgImage.setImage(new Image(getClass().getResourceAsStream("/Assets/Images/login_signup.jpg")));
+        } catch (Exception e) {
+            bgImage.setImage(null);
+        }
+        bgImage.setFitWidth(1366);
+        bgImage.setFitHeight(768);
+        bgImage.setPreserveRatio(false);
+        bgImage.setOpacity(0.92);
 
-        VBox card = new VBox(24);
+        VBox card = new VBox(22);
         card.getStyleClass().add("eco-card");
         card.setAlignment(Pos.CENTER);
         card.setMaxWidth(400);
+        card.setMaxHeight(480);
+        card.setMinHeight(420);
+        card.setPadding(new Insets(24, 32, 24, 32));
+        card.setStyle("-fx-background-color: transparent; " +
+            "-fx-background-radius: 28; " +
+            "-fx-border-color: rgba(255,255,255,0.7); " +
+            "-fx-border-width: 2.5; " +
+            "-fx-border-radius: 28; " +
+            "-fx-effect: dropshadow(gaussian, #00000055, 32, 0.18, 0, 8);");
 
-        // Lottie animation placeholder (replace with real Lottie integration if available)
-        ImageView ecoAnim = new ImageView(new Image(getClass().getResource("/Assets/Images/welcomepage.jpg").toExternalForm()));
-        ecoAnim.setFitWidth(120);
-        ecoAnim.setFitHeight(120);
-        ecoAnim.setClip(new Circle(60, 60, 60));
-        ecoAnim.setStyle("-fx-effect: dropshadow(gaussian, #A8E6CF, 12, 0.2, 0, 4);");
-
-        Label title = new Label("Join EcoEdu");
-        title.getStyleClass().add("eco-title");
-        title.setStyle("-fx-font-family: 'Quicksand', 'Nunito', sans-serif;");
+        Label title = new Label("Sign Up");
+        title.setFont(Font.font("Quicksand", FontWeight.BOLD, 32));
+        title.setTextFill(Color.web("#6a1b9a"));
+        title.setStyle("-fx-effect: dropshadow(gaussian, #fff, 8, 0.2, 0, 2); -fx-padding: 0 0 18 0; -fx-alignment: center;");
+        card.setAlignment(Pos.CENTER);
 
         HBox nameBox = new HBox(8);
         Label nameIcon = new Label("\uD83C\uDF33"); // Tree emoji as icon
@@ -62,6 +88,8 @@ public class StudentSignupPage extends VBox {
         nameField = new TextField();
         nameField.setPromptText("Full Name");
         nameField.getStyleClass().add("eco-field");
+        nameField.setStyle("-fx-background-radius: 16; -fx-background-color: rgba(255,255,255,0.7); -fx-font-size: 16px; -fx-padding: 8 16; -fx-border-radius: 16; -fx-border-color: #b2dfdb; -fx-border-width: 1.2;");
+        nameField.setPrefWidth(280);
         nameBox.setAlignment(Pos.CENTER_LEFT);
         nameBox.getChildren().addAll(nameIcon, nameField);
 
@@ -71,6 +99,8 @@ public class StudentSignupPage extends VBox {
         emailField = new TextField();
         emailField.setPromptText("Email");
         emailField.getStyleClass().add("eco-field");
+        emailField.setStyle("-fx-background-radius: 16; -fx-background-color: rgba(255,255,255,0.7); -fx-font-size: 16px; -fx-padding: 8 16; -fx-border-radius: 16; -fx-border-color: #b2dfdb; -fx-border-width: 1.2;");
+        emailField.setPrefWidth(280);
         emailBox.setAlignment(Pos.CENTER_LEFT);
         emailBox.getChildren().addAll(emailIcon, emailField);
 
@@ -80,6 +110,8 @@ public class StudentSignupPage extends VBox {
         passwordField = new PasswordField();
         passwordField.setPromptText("Password");
         passwordField.getStyleClass().add("eco-field");
+        passwordField.setStyle("-fx-background-radius: 16; -fx-background-color: rgba(255,255,255,0.7); -fx-font-size: 16px; -fx-padding: 8 16; -fx-border-radius: 16; -fx-border-color: #b2dfdb; -fx-border-width: 1.2;");
+        passwordField.setPrefWidth(280);
         passBox.setAlignment(Pos.CENTER_LEFT);
         passBox.getChildren().addAll(passIcon, passwordField);
 
@@ -89,6 +121,8 @@ public class StudentSignupPage extends VBox {
         confirmPasswordField = new PasswordField();
         confirmPasswordField.setPromptText("Confirm Password");
         confirmPasswordField.getStyleClass().add("eco-field");
+        confirmPasswordField.setStyle("-fx-background-radius: 16; -fx-background-color: rgba(255,255,255,0.7); -fx-font-size: 16px; -fx-padding: 8 16; -fx-border-radius: 16; -fx-border-color: #b2dfdb; -fx-border-width: 1.2;");
+        confirmPasswordField.setPrefWidth(280);
         confirmBox.setAlignment(Pos.CENTER_LEFT);
         confirmBox.getChildren().addAll(confirmIcon, confirmPasswordField);
 
@@ -96,25 +130,33 @@ public class StudentSignupPage extends VBox {
         roleDropdown.getItems().addAll("Child", "Parent", "Teacher");
         roleDropdown.setPromptText("Select Role");
         roleDropdown.getStyleClass().add("eco-dropdown");
-        roleDropdown.setMaxWidth(300);
+        roleDropdown.setMaxWidth(280);
+        roleDropdown.setStyle("-fx-background-radius: 16; -fx-background-color: rgba(255,255,255,0.7); -fx-font-size: 16px; -fx-padding: 8 16; -fx-border-radius: 16; -fx-border-color: #b2dfdb; -fx-border-width: 1.2;");
+        roleDropdown.setPrefWidth(280);
 
         Button signupBtn = new Button("Sign Up");
         signupBtn.getStyleClass().add("eco-btn");
+        signupBtn.setStyle("-fx-background-color: linear-gradient(to right, #43e97b, #00c6ff); -fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold; -fx-background-radius: 24; -fx-padding: 12 40; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, #43e97b, 8, 0.2, 0, 2); -fx-border-color: rgba(255,255,255,0.4); -fx-border-width: 2; -fx-border-radius: 24; -fx-background-insets: 0;");
         signupBtn.setOnAction(e -> handleSignup());
+        signupBtn.setOnMouseEntered(e -> signupBtn.setStyle("-fx-background-color: linear-gradient(to right, #00c6ff, #43e97b); -fx-text-fill: #fff; -fx-font-size: 20px; -fx-font-weight: bold; -fx-background-radius: 24; -fx-padding: 12 40; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, #00c6ff, 12, 0.3, 0, 4); -fx-border-color: #fff; -fx-border-width: 2; -fx-border-radius: 24; -fx-background-insets: 0; -fx-scale-x:1.07;-fx-scale-y:1.07;"));
+        signupBtn.setOnMouseExited(e -> signupBtn.setStyle("-fx-background-color: linear-gradient(to right, #43e97b, #00c6ff); -fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold; -fx-background-radius: 24; -fx-padding: 12 40; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, #43e97b, 8, 0.2, 0, 2); -fx-border-color: rgba(255,255,255,0.4); -fx-border-width: 2; -fx-border-radius: 24; -fx-background-insets: 0;"));
 
         HBox links = new HBox(16);
         links.setAlignment(Pos.CENTER);
         Hyperlink loginLink = new Hyperlink("Already have an account? Login");
         loginLink.getStyleClass().add("eco-link");
+        loginLink.setStyle("-fx-border-color: #43e97b; -fx-border-width: 2; -fx-border-radius: 12; -fx-font-size: 15px; -fx-font-weight: bold; -fx-padding: 6 18; -fx-background-radius: 12; -fx-text-fill: #43e97b; -fx-background-color: rgba(255,255,255,0.5);");
         loginLink.setOnAction(e -> StudentLoginPage.show(primaryStage));
+        loginLink.setOnMouseEntered(e2 -> loginLink.setStyle("-fx-border-color: #00c6ff; -fx-border-width: 2; -fx-border-radius: 12; -fx-font-size: 15px; -fx-font-weight: bold; -fx-padding: 6 18; -fx-background-radius: 12; -fx-text-fill: #00c6ff; -fx-background-color: #e0f7fa;"));
+        loginLink.setOnMouseExited(e2 -> loginLink.setStyle("-fx-border-color: #43e97b; -fx-border-width: 2; -fx-border-radius: 12; -fx-font-size: 15px; -fx-font-weight: bold; -fx-padding: 6 18; -fx-background-radius: 12; -fx-text-fill: #43e97b; -fx-background-color: rgba(255,255,255,0.5);"));
         links.getChildren().add(loginLink);
 
         messageLabel = new Label("");
         messageLabel.getStyleClass().add("eco-error");
 
-        card.getChildren().addAll(ecoAnim, title, nameBox, emailBox, passBox, confirmBox, roleDropdown, signupBtn, links, messageLabel);
-        background.getChildren().add(card);
-        getChildren().add(background);
+        card.getChildren().addAll(title, nameBox, emailBox, passBox, confirmBox, roleDropdown, signupBtn, links, messageLabel);
+        root.getChildren().addAll(bgImage, card);
+        getChildren().add(root);
     }
 
     private void handleSignup() {
@@ -122,30 +164,42 @@ public class StudentSignupPage extends VBox {
         String password = passwordField.getText();
         String confirmPassword = confirmPasswordField.getText();
         String name = nameField.getText();
+        String role = ((ComboBox<String>) ((VBox) getChildren().get(0)).lookup(".combo-box")).getValue();
         messageLabel.setText("");
         if (email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() || name.isEmpty()) {
             messageLabel.setText("Please fill all fields.");
+            return;
+        }
+        if (!email.contains("@") || !email.contains(".")) {
+            messageLabel.setText("Please enter a valid email address.");
             return;
         }
         if (!password.equals(confirmPassword)) {
             messageLabel.setText("Passwords do not match.");
             return;
         }
+        if (role == null || role.isEmpty()) {
+            messageLabel.setText("Please select a role.");
+            return;
+        }
+        // Check for duplicate email
+        for (ProfileData.User u : ProfileData.users) {
+            if (u.email.equalsIgnoreCase(email)) {
+                messageLabel.setText("Email already registered. Please use a different email.");
+                return;
+            }
+        }
         // Save to ProfileData
         ProfileData.name = name;
         ProfileData.email = email;
-        // TODO: Save to Firebase in the future
-        boolean signupSuccess = true; // Replace with real check
-        if (signupSuccess) {
-            com.ecoedu.dashboard.ProfilePage.show(primaryStage, false);
-        } else {
-            messageLabel.setText("Signup failed. Try a different email.");
-        }
+        ProfileData.users.add(new ProfileData.User(name, email, password, role));
+        // After signup, navigate to login
+        StudentLoginPage.show(primaryStage);
     }
 
     public static void show(Stage primaryStage) {
         StudentSignupPage page = new StudentSignupPage(primaryStage);
-        Scene scene = new Scene(page, 500, 550);
+        Scene scene = new Scene(page, 1366, 768);
         // com.ecoedu.Main.applyEcoEduTheme(scene);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Student Sign Up");

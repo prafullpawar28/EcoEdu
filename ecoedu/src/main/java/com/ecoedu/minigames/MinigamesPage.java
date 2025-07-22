@@ -73,7 +73,7 @@ public class MinigamesPage extends VBox {
 
     public static void show(Stage primaryStage) {
         MinigamesPage page = new MinigamesPage(primaryStage);
-        Scene scene = new Scene(page, 900, 700);
+        Scene scene = new Scene(page, 1366, 768);
         primaryStage.setScene(scene);
         primaryStage.setTitle("EcoEdu - Minigames");
         primaryStage.show();

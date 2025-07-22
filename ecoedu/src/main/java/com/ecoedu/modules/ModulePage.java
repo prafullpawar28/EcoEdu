@@ -217,7 +217,7 @@ public class ModulePage extends VBox {
 
     public static void show(Stage primaryStage) {
         ModulePage page = new ModulePage(primaryStage);
-        Scene scene = new Scene(page, 900, 700);
+        Scene scene = new Scene(page, 1366, 768);
         primaryStage.setScene(scene);
         primaryStage.setTitle("EcoEdu - Modules");
         primaryStage.show();

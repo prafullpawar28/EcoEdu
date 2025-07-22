@@ -23,7 +23,7 @@ public class StudentSettingsView extends VBox {
         tabPane.getTabs().add(createTab("Help"));
         Button closeBtn = new Button("Close");
         closeBtn.getStyleClass().add("eco-btn");
-        closeBtn.setOnAction(e -> primaryStage.setScene(new Scene(new StudentDashboard(primaryStage), 900, 700)));
+        closeBtn.setOnAction(e -> primaryStage.setScene(new Scene(new StudentDashboard(primaryStage), 1366, 768)));
         getChildren().addAll(title, tabPane, closeBtn);
     }
     private Tab createTab(String name) {
@@ -38,7 +38,7 @@ public class StudentSettingsView extends VBox {
     }
     public static void show(Stage primaryStage) {
         StudentSettingsView view = new StudentSettingsView(primaryStage);
-        Scene scene = new Scene(view, 500, 500);
+        Scene scene = new Scene(view, 1366, 768);
         com.ecoedu.Main.applyEcoEduTheme(scene);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Student Settings");

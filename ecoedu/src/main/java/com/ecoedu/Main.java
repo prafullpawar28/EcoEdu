@@ -13,4 +13,3 @@ public class Main  {
         scene.getStylesheets().add(Main.class.getResource("/css/ecoedu-theme.css").toExternalForm());
     }
 }
-

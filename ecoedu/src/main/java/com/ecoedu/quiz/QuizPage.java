@@ -5,7 +5,6 @@ import javafx.animation.ScaleTransition;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
@@ -191,7 +190,7 @@ public class QuizPage extends VBox {
     public static void show(Stage primaryStage, String quizCategory) {
         List<Question> questions = QuizData.getQuestionsForCategory(quizCategory);
         QuizPage page = new QuizPage(primaryStage, quizCategory, questions);
-        Scene scene = new Scene(page, 900, 700);
+        Scene scene = new Scene(page, 1366, 768);
         primaryStage.setScene(scene);
         primaryStage.setTitle("EcoEdu - Quiz: " + quizCategory);
         primaryStage.show();

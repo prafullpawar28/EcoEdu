@@ -1,29 +1,26 @@
-package com.ecoedu.dashboard;
+package com.ecoedu.adminpanel;
 
-import javafx.geometry.Insets;
+
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
-import javafx.animation.FadeTransition;
-import javafx.util.Duration;
+import javafx.scene.layout.StackPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.shape.Circle;
-import javafx.scene.layout.HBox;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.ProgressIndicator;
-import javafx.scene.input.KeyCode;
-import javafx.scene.layout.StackPane;
-import javafx.scene.image.ImageView;
-import javafx.scene.shape.Circle;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
-import com.ecoedu.dashboard.AdminHelpDialog;
+import javafx.geometry.Insets;
 
 public class AdminLoginPage extends VBox {
     private Stage primaryStage;
@@ -38,28 +35,39 @@ public class AdminLoginPage extends VBox {
         this.primaryStage = primaryStage;
         setSpacing(0);
         setAlignment(Pos.CENTER);
-        setStyle("-fx-background-color: linear-gradient(to bottom right, #ede7f6, #e1f5fe);");
-
-        StackPane background = new StackPane();
-        background.setStyle("-fx-background-color: transparent;");
-        background.setPrefSize(500, 600);
+        // Background image
+        StackPane root = new StackPane();
+        ImageView bgImage = new ImageView();
+        try {
+            bgImage.setImage(new Image(getClass().getResourceAsStream("/Assets/Images/login_signup.jpg")));
+        } catch (Exception e) {
+            bgImage.setImage(null);
+        }
+        bgImage.setFitWidth(1366);
+        bgImage.setFitHeight(768);
+        bgImage.setPreserveRatio(false);
+        bgImage.setOpacity(0.92);
 
         VBox card = new VBox(24);
         card.setAlignment(Pos.CENTER);
         card.setMaxWidth(400);
-        card.setStyle("-fx-background-color: white; -fx-background-radius: 24; -fx-effect: dropshadow(gaussian, #6a1b9a, 16, 0.2, 0, 4);");
+        card.setMaxHeight(420);
+        card.setMinHeight(380);
+        card.setPadding(new Insets(24, 32, 24, 32));
+        card.setStyle("-fx-background-color: transparent; " +
+            "-fx-background-radius: 28; " +
+            "-fx-border-color: rgba(255,255,255,0.7); " +
+            "-fx-border-width: 2.5; " +
+            "-fx-border-radius: 28; " +
+            "-fx-effect: dropshadow(gaussian, #00000055, 32, 0.18, 0, 8);");
 
         // Animated admin icon
-        ImageView adminAnim = new ImageView();
-        try {
-            adminAnim.setImage(new Image(getClass().getResource("/Assets/Images/avatar.png").toExternalForm()));
-        } catch (Exception e) {
-            adminAnim.setImage(null);
-        }
-        adminAnim.setFitWidth(100);
-        adminAnim.setFitHeight(100);
-        adminAnim.setClip(new Circle(50, 50, 50));
-        adminAnim.setStyle("-fx-effect: dropshadow(gaussian, #6a1b9a, 12, 0.2, 0, 4);");
+        Circle avatarCircle = new Circle(50, Color.web("#fffde7"));
+        Label avatarLabel = new Label("A");
+        avatarLabel.setFont(Font.font("Segoe UI", FontWeight.BOLD, 40));
+        avatarLabel.setTextFill(Color.web("#6a1b9a"));
+        StackPane avatarPane = new StackPane(avatarCircle, avatarLabel);
+        card.getChildren().add(avatarPane);
 
         Label title = new Label("Welcome, Admin!");
         title.setFont(Font.font("Quicksand", FontWeight.BOLD, 28));
@@ -114,11 +122,6 @@ public class AdminLoginPage extends VBox {
         passwordField.setOnKeyPressed(e -> { if (e.getCode() == KeyCode.ENTER) handleLogin(); });
         passwordVisibleField.setOnKeyPressed(e -> { if (e.getCode() == KeyCode.ENTER) handleLogin(); });
 
-        Button helpBtn = new Button("Help");
-        helpBtn.setFont(Font.font("Quicksand", 14));
-        helpBtn.setStyle("-fx-background-color: #81c784; -fx-text-fill: white; -fx-background-radius: 16; -fx-padding: 6 24; -fx-cursor: hand;");
-        helpBtn.setOnAction(e -> AdminHelpDialog.show(primaryStage));
-
         messageLabel = new Label("");
         messageLabel.setFont(Font.font("Quicksand", 13));
         messageLabel.setTextFill(Color.web("#d32f2f"));
@@ -127,9 +130,14 @@ public class AdminLoginPage extends VBox {
         loadingIndicator.setVisible(false);
         loadingIndicator.setPrefSize(32, 32);
 
-        card.getChildren().setAll(adminAnim, title, subtitle, formBox, loginBtn, helpBtn, messageLabel, loadingIndicator);
-        background.getChildren().setAll(card);
-        getChildren().setAll(background);
+        Button backBtn = new Button("Back");
+        backBtn.setFont(Font.font("Quicksand", FontWeight.BOLD, 15));
+        backBtn.setStyle("-fx-background-color: #FFD3B6; -fx-text-fill: #6a1b9a; -fx-background-radius: 16; -fx-padding: 8 32; -fx-cursor: hand; margin-top: 16px;");
+        backBtn.setOnAction(e -> com.ecoedu.dashboard.StudentLoginPage.show(primaryStage));
+
+        card.getChildren().addAll(title, subtitle, formBox, loginBtn, messageLabel, loadingIndicator, backBtn);
+        root.getChildren().addAll(bgImage, card);
+        getChildren().add(root);
     }
 
     private void togglePasswordVisibility() {
@@ -153,18 +161,25 @@ public class AdminLoginPage extends VBox {
             return;
         }
         loadingIndicator.setVisible(true);
-        // Simulate loading and call real authentication service here
         new Thread(() -> {
-            try { Thread.sleep(1200); } catch (InterruptedException ignored) {}
+            try { Thread.sleep(800); } catch (InterruptedException ignored) {}
             javafx.application.Platform.runLater(() -> {
                 loadingIndicator.setVisible(false);
-                // TODO: Replace with real authentication logic, e.g.:
-                // boolean loginSuccess = AuthService.login(email, password);
-                boolean loginSuccess = true; // TEMP: allows any login for testing
-                if (loginSuccess) {
-                    AdminDashboard.show(primaryStage);
+                AdminDataService.User found = null;
+                for (AdminDataService.User u : AdminDataService.getInstance().getUsers()) {
+                    if (u.email.equalsIgnoreCase(email)) {
+                        found = u;
+                        break;
+                    }
+                }
+                if (found == null) {
+                    messageLabel.setText("No such user.");
+                } else if (!found.password.equals(password)) {
+                    messageLabel.setText("Incorrect password.");
+                } else if (!"Admin".equals(found.role)) {
+                    messageLabel.setText("Not an admin user.");
                 } else {
-                    messageLabel.setText("Invalid email or password.");
+                    AdminDashboard.show(primaryStage);
                 }
             });
         }).start();
@@ -172,7 +187,7 @@ public class AdminLoginPage extends VBox {
 
     public static void show(Stage primaryStage) {
         AdminLoginPage page = new AdminLoginPage(primaryStage);
-        Scene scene = new Scene(page, 500, 500);
+        Scene scene = new Scene(page, 1366, 768);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Admin Login");
         primaryStage.show();

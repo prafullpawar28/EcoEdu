@@ -84,7 +84,7 @@ public class SettingsPage extends VBox {
 
     public static void show(Stage primaryStage, boolean isAdmin) {
         SettingsPage page = new SettingsPage(primaryStage, isAdmin);
-        Scene scene = new Scene(page, 500, 500);
+        Scene scene = new Scene(page, 1366, 768);
         com.ecoedu.Main.applyEcoEduTheme(scene);
         primaryStage.setScene(scene);
         primaryStage.setTitle(isAdmin ? "Admin Settings" : "User Settings");

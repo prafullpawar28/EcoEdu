@@ -218,7 +218,7 @@ public class TrashSortingGame extends VBox {
         topBar.getChildren().add(backBtn);
         root.getChildren().add(topBar);
         root.getChildren().add(game);
-        Scene scene = new Scene(root, 900, 700);
+        Scene scene = new Scene(root, 1366, 768);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Trash Sorting Game");
         primaryStage.show();

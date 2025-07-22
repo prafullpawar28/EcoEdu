@@ -17,6 +17,7 @@ import javafx.stage.Stage;
 import javafx.scene.control.Hyperlink;
 import javafx.animation.FadeTransition;
 import javafx.util.Duration;
+import com.ecoedu.adminpanel.AdminPanelMain;
 
 public class StudentLoginPage extends VBox {
     private Stage primaryStage;
@@ -30,33 +31,38 @@ public class StudentLoginPage extends VBox {
         setAlignment(Pos.CENTER);
         getStyleClass().add("root");
 
-        StackPane background = new StackPane();
-        background.setStyle("-fx-background-color: linear-gradient(to bottom right, #A8E6CF, #DCEDC1);");
-        background.setPrefSize(500, 600);
+        // Background image
+        StackPane root = new StackPane();
+        ImageView bgImage = new ImageView();
+        try {
+            bgImage.setImage(new Image(getClass().getResourceAsStream("/Assets/Images/login_signup.jpg")));
+        } catch (Exception e) {
+            bgImage.setImage(null);
+        }
+        bgImage.setFitWidth(1366);
+        bgImage.setFitHeight(768);
+        bgImage.setPreserveRatio(false);
+        bgImage.setOpacity(0.92);
 
         VBox card = new VBox(24);
         card.getStyleClass().add("eco-card");
         card.setAlignment(Pos.CENTER);
         card.setMaxWidth(380);
+        card.setMaxHeight(420);
+        card.setMinHeight(380);
+        card.setPadding(new Insets(24, 32, 24, 32));
+        card.setStyle("-fx-background-color: transparent; " +
+            "-fx-background-radius: 28; " +
+            "-fx-border-color: rgba(255,255,255,0.7); " +
+            "-fx-border-width: 2.5; " +
+            "-fx-border-radius: 28; " +
+            "-fx-effect: dropshadow(gaussian, #00000055, 32, 0.18, 0, 8);");
+        // Lottie animation placeholder (replace with real Lottie integration if available)
 
-        // Animated eco icon
-        ImageView ecoAnim = new ImageView(new Image(getClass().getResource("/Assets/Images/loginpage1.jpg").toExternalForm()));
-        ecoAnim.setFitWidth(120);
-        ecoAnim.setFitHeight(120);
-        ecoAnim.setClip(new Circle(60, 60, 60));
-        ecoAnim.setStyle("-fx-effect: dropshadow(gaussian, #A8E6CF, 12, 0.2, 0, 4);");
-        FadeTransition fade = new FadeTransition(Duration.seconds(2), ecoAnim);
-        fade.setFromValue(0.7);
-        fade.setToValue(1.0);
-        fade.setCycleCount(FadeTransition.INDEFINITE);
-        fade.setAutoReverse(true);
-        fade.play();
-
-        Label title = new Label("Welcome to EcoEdu!");
-        title.getStyleClass().add("eco-title");
-        title.setStyle("-fx-font-family: 'Quicksand', 'Nunito', sans-serif; -fx-font-size: 26px;");
-        Label subtitle = new Label("Learn. Play. Grow. Save the Planet!");
-        subtitle.setStyle("-fx-font-size: 15px; -fx-text-fill: #388e3c; -fx-font-family: 'Quicksand', 'Nunito', sans-serif;");
+        Label welcome = new Label("Welcome, Student");
+        welcome.setFont(Font.font("Quicksand", FontWeight.BOLD, 35));
+        welcome.setTextFill(Color.web("rgb(37, 9, 54)"));
+        welcome.setStyle("-fx-effect: dropshadow(gaussian, #fff, 8, 0.2, 0, 2); -fx-padding: 0 0 18 0;");
 
         HBox emailBox = new HBox(8);
         Label emailIcon = new Label("\uD83D\uDCE7");
@@ -85,9 +91,9 @@ public class StudentLoginPage extends VBox {
 
         Button forgotBtn = new Button("Forgot Password?");
         forgotBtn.getStyleClass().add("eco-link");
-        forgotBtn.setOnAction(e -> {/* TODO: Add forgot password logic */});
-        forgotBtn.setStyle("-fx-background-color: transparent; -fx-padding: 0 0 0 0;");
+        forgotBtn.setStyle("-fx-background-color: transparent; -fx-padding: 0 0 0 0; -fx-text-fill: #388e3c; -fx-underline: true; -fx-cursor: hand;");
         forgotBtn.setTooltip(new Tooltip("Reset your password"));
+        forgotBtn.setOnAction(e -> showForgotPasswordDialog());
 
         HBox links = new HBox(16);
         links.setAlignment(Pos.CENTER);
@@ -103,19 +109,23 @@ public class StudentLoginPage extends VBox {
         // --- Admin Login and Back ---
         HBox adminBackBox = new HBox(24);
         adminBackBox.setAlignment(Pos.CENTER);
-        Hyperlink adminLoginLink = new Hyperlink("Admin Login");
-        adminLoginLink.getStyleClass().add("eco-link");
-        adminLoginLink.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #388E3C;");
-        adminLoginLink.setOnAction(e -> com.ecoedu.dashboard.AdminLoginPage.show(primaryStage));
+        Button adminLoginBtn = new Button("Admin Login");
+        adminLoginBtn.setFont(Font.font("Quicksand", FontWeight.BOLD, 15));
+        adminLoginBtn.setStyle("-fx-background-color: #FFD3B6; -fx-text-fill: white; -fx-background-radius: 16; -fx-padding: 8 32; -fx-cursor: hand; margin-top: 8px;");
+        adminLoginBtn.setOnAction(e -> com.ecoedu.adminpanel.AdminLoginPage.show(primaryStage));
+        adminLoginBtn.setOnMouseEntered(e -> adminLoginBtn.setStyle("-fx-background-color: #ffb74d; -fx-text-fill:  #388E3C; -fx-background-radius: 16; -fx-padding: 8 32; -fx-cursor: hand; margin-top: 8px; -fx-scale-x:1.07;-fx-scale-y:1.07; -fx-effect: dropshadow(gaussian , 12, 0.3, 0, 4);"));
+        adminLoginBtn.setOnMouseExited(e -> adminLoginBtn.setStyle("-fx-background-color:  #FFD3B6; -fx-text-fill: white; -fx-background-radius: 16; -fx-padding: 8 32; -fx-cursor: hand; margin-top: 8px;"));
         Button backBtn = new Button("Back");
         backBtn.getStyleClass().add("eco-btn");
         backBtn.setStyle("-fx-background-color: #FFD3B6; -fx-text-fill: #388E3C; -fx-font-size: 15px; -fx-background-radius: 20; -fx-padding: 6 24; -fx-cursor: hand;");
         backBtn.setOnAction(e -> com.ecoedu.Home.Home.showHome(primaryStage));
-        adminBackBox.getChildren().addAll(adminLoginLink, backBtn);
+        backBtn.setOnMouseEntered(e -> backBtn.setStyle("-fx-background-color: #ffb74d; -fx-text-fill: #fff; -fx-font-size: 15px; -fx-background-radius: 20; -fx-padding: 6 24; -fx-cursor: hand; -fx-scale-x:1.07;-fx-scale-y:1.07; -fx-effect: dropshadow(gaussian, #ffb74d, 12, 0.3, 0, 4);"));
+        backBtn.setOnMouseExited(e -> backBtn.setStyle("-fx-background-color: #FFD3B6; -fx-text-fill: #388E3C; -fx-font-size: 15px; -fx-background-radius: 20; -fx-padding: 6 24; -fx-cursor: hand;"));
+        adminBackBox.getChildren().addAll(adminLoginBtn, backBtn);
 
-        card.getChildren().addAll(ecoAnim, title, subtitle, emailBox, passBox, loginBtn, links, messageLabel, adminBackBox);
-        background.getChildren().add(card);
-        getChildren().add(background);
+        card.getChildren().addAll(welcome, emailBox, passBox, loginBtn, links, messageLabel, adminBackBox);
+        root.getChildren().addAll(bgImage, card);
+        getChildren().add(root);
     }
 
     private void handleLogin() {
@@ -136,9 +146,28 @@ public class StudentLoginPage extends VBox {
         }
     }
 
+    // --- Forgot Password Logic ---
+    private void showForgotPasswordDialog() {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Forgot Password");
+        dialog.setHeaderText("Reset your password");
+        dialog.setContentText("Enter your registered email:");
+        dialog.getDialogPane().setStyle("-fx-font-family: 'Quicksand', 'Nunito', sans-serif;");
+        dialog.showAndWait().ifPresent(email -> {
+            if (email.isEmpty() || !email.contains("@") || !email.contains(".")) {
+                Alert alert = new Alert(Alert.AlertType.ERROR, "Please enter a valid email address.", ButtonType.OK);
+                alert.showAndWait();
+                return;
+            }
+            // Simulate sending a reset link
+            Alert alert = new Alert(Alert.AlertType.INFORMATION, "If an account with this email exists, a password reset link has been sent.", ButtonType.OK);
+            alert.showAndWait();
+        });
+    }
+
     public static void show(Stage primaryStage) {
         StudentLoginPage page = new StudentLoginPage(primaryStage);
-        Scene scene = new Scene(page, 500, 500);
+        Scene scene = new Scene(page, 1366, 768);
          com.ecoedu.Main.applyEcoEduTheme(scene);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Student Login");

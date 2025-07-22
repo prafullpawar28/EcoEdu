@@ -24,7 +24,7 @@ public class ParentalControlsDialog {
         closeBtn.setStyle("-fx-background-color: #81c784; -fx-text-fill: white; -fx-font-size: 16px; -fx-background-radius: 16; -fx-padding: 8 32; -fx-cursor: hand;");
         closeBtn.setOnAction(e -> dialog.close());
         root.getChildren().addAll(info, closeBtn);
-        Scene scene = new Scene(root, 340, 160);
+        Scene scene = new Scene(root, 1366, 768);
         dialog.setScene(scene);
         dialog.showAndWait();
     }

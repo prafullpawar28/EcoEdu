@@ -9,7 +9,6 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -61,7 +60,7 @@ public class UserPanel extends VBox {
 
     public static void show(Stage primaryStage) {
         UserPanel panel = new UserPanel(primaryStage);
-        Scene scene = new Scene(panel, 700, 400);
+        Scene scene = new Scene(panel, 1366, 768);
         // com.ecoedu.Main.applyEcoEduTheme(scene);
         primaryStage.setScene(scene);
         primaryStage.setTitle("EcoEdu - User Panel");

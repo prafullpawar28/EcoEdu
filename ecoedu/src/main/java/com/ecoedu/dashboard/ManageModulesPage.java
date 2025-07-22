@@ -13,6 +13,8 @@ import javafx.stage.Stage;
 import java.util.Arrays;
 import java.util.List;
 
+import com.ecoedu.adminpanel.AdminDashboard;
+
 public class ManageModulesPage extends VBox {
     private Stage primaryStage;
 
@@ -88,7 +90,7 @@ public class ManageModulesPage extends VBox {
 
     public static void show(Stage primaryStage) {
         ManageModulesPage page = new ManageModulesPage(primaryStage);
-        Scene scene = new Scene(page, 800, 600);
+        Scene scene = new Scene(page, 1366, 768);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Manage Modules");
         primaryStage.show();

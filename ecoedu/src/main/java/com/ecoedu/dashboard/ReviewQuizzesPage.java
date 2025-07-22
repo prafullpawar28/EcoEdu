@@ -1,5 +1,6 @@
 package com.ecoedu.dashboard;
 
+import com.ecoedu.adminpanel.AdminPanelMain;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -23,7 +24,7 @@ public class ReviewQuizzesPage extends VBox {
         setAlignment(Pos.TOP_CENTER);
         setStyle("-fx-background-color: linear-gradient(to bottom right, #e1f5fe, #f3e5f5);");
 
-        Label title = new Label("📝 Review Quizzes");
+        Label title = new Label("\ud83d\udcdd Review Quizzes");
         title.setFont(Font.font("Comic Sans MS", FontWeight.BOLD, 32));
         title.setTextFill(Color.web("#0288d1"));
         getChildren().add(title);
@@ -68,10 +69,16 @@ public class ReviewQuizzesPage extends VBox {
         table.getItems().addAll(quizzes);
         getChildren().add(table);
 
-        Button backBtn = new Button("Back to Admin Dashboard");
+        Button backBtn = new Button("Back to Admin Panel");
         backBtn.setFont(Font.font("Comic Sans MS", FontWeight.BOLD, 16));
         backBtn.setStyle("-fx-background-color: #6a1b9a; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 10 36;");
-        backBtn.setOnAction(e -> AdminDashboard.show(primaryStage));
+        backBtn.setOnAction(e -> {
+            try {
+                AdminPanelMain.main(new String[]{});
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        });
         getChildren().add(backBtn);
     }
 
@@ -88,7 +95,7 @@ public class ReviewQuizzesPage extends VBox {
 
     public static void show(Stage primaryStage) {
         ReviewQuizzesPage page = new ReviewQuizzesPage(primaryStage);
-        Scene scene = new Scene(page, 800, 600);
+        Scene scene = new Scene(page, 1366, 768);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Review Quizzes");
         primaryStage.show();

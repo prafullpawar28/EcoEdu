@@ -1,5 +1,7 @@
 package com.ecoedu.dashboard;
 
+import com.ecoedu.adminpanel.AdminDashboard;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -47,7 +49,7 @@ public class AnalyticsPage extends VBox {
 
     public static void show(Stage primaryStage) {
         AnalyticsPage page = new AnalyticsPage(primaryStage);
-        Scene scene = new Scene(page, 700, 500);
+        Scene scene = new Scene(page, 1366, 768);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Analytics");
         primaryStage.show();

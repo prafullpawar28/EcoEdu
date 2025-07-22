@@ -229,7 +229,7 @@ public class AvatarCustomizer extends StackPane {
     }
 
     public void start(Stage stage) {
-        Scene scene = new Scene(this, 900, 700);
+        Scene scene = new Scene(this, 1366, 768);
         stage.setScene(scene);
         stage.setTitle("EcoEdu - Avatar Customization");
         stage.show();
