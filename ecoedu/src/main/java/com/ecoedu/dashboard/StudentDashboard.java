@@ -94,11 +94,12 @@ public class StudentDashboard extends VBox {
         profile = new StudentProfile("Eco Kid", "/Assets/Images/avatar.png", "Eco Explorer", 0.65, 4);
         cards = new ArrayList<>();
         cards.add(new DashboardCard("\uD83D\uDCDA Modules", "3 modules available!", "#81c784", "/Assets/Images/module.png", () -> openSection(() -> com.ecoedu.modules.ModulePage.show(primaryStage))));
-        cards.add(new DashboardCard("\uD83E\uDDE9 Quiz & Puzzles", "2 quizzes pending!", "#ffd54f", "/Assets/Images/quiz.png", () -> openSection(() -> com.ecoedu.quiz.QuizPage.show(primaryStage))));
+        cards.add(new DashboardCard("\uD83E\uDDE9 Quiz & Puzzles", "2 quizzes pending!", "#ffd54f", "/Assets/Images/quiz.png", () -> openSection(() -> com.ecoedu.quiz.QuizHomePage.show(primaryStage))));
         cards.add(new DashboardCard("\uD83E\uDDD1\u200D\uD83C\uDFA8 Avatar Customization", "Style your eco hero!", "#4fc3f7", "/Assets/Images/avatar.png", () -> openSection(() -> {
             com.ecoedu.avatar.AvatarCustomizer avatarCustomizer = new com.ecoedu.avatar.AvatarCustomizer();
-            Stage avatarStage = new Stage();
-            avatarCustomizer.start(avatarStage);
+            Scene scene = new Scene(avatarCustomizer, 900, 700);
+            primaryStage.setScene(scene);
+            primaryStage.setTitle("EcoEdu - Avatar Customization");
         })));
         cards.add(new DashboardCard("\uD83C\uDFC6 Leaderboard & Badges", "4 badges earned!", "#ffd54f", "/Assets/Images/leaderboard.png", () -> openSection(() -> com.ecoedu.leaderboard.LeaderboardAndBadgesPage.show(primaryStage))));
         cards.add(new DashboardCard("\uD83C\uDFAE Minigames", "1 new minigame!", "#ff8a65", "/Assets/Images/minigames.png", () -> openSection(() -> com.ecoedu.minigames.MinigamesPage.show(primaryStage))));
@@ -301,7 +302,7 @@ public class StudentDashboard extends VBox {
             }),
             new DashboardCard("\uD83E\uDDE9 Quiz & Puzzles", "2 quizzes pending!", "#ffd54f", "/Assets/Images/quiz.png", () -> {
                 try {
-                    com.ecoedu.quiz.QuizPage.show(primaryStage);
+                    com.ecoedu.quiz.QuizPage.show(primaryStage, null);
                 } catch (Exception e) {
                     Alert alert = new Alert(Alert.AlertType.INFORMATION);
                     alert.setTitle("Coming Soon");

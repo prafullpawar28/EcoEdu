@@ -52,7 +52,7 @@ public class UserPanel extends VBox {
         modulesBtn.setOnAction(e -> com.ecoedu.modules.ModulePage.show(primaryStage));
         Button quizzesBtn = new Button("Quizzes");
         quizzesBtn.getStyleClass().add("eco-btn");
-        quizzesBtn.setOnAction(e -> com.ecoedu.quiz.QuizPage.show(primaryStage));
+        quizzesBtn.setOnAction(e -> com.ecoedu.quiz.QuizPage.show(primaryStage, null));
         quickLinks.getChildren().addAll(modulesBtn, quizzesBtn);
 
         // Add all to main panel

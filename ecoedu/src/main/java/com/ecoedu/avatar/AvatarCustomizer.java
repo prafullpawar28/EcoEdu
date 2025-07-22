@@ -24,8 +24,9 @@ import javafx.stage.Stage;
 import java.util.Random;
 import javafx.animation.FadeTransition;
 import javafx.util.Duration;
+import javafx.scene.layout.StackPane;
 
-public class AvatarCustomizer extends VBox {
+public class AvatarCustomizer extends StackPane {
     private ImageView avatarFace, avatarHair, avatarAccessory, avatarClothes;
     private int hairIndex = 0, faceIndex = 0, accessoryIndex = 0, clothesIndex = 0;
     private static final String[] HAIR_OPTIONS = {"/Assets/Images/hair1.png", "/Assets/Images/hair2.png", "/Assets/Images/hair3.png"};
@@ -34,10 +35,7 @@ public class AvatarCustomizer extends VBox {
     private static final String[] CLOTHES_OPTIONS = {"/Assets/Images/shirt1.png", "/Assets/Images/shirt2.png", "/Assets/Images/shirt3.png"};
 
     public AvatarCustomizer() {
-        setSpacing(24);
-        setPadding(new Insets(40, 60, 40, 60));
-        setAlignment(Pos.TOP_CENTER);
-        // Animated background
+        // Animated eco background
         Rectangle bgRect = new Rectangle(900, 700);
         bgRect.setArcWidth(60);
         bgRect.setArcHeight(60);
@@ -52,13 +50,16 @@ public class AvatarCustomizer extends VBox {
         fade.setAutoReverse(true);
         fade.setCycleCount(FadeTransition.INDEFINITE);
         fade.play();
-        getChildren().add(0, bgRect);
-        setStyle("-fx-background-color: linear-gradient(to bottom right, #e1f5fe 60%, #fffde7 100%);");
+
+        VBox content = new VBox(24);
+        content.setPadding(new Insets(40, 60, 40, 60));
+        content.setAlignment(Pos.TOP_CENTER);
+        content.setStyle("-fx-background-color: transparent;");
 
         Label title = new Label("Avatar Customization");
         title.setFont(Font.font("Quicksand", FontWeight.BOLD, 32));
         title.setTextFill(Color.web("#0288d1"));
-        getChildren().add(title);
+        content.getChildren().add(title);
 
         // Avatar Preview
         VBox previewBox = new VBox();
@@ -66,7 +67,6 @@ public class AvatarCustomizer extends VBox {
         previewBox.setPadding(new Insets(16));
         previewBox.setStyle("-fx-background-color: #fffde7; -fx-background-radius: 40; -fx-effect: dropshadow(gaussian, #81c784, 16, 0.2, 0, 4);");
         previewBox.setPrefSize(220, 260);
-        // Layered avatar parts
         avatarFace = new ImageView();
         avatarHair = new ImageView();
         avatarAccessory = new ImageView();
@@ -85,22 +85,22 @@ public class AvatarCustomizer extends VBox {
         VBox avatarStack = new VBox(avatarClothes, avatarFace, avatarHair, avatarAccessory);
         avatarStack.setAlignment(Pos.CENTER);
         previewBox.getChildren().add(avatarStack);
-        getChildren().add(previewBox);
+        content.getChildren().add(previewBox);
 
         // Feature pickers
-        getChildren().add(makeFeaturePicker("Hair", HAIR_OPTIONS, i -> {
+        content.getChildren().add(makeFeaturePicker("Hair", HAIR_OPTIONS, i -> {
             hairIndex = i;
             updateAvatar();
         }));
-        getChildren().add(makeFeaturePicker("Face", FACE_OPTIONS, i -> {
+        content.getChildren().add(makeFeaturePicker("Face", FACE_OPTIONS, i -> {
             faceIndex = i;
             updateAvatar();
         }));
-        getChildren().add(makeFeaturePicker("Accessory", ACCESSORY_OPTIONS, i -> {
+        content.getChildren().add(makeFeaturePicker("Accessory", ACCESSORY_OPTIONS, i -> {
             accessoryIndex = i;
             updateAvatar();
         }));
-        getChildren().add(makeFeaturePicker("Clothes", CLOTHES_OPTIONS, i -> {
+        content.getChildren().add(makeFeaturePicker("Clothes", CLOTHES_OPTIONS, i -> {
             clothesIndex = i;
             updateAvatar();
         }));
@@ -132,9 +132,10 @@ public class AvatarCustomizer extends VBox {
             animateAvatar();
         });
         btnBox.getChildren().addAll(saveBtn, resetBtn, randomBtn);
-        getChildren().add(btnBox);
+        content.getChildren().add(btnBox);
 
         updateAvatar();
+        getChildren().addAll(bgRect, content);
     }
 
     private void updateAvatar() {
@@ -148,12 +149,37 @@ public class AvatarCustomizer extends VBox {
     private void setImageSafe(ImageView view, String path) {
         if (path == null) {
             view.setImage(null);
+            // Show a placeholder if this is the face layer
+            if (view == avatarFace) {
+                view.setImage(null);
+                view.setStyle("-fx-background-color: #b2ff59; -fx-border-radius: 80; -fx-background-radius: 80;");
+            }
             return;
         }
         try {
-            view.setImage(new Image(getClass().getResourceAsStream(path)));
+            Image img = new Image(getClass().getResourceAsStream(path));
+            if (img == null || img.isError() || img.getWidth() <= 0) {
+                System.out.println("Image not found: " + path);
+                // Show a placeholder for missing images
+                view.setImage(null);
+                view.setStyle("-fx-background-color: #ffd54f; -fx-border-radius: 80; -fx-background-radius: 80;");
+                if (view == avatarFace) {
+                    // Add a fallback emoji face
+                    Label emoji = new Label("😊");
+                    emoji.setFont(Font.font("Quicksand", FontWeight.BOLD, 64));
+                    emoji.setTextFill(Color.web("#388e3c"));
+                    if (!((VBox)view.getParent()).getChildren().contains(emoji)) {
+                        ((VBox)view.getParent()).getChildren().add(emoji);
+                    }
+                }
+            } else {
+                view.setImage(img);
+                view.setStyle("");
+            }
         } catch (Exception e) {
+            System.out.println("Error loading image: " + path);
             view.setImage(null);
+            view.setStyle("-fx-background-color: #ffd54f; -fx-border-radius: 80; -fx-background-radius: 80;");
         }
     }
 
@@ -203,7 +229,7 @@ public class AvatarCustomizer extends VBox {
     }
 
     public void start(Stage stage) {
-        Scene scene = new Scene(this, 700, 700);
+        Scene scene = new Scene(this, 900, 700);
         stage.setScene(scene);
         stage.setTitle("EcoEdu - Avatar Customization");
         stage.show();
