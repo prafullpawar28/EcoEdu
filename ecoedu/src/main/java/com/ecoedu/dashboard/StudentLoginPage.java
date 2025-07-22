@@ -130,11 +130,6 @@ public class StudentLoginPage extends VBox {
         boolean loginSuccess = true; // Replace with real check
         if (loginSuccess) {
             System.out.println("Student login successful. Navigating to dashboard on stage: " + primaryStage);
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Login Success");
-            alert.setHeaderText(null);
-            alert.setContentText("Welcome to EcoEdu, " + email + "!");
-            alert.showAndWait();
             com.ecoedu.Home.Home.showStudentDashboard(primaryStage);
         } else {
             messageLabel.setText("Invalid email or password.");

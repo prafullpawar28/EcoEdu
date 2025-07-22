@@ -18,9 +18,37 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import javafx.scene.layout.Region;
+import javafx.scene.control.ProgressBar;
+import javafx.animation.PauseTransition;
+import javafx.util.Duration;
+import java.util.List;
+import java.util.function.Supplier;
+import javafx.scene.shape.Circle;
+import javafx.animation.FadeTransition;
+import javafx.application.Platform;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.MenuItem;
+import com.ecoedu.dashboard.StudentProfileDialog;
+import com.ecoedu.dashboard.ThemeSelectorDialog;
+import com.ecoedu.dashboard.HelpDialog;
+import com.ecoedu.dashboard.SoundToggleDialog;
+import com.ecoedu.dashboard.ParentalControlsDialog;
 
 public class StudentDashboard extends VBox {
     private Stage primaryStage;
+    private StudentProfile profile;
+    private List<DashboardCard> cards;
+    private List<String> quotes;
+    private Label welcomeLabel;
+    private Label quoteLabel;
+    private GridPane cardGrid;
+    private int quoteIndex = 0;
+    private ScheduledExecutorService scheduler;
 
     public StudentDashboard(Stage primaryStage) {
         this.primaryStage = primaryStage;
@@ -29,185 +57,313 @@ public class StudentDashboard extends VBox {
         setAlignment(Pos.TOP_CENTER);
         setStyle("-fx-background-color: linear-gradient(to bottom right, #e1f5fe 60%, #fffde7 100%);");
 
-        // --- Header with Settings Icon ---
-        HBox header = new HBox();
-        header.setAlignment(Pos.CENTER_RIGHT);
-        header.setPadding(new Insets(0, 0, 10, 0));
+        // --- Top Bar with Settings Icon ---
+        HBox topBar = new HBox();
+        topBar.setAlignment(Pos.TOP_RIGHT);
+        topBar.setPadding(new Insets(0, 0, 10, 0));
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
-        Button settingsBtn = new Button();
-        ImageView settingsIcon = new ImageView(new Image(getClass().getResource("").toExternalForm()));
-        settingsIcon.setFitWidth(32);
-        settingsIcon.setFitHeight(32);
-        settingsBtn.setGraphic(settingsIcon);
-        settingsBtn.setStyle("-fx-background-color: transparent; -fx-cursor: hand;");
-        settingsBtn.setOnAction(e -> StudentSettingsView.show(primaryStage));
-        header.getChildren().addAll(spacer, settingsBtn);
-        getChildren().add(header);
+        MenuButton settingsMenu = new MenuButton();
+        ImageView gearIcon = new ImageView();
+        try {
+            gearIcon.setImage(new Image(getClass().getResourceAsStream("/Assets/Images/settings.png")));
+        } catch (Exception e) {
+            gearIcon.setImage(null);
+        }
+        gearIcon.setFitWidth(32);
+        gearIcon.setFitHeight(32);
+        settingsMenu.setGraphic(gearIcon);
+        settingsMenu.setStyle("-fx-background-color: transparent; -fx-cursor: hand; -fx-padding: 0 8 0 8; -fx-background-radius: 16;");
+        MenuItem profileItem = new MenuItem("Profile");
+        profileItem.setOnAction(e -> StudentProfileDialog.show(primaryStage, profile));
+        MenuItem logoutItem = new MenuItem("Logout");
+        logoutItem.setOnAction(e -> com.ecoedu.dashboard.StudentLoginPage.show(primaryStage));
+        MenuItem themeItem = new MenuItem("Change Theme");
+        themeItem.setOnAction(e -> ThemeSelectorDialog.show(primaryStage));
+        MenuItem helpItem = new MenuItem("Help");
+        helpItem.setOnAction(e -> HelpDialog.show(primaryStage));
+        MenuItem soundItem = new MenuItem("Sound");
+        soundItem.setOnAction(e -> SoundToggleDialog.show(primaryStage));
+        MenuItem parentItem = new MenuItem("Parental Controls");
+        parentItem.setOnAction(e -> ParentalControlsDialog.show(primaryStage));
+        settingsMenu.getItems().addAll(profileItem, logoutItem, themeItem, helpItem, soundItem, parentItem);
+        topBar.getChildren().addAll(spacer, settingsMenu);
+        getChildren().add(0, topBar);
 
-        // --- Playful Animated Eco-Themed Header ---
-        HBox playfulHeader = new HBox(18);
-        playfulHeader.setAlignment(Pos.CENTER_LEFT);
-        playfulHeader.setPadding(new Insets(0, 0, 0, 0));
-        Label mascot = new Label("\uD83C\uDF0E");
-        mascot.setFont(Font.font("Quicksand", FontWeight.BOLD, 44));
-        Label sun = new Label("\u2600\uFE0F");
-        sun.setFont(Font.font("Quicksand", 32));
-        Label greeting = new Label("Welcome back, Eco Hero!");
-        greeting.setFont(Font.font("Quicksand", FontWeight.BOLD, 26));
-        greeting.setTextFill(Color.web("#0288d1"));
-        playfulHeader.getChildren().addAll(mascot, greeting, sun);
-        getChildren().add(playfulHeader);
+        // --- Simulated Real-Time Data ---
+        profile = new StudentProfile("Eco Kid", "/Assets/Images/avatar.png", "Eco Explorer", 0.65, 4);
+        cards = new ArrayList<>();
+        cards.add(new DashboardCard("\uD83D\uDCDA Modules", "3 modules available!", "#81c784", "/Assets/Images/module.png", () -> openSection(() -> com.ecoedu.modules.ModulePage.show(primaryStage))));
+        cards.add(new DashboardCard("\uD83E\uDDE9 Quiz & Puzzles", "2 quizzes pending!", "#ffd54f", "/Assets/Images/quiz.png", () -> openSection(() -> com.ecoedu.quiz.QuizPage.show(primaryStage))));
+        cards.add(new DashboardCard("\uD83E\uDDD1\u200D\uD83C\uDFA8 Avatar Customization", "Style your eco hero!", "#4fc3f7", "/Assets/Images/avatar.png", () -> openSection(() -> {
+            com.ecoedu.avatar.AvatarCustomizer avatarCustomizer = new com.ecoedu.avatar.AvatarCustomizer();
+            Stage avatarStage = new Stage();
+            avatarCustomizer.start(avatarStage);
+        })));
+        cards.add(new DashboardCard("\uD83C\uDFC6 Leaderboard & Badges", "4 badges earned!", "#ffd54f", "/Assets/Images/leaderboard.png", () -> openSection(() -> com.ecoedu.leaderboard.LeaderboardAndBadgesPage.show(primaryStage))));
+        cards.add(new DashboardCard("\uD83C\uDFAE Minigames", "1 new minigame!", "#ff8a65", "/Assets/Images/minigames.png", () -> openSection(() -> com.ecoedu.minigames.MinigamesPage.show(primaryStage))));
+        cards.add(new DashboardCard("\uD83C\uDF31 Daily Challenge", "New eco tasks!", "#a1887f", "/Assets/Images/daily.png", () -> openSection(() -> com.ecoedu.dailytasks.DailyChallengePage.show(primaryStage))));
+        quotes = Arrays.asList(
+            "The Earth is what we all have in common. – Wendell Berry",
+            "Small eco-actions can transform the world.",
+            "Be the change you wish to see in the world. – Gandhi",
+            "Every small eco-action counts!"
+        );
 
-        // --- Notification/Info Bar ---
-        HBox infoBar = new HBox();
-        infoBar.setAlignment(Pos.CENTER_LEFT);
-        infoBar.setPadding(new Insets(10, 0, 10, 0));
-        infoBar.setStyle("-fx-background-color: linear-gradient(to right, #b2ff59, #81d4fa); -fx-background-radius: 16; -fx-effect: dropshadow(gaussian, #b2ff59, 8, 0.1, 0, 2);");
-        Label infoLabel = new Label("\uD83C\uDF31 Tip: Every small eco-action counts! Try a new module today.");
-        infoLabel.setFont(Font.font("Quicksand", FontWeight.BOLD, 16));
-        infoLabel.setTextFill(Color.web("#388e3c"));
-        infoBar.getChildren().add(infoLabel);
-        getChildren().add(infoBar);
+        // --- Animated Welcome Message ---
+        welcomeLabel = new Label("Welcome, " + profile.getName() + "!");
+        welcomeLabel.setFont(Font.font("Quicksand", FontWeight.BOLD, 28));
+        welcomeLabel.setTextFill(Color.web("#0288d1"));
+        welcomeLabel.setPadding(new Insets(0, 0, 18, 0));
+        welcomeLabel.setOpacity(0);
+        getChildren().add(welcomeLabel);
+        FadeTransition fadeInWelcome = new FadeTransition(Duration.seconds(1.2), welcomeLabel);
+        fadeInWelcome.setFromValue(0);
+        fadeInWelcome.setToValue(1);
+        fadeInWelcome.play();
 
-        // --- Dashboard Title ---
-        Label title = new Label("\uD83D\uDC66 Student Dashboard");
-        title.setFont(Font.font("Quicksand", FontWeight.BOLD, 36));
-        title.setTextFill(Color.web("#0288d1"));
-        title.setStyle("-fx-font-weight: bold;");
-        getChildren().add(title);
+        // --- Animated Quote Bar ---
+        quoteLabel = new Label(quotes.get(0));
+        quoteLabel.setFont(Font.font("Quicksand", FontWeight.BOLD, 16));
+        quoteLabel.setTextFill(Color.web("#388e3c"));
+        quoteLabel.setStyle("-fx-background-color: linear-gradient(to right, #b2ff59, #81d4fa); -fx-background-radius: 16; -fx-padding: 10 32; -fx-effect: dropshadow(gaussian, #b2ff59, 8, 0.1, 0, 2);");
+        quoteLabel.setOpacity(0);
+        getChildren().add(quoteLabel);
+        FadeTransition fadeInQuote = new FadeTransition(Duration.seconds(1.2), quoteLabel);
+        fadeInQuote.setFromValue(0);
+        fadeInQuote.setToValue(1);
+        fadeInQuote.play();
 
         // --- Card Grid with Scroll ---
-        GridPane cardGrid = new GridPane();
+        cardGrid = new GridPane();
         cardGrid.setHgap(40);
         cardGrid.setVgap(40);
         cardGrid.setAlignment(Pos.TOP_CENTER);
-        cardGrid.add(makeCard("\uD83D\uDCDA Modules", "Learn eco topics!", "#81c784", "/Assets/Images/module.png", true, () -> openModules()), 0, 0);
-        cardGrid.add(makeCard("\uD83E\uDDE9 Quiz & Puzzles", "Test your eco skills!", "#ffd54f", "/Assets/Images/quiz.png", false, () -> openQuiz()), 1, 0);
-        cardGrid.add(makeCard("\uD83E\uDDD1\u200D\uD83C\uDFA8 Avatar Customization", "Style your eco hero!", "#4fc3f7", "/Assets/Images/avatar.png", false, () -> openAvatar()), 0, 1);
-        cardGrid.add(makeCard("\uD83C\uDFC6 Leaderboard & Badges", "See your rank and achievements!", "#ffd54f", "/Assets/Images/leaderboard.png", true, () -> openLeaderboardAndBadges()), 1, 1);
-        cardGrid.add(makeCard("\uD83C\uDFAE Minigames", "Play & learn!", "#ff8a65", "/Assets/Images/minigames.png", false, () -> openMinigamesPage()), 0, 2);
-        cardGrid.add(makeCard("\uD83C\uDF31 Daily Challenge", "New eco tasks!", "#a1887f", "/Assets/Images/daily.png", false, () -> openDaily()), 1, 2);
+        updateCardGrid();
         ScrollPane scrollPane = new ScrollPane(cardGrid);
         scrollPane.setFitToWidth(true);
         scrollPane.setPrefHeight(500);
         scrollPane.setStyle("-fx-background: transparent; -fx-background-color: transparent;");
         getChildren().add(scrollPane);
 
-        // --- Footer with Motivational Quote ---
-        HBox footer = new HBox();
-        footer.setAlignment(Pos.CENTER);
-        footer.setPadding(new Insets(18, 0, 0, 0));
-        footer.setStyle("-fx-background-color: transparent;");
-        Label quote = new Label("\"The Earth is what we all have in common.\" – Wendell Berry");
-        quote.setFont(Font.font("Quicksand", FontWeight.BOLD, 16));
-        quote.setTextFill(Color.web("#388e3c"));
-        footer.getChildren().add(quote);
-        getChildren().add(footer);
+        // --- Real-Time Data Simulation ---
+        scheduler = Executors.newSingleThreadScheduledExecutor();
+        scheduler.scheduleAtFixedRate(this::simulateRealTimeUpdates, 6, 6, TimeUnit.SECONDS);
+        scheduler.scheduleAtFixedRate(this::rotateQuote, 6, 6, TimeUnit.SECONDS);
     }
 
-    // Enhanced makeCard with increased width, spacing, and expressive hover
-    private VBox makeCard(String title, String subtitle, String color, String iconPath, boolean isNew, Runnable onClick) {
-        VBox card = new VBox(10);
-        card.setAlignment(Pos.CENTER);
-        card.setPrefSize(340, 220);
-        card.setStyle("-fx-background-color: linear-gradient(to bottom right, " + color + ", #fffde7 80%); -fx-background-radius: 28; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, #bdbdbd, 16, 0.2, 0, 4);");
+    private void updateCardGrid() {
+        Platform.runLater(() -> {
+            cardGrid.getChildren().clear();
+            for (int i = 0; i < cards.size(); i++) {
+                DashboardCard card = cards.get(i);
+                VBox cardBox = makeCard(card);
+                cardGrid.add(cardBox, i % 2, i / 2);
+            }
+        });
+    }
+
+    private VBox makeCard(DashboardCard card) {
+        VBox cardBox = new VBox(10);
+        cardBox.setAlignment(Pos.CENTER);
+        cardBox.setPrefSize(340, 220);
+        cardBox.setStyle("-fx-background-color: linear-gradient(to bottom right, " + card.getColor() + ", #fffde7 80%); -fx-background-radius: 28; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, #bdbdbd, 16, 0.2, 0, 4);");
         ImageView icon = new ImageView();
         try {
-            icon.setImage(new Image(getClass().getResourceAsStream(iconPath)));
+            icon.setImage(new Image(getClass().getResourceAsStream(card.getIconPath())));
         } catch (Exception e) {
             icon.setImage(null);
         }
         icon.setFitWidth(72);
         icon.setFitHeight(72);
         icon.setStyle("-fx-background-color: #fffde7; -fx-background-radius: 36; -fx-border-radius: 36; -fx-border-color: #fff; -fx-border-width: 2; -fx-effect: dropshadow(gaussian, #fffde7, 8, 0.2, 0, 2);");
-        Label titleLabel = new Label(title);
-        titleLabel.setFont(Font.font("Quicksand", 22));
+        Label titleLabel = new Label(card.getTitle());
+        titleLabel.setFont(Font.font("Quicksand", FontWeight.BOLD, 22));
         titleLabel.setTextFill(Color.web("#263238"));
         titleLabel.setStyle("-fx-font-weight: bold;");
-        Label subtitleLabel = new Label(subtitle);
+        Label subtitleLabel = new Label(card.getSubtitle());
         subtitleLabel.setFont(Font.font("Quicksand", 14));
         subtitleLabel.setTextFill(Color.web("#424242"));
-        HBox badgeBox = new HBox();
-        badgeBox.setAlignment(Pos.CENTER);
-        if (isNew) {
-            Label badge = new Label("NEW");
-            badge.setFont(Font.font("Quicksand", FontWeight.BOLD, 12));
-            badge.setTextFill(Color.WHITE);
-            badge.setStyle("-fx-background-color: #ff5252; -fx-background-radius: 10; -fx-padding: 2 10; -fx-effect: dropshadow(gaussian, #ff5252, 4, 0.2, 0, 1);");
-            badgeBox.getChildren().add(badge);
-        }
-        card.getChildren().addAll(icon, titleLabel, subtitleLabel, badgeBox);
-        card.setOnMouseClicked(e -> onClick.run());
-        card.setOnMouseEntered(e -> card.setStyle("-fx-background-color: linear-gradient(to bottom right, " + color + ", #fffde7 80%); -fx-background-radius: 28; -fx-cursor: hand; -fx-scale-x:1.08;-fx-scale-y:1.08;-fx-effect: dropshadow(gaussian, #0288d1, 32, 0.3, 0, 10);"));
-        card.setOnMouseExited(e -> card.setStyle("-fx-background-color: linear-gradient(to bottom right, " + color + ", #fffde7 80%); -fx-background-radius: 28; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, #bdbdbd, 16, 0.2, 0, 4);"));
-        return card;
+        cardBox.getChildren().addAll(icon, titleLabel, subtitleLabel);
+        cardBox.setOnMouseClicked(e -> {
+            try {
+                card.getOnClick().run();
+            } catch (Exception ex) {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Coming Soon");
+                alert.setHeaderText(null);
+                alert.setContentText("This section is coming soon!");
+                alert.showAndWait();
+            }
+        });
+        cardBox.setOnMouseEntered(e -> cardBox.setStyle("-fx-background-color: linear-gradient(to bottom right, " + card.getColor() + ", #fffde7 80%); -fx-background-radius: 28; -fx-cursor: hand; -fx-scale-x:1.08;-fx-scale-y:1.08;-fx-effect: dropshadow(gaussian, #0288d1, 32, 0.3, 0, 10);"));
+        cardBox.setOnMouseExited(e -> cardBox.setStyle("-fx-background-color: linear-gradient(to bottom right, " + card.getColor() + ", #fffde7 80%); -fx-background-radius: 28; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, #bdbdbd, 16, 0.2, 0, 4);"));
+        return cardBox;
     }
 
-    // Navigation for each card
-    private void openModules() {
-        // Navigate to the main modules page
+    private void rotateQuote() {
+        Platform.runLater(() -> {
+            quoteIndex = (quoteIndex + 1) % quotes.size();
+            FadeTransition fadeOut = new FadeTransition(Duration.seconds(0.5), quoteLabel);
+            fadeOut.setFromValue(1);
+            fadeOut.setToValue(0);
+            fadeOut.setOnFinished(e -> {
+                quoteLabel.setText(quotes.get(quoteIndex));
+                FadeTransition fadeIn = new FadeTransition(Duration.seconds(0.8), quoteLabel);
+                fadeIn.setFromValue(0);
+                fadeIn.setToValue(1);
+                fadeIn.play();
+            });
+            fadeOut.play();
+        });
+    }
+
+    private void simulateRealTimeUpdates() {
+        // Simulate real-time updates (e.g., new modules, quizzes, etc.)
+        Platform.runLater(() -> {
+            int modules = 3 + (int)(Math.random() * 3);
+            int quizzes = 2 + (int)(Math.random() * 2);
+            int badges = 4 + (int)(Math.random() * 2);
+            cards.get(0).setSubtitle(modules + " modules available!");
+            cards.get(1).setSubtitle(quizzes + " quizzes pending!");
+            cards.get(3).setSubtitle(badges + " badges earned!");
+            updateCardGrid();
+        });
+    }
+
+    private void openSection(Runnable section) {
         try {
-            com.ecoedu.modules.ModulePage.show(primaryStage);
+            section.run();
         } catch (Exception e) {
-            showComingSoon("Modules");
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Coming Soon");
+            alert.setHeaderText(null);
+            alert.setContentText("This section is coming soon!");
+            alert.showAndWait();
         }
     }
-    private void openQuiz() {
-        try {
-            com.ecoedu.quiz.QuizPage.show(primaryStage);
-        } catch (Exception e) {
-            showComingSoon("Quiz & Puzzles");
+
+    // Data classes
+    public static class StudentProfile {
+        private String name;
+        private String avatarPath;
+        private String ecoLevel;
+        private double progress;
+        private int badges;
+        public StudentProfile(String name, String avatarPath, String ecoLevel, double progress, int badges) {
+            this.name = name;
+            this.avatarPath = avatarPath;
+            this.ecoLevel = ecoLevel;
+            this.progress = progress;
+            this.badges = badges;
         }
+        public String getName() { return name; }
+        public String getAvatarPath() { return avatarPath; }
+        public String getEcoLevel() { return ecoLevel; }
+        public double getProgress() { return progress; }
+        public int getBadges() { return badges; }
     }
-    private void openAvatar() {
-        try {
-            com.ecoedu.avatar.AvatarCustomizer avatarCustomizer = new com.ecoedu.avatar.AvatarCustomizer();
-            Stage avatarStage = new Stage();
-            avatarCustomizer.start(avatarStage);
-        } catch (Exception e) {
-            showComingSoon("Avatar Customization");
+    public static class DashboardCard {
+        private String title;
+        private String subtitle;
+        private String color;
+        private String iconPath;
+        private Runnable onClick;
+        public DashboardCard(String title, String subtitle, String color, String iconPath, Runnable onClick) {
+            this.title = title;
+            this.subtitle = subtitle;
+            this.color = color;
+            this.iconPath = iconPath;
+            this.onClick = onClick;
         }
-    }
-    private void openLeaderboardAndBadges() {
-        try {
-            com.ecoedu.leaderboard.LeaderboardAndBadgesPage.show(primaryStage);
-        } catch (Exception e) {
-            showComingSoon("Leaderboard & Badges");
-        }
-    }
-    private void openMinigames() {
-        // Navigate to the minigames section (default to TrashSortingGame if no MinigamesPage)
-        try {
-            com.ecoedu.minigames.TrashSortingGame.show(primaryStage);
-        } catch (Exception e) {
-            showComingSoon("Minigames");
-        }
-    }
-    private void openMinigamesPage() {
-        try {
-            com.ecoedu.minigames.MinigamesPage.show(primaryStage);
-        } catch (Exception e) {
-            showComingSoon("Minigames");
-        }
-    }
-    private void openDaily() {
-        try {
-            com.ecoedu.dailytasks.DailyChallengePage.show(primaryStage);
-        } catch (Exception e) {
-            showComingSoon("Daily Challenge");
-        }
-    }
-    // Show a playful alert if a section is not implemented
-    private void showComingSoon(String section) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Coming Soon");
-        alert.setHeaderText(null);
-        alert.setContentText(section + " section is coming soon!");
-        alert.showAndWait();
+        public String getTitle() { return title; }
+        public String getSubtitle() { return subtitle; }
+        public void setSubtitle(String subtitle) { this.subtitle = subtitle; }
+        public String getColor() { return color; }
+        public String getIconPath() { return iconPath; }
+        public Runnable getOnClick() { return onClick; }
     }
 
     public static void show(Stage primaryStage) {
+        // Mock providers for demonstration
+        StudentProfile profile = new StudentProfile("Eco Kid", "/Assets/Images/avatar.png", "Eco Explorer", 0.65, 4);
+        List<DashboardCard> cards = List.of(
+            new DashboardCard("\uD83D\uDCDA Modules", "3 new modules!", "#81c784", "/Assets/Images/module.png", () -> {
+                try {
+                    com.ecoedu.modules.ModulePage.show(primaryStage);
+                } catch (Exception e) {
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Coming Soon");
+                    alert.setHeaderText(null);
+                    alert.setContentText("This section is coming soon!");
+                    alert.showAndWait();
+                }
+            }),
+            new DashboardCard("\uD83E\uDDE9 Quiz & Puzzles", "2 quizzes pending!", "#ffd54f", "/Assets/Images/quiz.png", () -> {
+                try {
+                    com.ecoedu.quiz.QuizPage.show(primaryStage);
+                } catch (Exception e) {
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Coming Soon");
+                    alert.setHeaderText(null);
+                    alert.setContentText("This section is coming soon!");
+                    alert.showAndWait();
+                }
+            }),
+            new DashboardCard("\uD83E\uDDD1\u200D\uD83C\uDFA8 Avatar Customization", "Style your eco hero!", "#4fc3f7", "/Assets/Images/avatar.png", () -> {
+                try {
+                    com.ecoedu.avatar.AvatarCustomizer avatarCustomizer = new com.ecoedu.avatar.AvatarCustomizer();
+                    Stage avatarStage = new Stage();
+                    avatarCustomizer.start(avatarStage);
+                } catch (Exception e) {
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Coming Soon");
+                    alert.setHeaderText(null);
+                    alert.setContentText("This section is coming soon!");
+                    alert.showAndWait();
+                }
+            }),
+            new DashboardCard("\uD83C\uDFC6 Leaderboard & Badges", "4 badges earned!", "#ffd54f", "/Assets/Images/leaderboard.png", () -> {
+                try {
+                    com.ecoedu.leaderboard.LeaderboardAndBadgesPage.show(primaryStage);
+                } catch (Exception e) {
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Coming Soon");
+                    alert.setHeaderText(null);
+                    alert.setContentText("This section is coming soon!");
+                    alert.showAndWait();
+                }
+            }),
+            new DashboardCard("\uD83C\uDFAE Minigames", "1 new minigame!", "#ff8a65", "/Assets/Images/minigames.png", () -> {
+                try {
+                    com.ecoedu.minigames.TrashSortingGame.show(primaryStage);
+                } catch (Exception e) {
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Coming Soon");
+                    alert.setHeaderText(null);
+                    alert.setContentText("This section is coming soon!");
+                    alert.showAndWait();
+                }
+            }),
+            new DashboardCard("\uD83C\uDF31 Daily Challenge", "New eco tasks!", "#a1887f", "/Assets/Images/daily.png", () -> {
+                try {
+                    com.ecoedu.dailytasks.DailyChallengePage.show(primaryStage);
+                } catch (Exception e) {
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Coming Soon");
+                    alert.setHeaderText(null);
+                    alert.setContentText("This section is coming soon!");
+                    alert.showAndWait();
+                }
+            })
+        );
+        List<String> quotes = Arrays.asList(
+            "The Earth is what we all have in common. – Wendell Berry",
+            "Small acts, when multiplied, can transform the world.",
+            "Be the change you wish to see in the world. – Gandhi",
+            "Every small eco-action counts!"
+        );
+
         StudentDashboard dashboard = new StudentDashboard(primaryStage);
         Scene scene = new Scene(dashboard, 900, 700);
         primaryStage.setScene(scene);

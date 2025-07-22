@@ -68,4 +68,8 @@ public class FeedbackSupportPage extends VBox {
         public javafx.beans.property.StringProperty emailProperty() { return email; }
         public javafx.beans.property.StringProperty messageProperty() { return message; }
     }
+    public static void show(Stage primaryStage2) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'show'");
+    }
 } 

@@ -21,6 +21,7 @@ import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import java.util.*;
+import javafx.scene.layout.HBox;
 
 public class OceanCleanupGame extends VBox {
     private Stage primaryStage;
@@ -47,10 +48,11 @@ public class OceanCleanupGame extends VBox {
         title.setTextFill(Color.web("#0277bd"));
         getChildren().add(title);
 
+        // Score label
         scoreLabel = new Label("Score: 0");
-        scoreLabel.setFont(Font.font("Comic Sans MS", 18));
-        scoreLabel.setTextFill(Color.web("#0288d1"));
-        getChildren().add(scoreLabel);
+        scoreLabel.setFont(Font.font("Quicksand", FontWeight.BOLD, 26));
+        scoreLabel.setTextFill(Color.web("#43a047"));
+        getChildren().add(0, scoreLabel);
 
         oceanPane = new Pane();
         oceanPane.setPrefSize(OCEAN_WIDTH, OCEAN_HEIGHT);
@@ -109,7 +111,7 @@ public class OceanCleanupGame extends VBox {
     private void resetGame() {
         score = 0;
         gameOverShown = false;
-        updateScore();
+        updateScore(0);
         oceanPane.getChildren().removeIf(node -> node instanceof TrashSprite);
         trashSprites = new ArrayList<>();
         Random rand = new Random();
@@ -123,17 +125,26 @@ public class OceanCleanupGame extends VBox {
         }
     }
 
-    private void updateScore() {
+    private void updateScore(int delta) {
+        score += delta;
         scoreLabel.setText("Score: " + score);
+        // Animate score label
+        ScaleTransition st = new ScaleTransition(javafx.util.Duration.millis(250), scoreLabel);
+        st.setFromX(1.0);
+        st.setFromY(1.0);
+        st.setToX(1.2);
+        st.setToY(1.2);
+        st.setAutoReverse(true);
+        st.setCycleCount(2);
+        st.play();
     }
 
     // Only called when drop is on netBin
     private void handleDrop(TrashSprite sprite) {
-        score += 15;
+        updateScore(15);
         playSuccessAnimation(sprite);
         oceanPane.getChildren().remove(sprite);
         trashSprites.remove(sprite);
-        updateScore();
         if (trashSprites.isEmpty() && !gameOverShown) {
             showGameOver();
             gameOverShown = true;
@@ -200,9 +211,20 @@ public class OceanCleanupGame extends VBox {
 
     public static void show(Stage primaryStage) {
         OceanCleanupGame game = new OceanCleanupGame(primaryStage);
-        Scene scene = new Scene(game, 900, 700);
+        VBox root = new VBox();
+        root.setSpacing(0);
+        // Top bar with back button
+        HBox topBar = new HBox();
+        topBar.setAlignment(Pos.TOP_LEFT);
+        Button backBtn = new Button("← Back to Minigames");
+        backBtn.setStyle("-fx-background-color: #0288d1; -fx-text-fill: white; -fx-font-size: 15px; -fx-background-radius: 20; -fx-padding: 8 24; -fx-cursor: hand;");
+        backBtn.setOnAction(e -> com.ecoedu.minigames.MinigamesPage.show(primaryStage));
+        topBar.getChildren().add(backBtn);
+        root.getChildren().add(topBar);
+        root.getChildren().add(game);
+        Scene scene = new Scene(root, 900, 700);
         primaryStage.setScene(scene);
-        primaryStage.setTitle("EcoEdu - Ocean Cleanup Game");
+        primaryStage.setTitle("Ocean Cleanup Game");
         primaryStage.show();
     }
 

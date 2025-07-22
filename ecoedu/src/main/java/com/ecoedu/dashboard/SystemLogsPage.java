@@ -54,4 +54,8 @@ public class SystemLogsPage extends VBox {
         public javafx.beans.property.StringProperty actionProperty() { return action; }
         public javafx.beans.property.StringProperty detailsProperty() { return details; }
     }
+    public static void show(Stage primaryStage2) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'show'");
+    }
 } 

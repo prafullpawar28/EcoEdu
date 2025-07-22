@@ -2,13 +2,15 @@ package com.ecoedu.minigames;
 
 import javafx.animation.FadeTransition;
 import javafx.animation.ScaleTransition;
+import javafx.animation.TranslateTransition;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.effect.DropShadow;
-//import javafx.scene.image.ImageView;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.MouseEvent;
@@ -35,20 +37,21 @@ public class TrashSortingGame extends VBox {
 
     public TrashSortingGame(Stage primaryStage) {
         this.primaryStage = primaryStage;
-        setSpacing(20);
-        setPadding(new Insets(30));
+        setSpacing(24);
+        setPadding(new Insets(32));
         setAlignment(Pos.TOP_CENTER);
-        setStyle("-fx-background-color: linear-gradient(to bottom right, #e0f7fa, #fffde7);");
+        setStyle("-fx-background-color: linear-gradient(to bottom right, #e1f5fe 60%, #fffde7 100%);");
+
+        // Score label
+        scoreLabel = new Label("Score: 0");
+        scoreLabel.setFont(Font.font("Quicksand", FontWeight.BOLD, 26));
+        scoreLabel.setTextFill(Color.web("#43a047"));
+        getChildren().add(scoreLabel);
 
         Label title = new Label("Trash Sorting Minigame");
         title.setFont(Font.font("Comic Sans MS", FontWeight.BOLD, 28));
         title.setTextFill(Color.web("#388e3c"));
         getChildren().add(title);
-
-        scoreLabel = new Label("Score: 0");
-        scoreLabel.setFont(Font.font("Comic Sans MS", 18));
-        scoreLabel.setTextFill(Color.web("#0288d1"));
-        getChildren().add(scoreLabel);
 
         HBox binsBox = new HBox(40);
         binsBox.setAlignment(Pos.CENTER);
@@ -98,7 +101,7 @@ public class TrashSortingGame extends VBox {
 
     private void resetGame() {
         score = 0;
-        updateScore();
+        updateScore(0);
         trashGrid.getChildren().clear();
         trashItems = new ArrayList<>();
         List<TrashType> types = Arrays.asList(TrashType.values());
@@ -119,8 +122,18 @@ public class TrashSortingGame extends VBox {
         }
     }
 
-    private void updateScore() {
+    private void updateScore(int delta) {
+        score += delta;
         scoreLabel.setText("Score: " + score);
+        // Animate score label
+        ScaleTransition st = new ScaleTransition(javafx.util.Duration.millis(250), scoreLabel);
+        st.setFromX(1.0);
+        st.setFromY(1.0);
+        st.setToX(1.2);
+        st.setToY(1.2);
+        st.setAutoReverse(true);
+        st.setCycleCount(2);
+        st.play();
     }
 
     private void handleDrop(DragEvent e, TrashType binType) {
@@ -128,13 +141,12 @@ public class TrashSortingGame extends VBox {
         TrashItem item = trashItems.stream().filter(t -> t.getTrashId().equals(trashId)).findFirst().orElse(null);
         if (item != null) {
             if (item.getType() == binType) {
-                score += 10;
+                updateScore(10);
                 playSuccessAnimation(item);
             } else {
-                score -= 5;
+                updateScore(-5);
                 playFailAnimation(item);
             }
-            updateScore();
             trashGrid.getChildren().remove(item);
             trashItems.remove(item);
             if (trashItems.isEmpty()) {
@@ -195,9 +207,20 @@ public class TrashSortingGame extends VBox {
 
     public static void show(Stage primaryStage) {
         TrashSortingGame game = new TrashSortingGame(primaryStage);
-        Scene scene = new Scene(game, 900, 700);
+        VBox root = new VBox();
+        root.setSpacing(0);
+        // Top bar with back button
+        HBox topBar = new HBox();
+        topBar.setAlignment(Pos.TOP_LEFT);
+        Button backBtn = new Button("← Back to Minigames");
+        backBtn.setStyle("-fx-background-color: #0288d1; -fx-text-fill: white; -fx-font-size: 15px; -fx-background-radius: 20; -fx-padding: 8 24; -fx-cursor: hand;");
+        backBtn.setOnAction(e -> com.ecoedu.minigames.MinigamesPage.show(primaryStage));
+        topBar.getChildren().add(backBtn);
+        root.getChildren().add(topBar);
+        root.getChildren().add(game);
+        Scene scene = new Scene(root, 900, 700);
         primaryStage.setScene(scene);
-        primaryStage.setTitle("EcoEdu - Trash Sorting Minigame");
+        primaryStage.setTitle("Trash Sorting Game");
         primaryStage.show();
     }
 

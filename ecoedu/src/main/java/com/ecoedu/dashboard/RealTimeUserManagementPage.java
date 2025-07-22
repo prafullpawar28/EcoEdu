@@ -65,4 +65,8 @@ public class RealTimeUserManagementPage extends VBox {
         public javafx.beans.property.StringProperty emailProperty() { return email; }
         public javafx.beans.property.StringProperty roleProperty() { return role; }
     }
+    public static void show(Stage primaryStage2) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'show'");
+    }
 } 
