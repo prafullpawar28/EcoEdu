@@ -22,6 +22,21 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import java.util.*;
 import javafx.scene.layout.HBox;
+import javafx.animation.Timeline;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.scene.layout.Region;
+import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.Stop;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
+import javafx.scene.control.Label;
+import javafx.scene.text.FontWeight;
+import javafx.scene.shape.SVGPath;
+import javafx.application.Platform;
+import javafx.animation.AnimationTimer;
 
 public class OceanCleanupGame extends VBox {
     private Stage primaryStage;
@@ -38,27 +53,95 @@ public class OceanCleanupGame extends VBox {
 
     public OceanCleanupGame(Stage primaryStage) {
         this.primaryStage = primaryStage;
-        setSpacing(20);
-        setPadding(new Insets(30));
+        setSpacing(0);
+        setPadding(new Insets(0));
         setAlignment(Pos.TOP_CENTER);
-        setStyle("-fx-background-color: linear-gradient(to bottom, #b3e5fc 60%, #e0f7fa 100%);");
+        setStyle("-fx-background-color: transparent;");
+        StackPane mainStack = new StackPane();
+        mainStack.setPrefSize(1366, 768);
+        // Animated gradient background
+        Region gradientBg = new Region();
+        gradientBg.setPrefSize(1366, 768);
+        gradientBg.setStyle("-fx-background-radius: 0; -fx-background-color: linear-gradient(to bottom, #b3e5fc 0%, #e0f7fa 60%, #b2dfdb 100%);");
+        mainStack.getChildren().add(gradientBg);
+        // Animated waves at the bottom
+        Pane wavePane = new Pane();
+        wavePane.setPrefSize(1366, 120);
+        wavePane.setLayoutY(768 - 120);
+        for (int i = 0; i < 4; i++) {
+            SVGPath wave = new SVGPath();
+            wave.setContent("M0,60 Q150,80 300,60 T600,60 T900,60 T1200,60 T1366,60 V120 H0 Z");
+            wave.setFill(Color.web(i % 2 == 0 ? "#4fc3f7" : "#b2ebf2", 0.18 + 0.08 * i));
+            wave.setLayoutY(i * 10);
+            wavePane.getChildren().add(wave);
+            Timeline waveAnim = new Timeline(
+                new KeyFrame(Duration.ZERO, new KeyValue(wave.translateXProperty(), 0)),
+                new KeyFrame(Duration.seconds(6 + i * 2), new KeyValue(wave.translateXProperty(), -200 + i * 50))
+            );
+            waveAnim.setCycleCount(Timeline.INDEFINITE);
+            waveAnim.setAutoReverse(true);
+            waveAnim.play();
+        }
+        mainStack.getChildren().add(wavePane);
+        // Bubble animation
+        Pane bubblePane = new Pane();
+        bubblePane.setPrefSize(1366, 768);
+        mainStack.getChildren().add(bubblePane);
+        AnimationTimer bubbleTimer = new AnimationTimer() {
+            private Random rand = new Random();
+            private ArrayList<Circle> bubbles = new ArrayList<>();
+            @Override
+            public void handle(long now) {
+                if (rand.nextDouble() < 0.03) {
+                    Circle bubble = new Circle(8 + rand.nextInt(10), Color.web("#b3e5fc", 0.4 + rand.nextDouble() * 0.3));
+                    bubble.setCenterX(30 + rand.nextInt(1366 - 60));
+                    bubble.setCenterY(768 + 20);
+                    bubbles.add(bubble);
+                    bubblePane.getChildren().add(0, bubble);
+                }
+                Iterator<Circle> iterator = bubbles.iterator();
+                while (iterator.hasNext()) {
+                    Circle bubble = iterator.next();
+                    bubble.setCenterY(bubble.getCenterY() - (1.5 + rand.nextDouble() * 1.5));
+                    if (bubble.getCenterY() < -20) {
+                        bubblePane.getChildren().remove(bubble);
+                        iterator.remove();
+                    }
+                }
+            }
+        };
+        bubbleTimer.start();
+        // Main game VBox
+        VBox gameVBox = new VBox(20);
+        gameVBox.setAlignment(Pos.TOP_CENTER);
+        gameVBox.setPrefWidth(1366);
+        gameVBox.setPadding(new Insets(40, 0, 0, 0));
+        mainStack.getChildren().add(gameVBox);
 
         Label title = new Label("🌊 Ocean Cleanup Game");
-        title.setFont(Font.font("Comic Sans MS", FontWeight.BOLD, 28));
-        title.setTextFill(Color.web("#0277bd"));
-        getChildren().add(title);
+        title.setFont(Font.font("Quicksand", FontWeight.EXTRA_BOLD, 36));
+        title.setTextFill(Color.web("#00c6ff"));
+        title.setStyle("-fx-effect: dropshadow(gaussian, #43e97b, 10, 0.3, 0, 2); -fx-padding: 0 0 18 0; -fx-alignment: center;");
+        gameVBox.getChildren().add(title);
 
         // Score label
         scoreLabel = new Label("Score: 0");
         scoreLabel.setFont(Font.font("Quicksand", FontWeight.BOLD, 26));
         scoreLabel.setTextFill(Color.web("#43a047"));
-        getChildren().add(0, scoreLabel);
+        // Floating score panel
+        StackPane scorePanel = new StackPane();
+        scorePanel.setPrefSize(220, 54);
+        scorePanel.setStyle("-fx-background-color: rgba(255,255,255,0.7); -fx-background-radius: 18; -fx-effect: dropshadow(gaussian, #43e97b, 8, 0.2, 0, 2); -fx-border-color: #00c6ff; -fx-border-width: 2; -fx-border-radius: 18;");
+        HBox scoreBox = new HBox(scoreLabel);
+        scoreBox.setAlignment(Pos.CENTER);
+        scorePanel.getChildren().add(scoreBox);
+        gameVBox.getChildren().add(scorePanel);
 
         oceanPane = new Pane();
         oceanPane.setPrefSize(OCEAN_WIDTH, OCEAN_HEIGHT);
         oceanPane.setStyle("-fx-background-color: linear-gradient(to bottom, #4fc3f7 80%, #01579b 100%); -fx-background-radius: 24; -fx-border-radius: 24; -fx-border-color: #0288d1; -fx-border-width: 4;");
         oceanPane.setEffect(new DropShadow(16, Color.web("#0288d1")));
-        getChildren().add(oceanPane);
+        gameVBox.getChildren().add(oceanPane);
 
         // Animated wave background
         Rectangle wave = new Rectangle(0, OCEAN_HEIGHT - 60, OCEAN_WIDTH, 60);
@@ -101,9 +184,14 @@ public class OceanCleanupGame extends VBox {
             e.consume();
         });
 
-        Button backBtn = new Button("Back to Dashboard");
-        backBtn.setOnAction(e -> com.ecoedu.dashboard.StudentDashboard.show(primaryStage));
-        getChildren().add(backBtn);
+        Button backBtn = new Button("Back to Minigames");
+        backBtn.setFont(Font.font("Quicksand", 18));
+        backBtn.setStyle("-fx-background-color: #43a047; -fx-text-fill: white; -fx-background-radius: 18; -fx-padding: 8 32; -fx-cursor: hand;");
+        backBtn.setOnMouseEntered(e -> backBtn.setStyle("-fx-background-color: #388e3c; -fx-text-fill: #fffde7; -fx-background-radius: 18; -fx-padding: 8 32; -fx-cursor: hand; -fx-scale-x:1.07;-fx-scale-y:1.07;"));
+        backBtn.setOnMouseExited(e -> backBtn.setStyle("-fx-background-color: #43a047; -fx-text-fill: white; -fx-background-radius: 18; -fx-padding: 8 32; -fx-cursor: hand;"));
+        backBtn.setOnAction(e -> com.ecoedu.minigames.MinigamesPage.show(primaryStage));
+        gameVBox.getChildren().add(backBtn);
+        getChildren().add(mainStack);
 
         resetGame();
     }
@@ -182,31 +270,40 @@ public class OceanCleanupGame extends VBox {
     }
 
     private void showGameOver() {
-        Label gameOver = new Label("Ocean Cleaned! Final Score: " + score);
-        gameOver.setFont(Font.font("Comic Sans MS", FontWeight.BOLD, 24));
-        gameOver.setTextFill(Color.web("#0277bd"));
-        getChildren().add(gameOver);
+        StackPane overlay = new StackPane();
+        overlay.setPrefSize(1366, 768);
+        overlay.setStyle("-fx-background-color: rgba(0,0,0,0.45);");
+        VBox box = new VBox(24);
+        box.setAlignment(Pos.CENTER);
+        Label gameOver = new Label("Ocean Cleaned!\nFinal Score: " + score);
+        gameOver.setFont(Font.font("Quicksand", FontWeight.EXTRA_BOLD, 32));
+        gameOver.setTextFill(Color.web("#fffde7"));
         Button playAgainBtn = new Button("🔄 Play Again");
-        playAgainBtn.setStyle("-fx-background-color: #388e3c; -fx-text-fill: white; -fx-font-size: 18px; -fx-background-radius: 20; -fx-padding: 10 32; -fx-effect: dropshadow(gaussian, #388e3c, 8, 0.2, 0, 2);");
+        playAgainBtn.setFont(Font.font("Quicksand", 20));
+        playAgainBtn.setStyle("-fx-background-color: #43a047; -fx-text-fill: white; -fx-background-radius: 18; -fx-padding: 12 40; -fx-cursor: hand;");
+        playAgainBtn.setOnMouseEntered(e -> playAgainBtn.setStyle("-fx-background-color: #388e3c; -fx-text-fill: #fffde7; -fx-background-radius: 18; -fx-padding: 12 40; -fx-cursor: hand; -fx-scale-x:1.07;-fx-scale-y:1.07;"));
+        playAgainBtn.setOnMouseExited(e -> playAgainBtn.setStyle("-fx-background-color: #43a047; -fx-text-fill: white; -fx-background-radius: 18; -fx-padding: 12 40; -fx-cursor: hand;"));
         playAgainBtn.setOnAction(e -> {
-            getChildren().remove(gameOver);
-            getChildren().remove(playAgainBtn);
-            // Remove back button if present
-            getChildren().removeIf(node -> node instanceof Button && ((Button)node).getText().contains("Back to Minigames"));
+            getChildren().remove(overlay);
             resetGame();
         });
-        getChildren().removeIf(node -> node instanceof Button && ((Button)node).getText().contains("Play Again"));
-        getChildren().add(playAgainBtn);
-        // Add Back to Minigames button
         Button backBtn = new Button("← Back to Minigames");
-        backBtn.setStyle("-fx-background-color: #0288d1; -fx-text-fill: white; -fx-font-size: 16px; -fx-background-radius: 20; -fx-padding: 8 24; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, #0288d1, 4, 0.2, 0, 1);");
+        backBtn.setFont(Font.font("Quicksand", 18));
+        backBtn.setStyle("-fx-background-color: #0288d1; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 8 24; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, #0288d1, 4, 0.2, 0, 1);");
+        backBtn.setOnMouseEntered(e -> backBtn.setStyle("-fx-background-color: #00c6ff; -fx-text-fill: #fffde7; -fx-background-radius: 20; -fx-padding: 8 24; -fx-cursor: hand; -fx-scale-x:1.07;-fx-scale-y:1.07;"));
+        backBtn.setOnMouseExited(e -> backBtn.setStyle("-fx-background-color: #0288d1; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 8 24; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, #0288d1, 4, 0.2, 0, 1);"));
         backBtn.setOnAction(e -> {
             javafx.stage.Stage stage = (javafx.stage.Stage) getScene().getWindow();
             com.ecoedu.minigames.MinigamesPage.show(stage);
         });
-        // Remove any existing back button before adding
-        getChildren().removeIf(node -> node instanceof Button && ((Button)node).getText().contains("Back to Minigames"));
-        getChildren().add(backBtn);
+        box.getChildren().addAll(gameOver, playAgainBtn, backBtn);
+        overlay.getChildren().add(box);
+        overlay.setOpacity(0);
+        getChildren().add(overlay);
+        FadeTransition fade = new FadeTransition(Duration.seconds(1.2), overlay);
+        fade.setFromValue(0);
+        fade.setToValue(1);
+        fade.play();
     }
 
     public static void show(Stage primaryStage) {

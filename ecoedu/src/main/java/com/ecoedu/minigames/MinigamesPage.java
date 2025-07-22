@@ -40,7 +40,17 @@ public class MinigamesPage extends VBox {
 
         VBox trashCard = makeGameCard("Trash Sorting Game", "Sort the trash correctly!", "/Assets/Images/trashsorter.jpeg", () -> TrashSortingGame.show(primaryStage));
         VBox oceanCard = makeGameCard("Ocean Cleaner Game", "Clean up the ocean!", "/Assets/Images/ocean.jpg", () -> OceanCleanupGame.show(primaryStage));
-        cardRow.getChildren().addAll(trashCard, oceanCard);
+        VBox pollutionCard = makeGameCard(
+            "Pollution Patrol",
+            "Catch falling trash, steer your boat, and save the sea!",
+            "/Assets/Images/boat.png",
+            () -> PollutionPatrolGame.show(primaryStage)
+        );
+        // Enhance Pollution Patrol card with a unique style and animation
+        pollutionCard.setStyle("-fx-background-color: linear-gradient(to bottom right, #00c6ff, #43e97b 80%); -fx-background-radius: 32; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, #00c6ff, 24, 0.3, 0, 8);");
+        pollutionCard.setOnMouseEntered(e -> pollutionCard.setStyle("-fx-background-color: linear-gradient(to bottom right, #43e97b, #00c6ff 80%); -fx-background-radius: 32; -fx-cursor: hand; -fx-scale-x:1.10;-fx-scale-y:1.10;-fx-effect: dropshadow(gaussian, #43e97b, 36, 0.4, 0, 14);"));
+        pollutionCard.setOnMouseExited(e -> pollutionCard.setStyle("-fx-background-color: linear-gradient(to bottom right, #00c6ff, #43e97b 80%); -fx-background-radius: 32; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, #00c6ff, 24, 0.3, 0, 8);"));
+        cardRow.getChildren().addAll(trashCard, oceanCard, pollutionCard);
         getChildren().add(cardRow);
     }
 
