@@ -29,6 +29,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import com.ecoedu.modules.ModulePage;
 import com.ecoedu.quiz.QuizPage;
+import javafx.stage.PopupWindow;
+import javafx.util.Pair;
 
 public class StudentDashboard extends VBox {
     private Stage primaryStage;
@@ -81,17 +83,64 @@ public class StudentDashboard extends VBox {
         // Settings icon
         ImageView settingsIcon = new ImageView();
         try {
-            settingsIcon.setImage(new Image(getClass().getResourceAsStream("/Assets/Images/settings.png")));
+            settingsIcon.setImage(new Image(getClass().getResourceAsStream("/Assets/Images/settings (1).png")));
         } catch (Exception e) {
             settingsIcon.setImage(null);
         }
-        settingsIcon.setFitHeight(36);
-        settingsIcon.setFitWidth(36);
+        settingsIcon.setFitHeight(24);
+        settingsIcon.setFitWidth(24);
         settingsIcon.setPreserveRatio(true);
-        settingsIcon.setStyle("-fx-cursor: hand;");
-        settingsIcon.setOnMouseClicked(e -> showSettingsDialog());
+        settingsIcon.setStyle("-fx-cursor: hand; -fx-padding: 10; -fx-background-radius: 18; -fx-background-color: rgba(255,255,255,0.08);");
         settingsIcon.setOnMouseEntered(e -> settingsIcon.setOpacity(0.7));
         settingsIcon.setOnMouseExited(e -> settingsIcon.setOpacity(1.0));
+        // --- Custom Dropdown Menu using Popup ---
+        javafx.stage.Popup settingsMenu = new javafx.stage.Popup();
+        VBox menuBox = new VBox(0);
+        menuBox.setStyle("-fx-background-radius: 18; -fx-background-color: linear-gradient(to bottom, #e0f7fa 60%, #b2dfdb 100%); -fx-effect: dropshadow(gaussian, #43e97b, 16, 0.18, 0, 4); -fx-padding: 10 0 10 0; -fx-border-radius: 18; -fx-border-color: #43e97b; -fx-border-width: 2;");
+        menuBox.setPrefWidth(220);
+        String menuItemStyle = "-fx-font-size: 17; -fx-font-family: 'Quicksand'; -fx-background-radius: 14; -fx-padding: 10 24 10 18; -fx-cursor: hand; -fx-text-fill: #388e3c; -fx-alignment: center-left;";
+        String menuItemHover = "-fx-background-color: linear-gradient(to right, #b2ff59 0%, #81d4fa 100%); -fx-text-fill: #0288d1;";
+        java.util.List<Pair<String, Runnable>> items = java.util.Arrays.asList(
+            new Pair<>("\uD83D\uDC64  Profile", () -> StudentProfileDialog.show(primaryStage, profile)),
+            new Pair<>("\uD83D\uDD13  Logout", () -> StudentLoginPage.show(primaryStage)),
+            new Pair<>("\uD83C\uDF08  Theme", () -> ThemeSelectorDialog.show(primaryStage)),
+            new Pair<>("\u2753  Help", () -> HelpDialog.show(primaryStage)),
+            new Pair<>("\uD83D\uDD0A  Sound", () -> SoundToggleDialog.show(primaryStage)),
+            new Pair<>("\uD83D\uDD12  Parental Controls", () -> ParentalControlsDialog.show(primaryStage))
+        );
+        for (Pair<String, Runnable> item : items) {
+            Label label = new Label(item.getKey());
+            label.setStyle(menuItemStyle);
+            label.setMinWidth(200);
+            label.setOnMouseEntered(ev -> label.setStyle(menuItemStyle + menuItemHover));
+            label.setOnMouseExited(ev -> label.setStyle(menuItemStyle));
+            label.setOnMouseClicked(ev -> {
+                settingsMenu.hide();
+                item.getValue().run();
+            });
+            menuBox.getChildren().add(label);
+        }
+        javafx.scene.layout.StackPane menuRoot = new javafx.scene.layout.StackPane(menuBox);
+        menuRoot.setStyle("-fx-background-radius: 18;");
+        menuRoot.setOpacity(0);
+        settingsMenu.getContent().clear();
+        settingsMenu.getContent().add(menuRoot);
+        settingsMenu.setAutoHide(true);
+        settingsMenu.setHideOnEscape(true);
+        settingsIcon.setOnMouseClicked(e -> {
+            if (settingsMenu.isShowing()) {
+                settingsMenu.hide();
+            } else {
+                javafx.geometry.Point2D iconPos = settingsIcon.localToScreen(settingsIcon.getBoundsInLocal().getMaxX(), settingsIcon.getBoundsInLocal().getMaxY());
+                settingsMenu.show(settingsIcon, iconPos.getX() - 210, iconPos.getY() + 8);
+                // Fade-in animation
+                menuRoot.setOpacity(0);
+                javafx.animation.FadeTransition ft = new javafx.animation.FadeTransition(javafx.util.Duration.millis(180), menuRoot);
+                ft.setFromValue(0);
+                ft.setToValue(1);
+                ft.play();
+            }
+        });
         header.getChildren().addAll(icon, welcome, headerSpacer, settingsIcon);
         // Add header as the very first node
         getChildren().add(0, header);
@@ -130,23 +179,23 @@ public class StudentDashboard extends VBox {
         getChildren().add(0, topBar);
 
         // --- Simulated Real-Time Data ---
-        profile = new StudentProfile("Eco Kid", "/Assets/Images/avatar.png", "Eco Explorer", 0.65, 4);
+        //profile = new StudentProfile("Eco Kid", "/Assets/Images/avatar.png", "Eco Explorer", 0.65, 4);
         cards = new ArrayList<>();
-        cards.add(new DashboardCard("\uD83D\uDCDA Modules", "3 modules available!", "#81c784", "/Assets/Images/module.png", () -> openSection(() -> com.ecoedu.modules.ModulePage.show(primaryStage))));
-        cards.add(new DashboardCard("\uD83E\uDDE9 Quiz & Puzzles", "2 quizzes pending!", "#ffd54f", "/Assets/Images/quiz.png", () -> openSection(() -> com.ecoedu.quiz.QuizHomePage.show(primaryStage))));
-        cards.add(new DashboardCard("\uD83E\uDDD1\u200D\uD83C\uDFA8 Avatar Customization", "Style your eco hero!", "#4fc3f7", "/Assets/Images/avatar.png", () -> openSection(() -> {
+        cards.add(new DashboardCard("\uD83D\uDCDA Modules", "Learn eco topics!", " #81c784", "/Assets/Images/module.png", () -> openSection(() -> com.ecoedu.modules.ModulePage.show(primaryStage))));
+        cards.add(new DashboardCard("\uD83E\uDDE9 Quiz & Puzzles", " Test your eco skills!", "rgb(242, 86, 174)", "/Assets/Images/quiz.png", () -> openSection(() -> com.ecoedu.quiz.QuizHomePage.show(primaryStage))));
+        cards.add(new DashboardCard("\uD83E\uDDD1\u200D\uD83C\uDFA8 Avatar Customization", "Style your eco hero!", "#4fc3f7", "/Assets/Images/avatar.png", () -> openSection(() ->  {
             com.ecoedu.avatar.AvatarCustomizer avatarCustomizer = new com.ecoedu.avatar.AvatarCustomizer();
             Scene scene = new Scene(avatarCustomizer, 1366, 768);
             primaryStage.setScene(scene);
             primaryStage.setTitle("EcoEdu - Avatar Customization");
         })));
-        cards.add(new DashboardCard("\uD83C\uDFC6 Leaderboard & Badges", "4 badges earned!", "#ffd54f", "/Assets/Images/leaderboard.png", () -> openSection(() -> com.ecoedu.leaderboard.LeaderboardAndBadgesPage.show(primaryStage))));
-        cards.add(new DashboardCard("\uD83C\uDFAE Minigames", "1 new minigame!", "#ff8a65", "/Assets/Images/minigames.png", () -> openSection(() -> com.ecoedu.minigames.MinigamesPage.show(primaryStage))));
+        cards.add(new DashboardCard("\uD83C\uDFC6 Leaderboard ", " See your rank!", "#ffd54f", "/Assets/Images/leaderboard.png", () -> openSection(() -> com.ecoedu.leaderboard.LeaderboardModule.show(primaryStage))));
+        cards.add(new DashboardCard("\uD83C\uDFAE Minigames", "Play & learn!", "#ff8a65", "/Assets/Images/minigames.png", () -> openSection(() -> com.ecoedu.minigames.MinigamesPage.show(primaryStage))));
         cards.add(new DashboardCard("\uD83C\uDF31 Daily Challenge", "New eco tasks!", "#a1887f", "/Assets/Images/daily.png", () -> openSection(() -> com.ecoedu.dailytasks.DailyChallengePage.show(primaryStage))));
         quotes = Arrays.asList(
             "The Earth is what we all have in common. – Wendell Berry",
             "Small eco-actions can transform the world.",
-            "Be the change you wish to see in the world. – Gandhi",
+            "Be the change you wish to see in the world. ",
             "Every small eco-action counts!"
         );
 
@@ -164,9 +213,9 @@ public class StudentDashboard extends VBox {
 
         // --- Card Grid with Scroll ---
         cardGrid = new GridPane();
-        cardGrid.setHgap(40);
-        cardGrid.setVgap(40);
-        cardGrid.setAlignment(Pos.TOP_CENTER);
+        cardGrid.setHgap(60); // horizontal gap between cards
+        cardGrid.setVgap(35); // vertical gap between cards
+        cardGrid.setAlignment(Pos.CENTER);
         updateCardGrid();
         ScrollPane scrollPane = new ScrollPane(cardGrid);
         scrollPane.setFitToWidth(true);
@@ -194,38 +243,86 @@ public class StudentDashboard extends VBox {
     private VBox makeCard(DashboardCard card) {
         VBox cardBox = new VBox(10);
         cardBox.setAlignment(Pos.CENTER);
-        cardBox.setPrefSize(340, 220);
-        cardBox.setStyle("-fx-background-color: linear-gradient(to bottom right, " + card.getColor() + ", #fffde7 80%); -fx-background-radius: 28; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, #bdbdbd, 16, 0.2, 0, 4);");
+        // Gradient background for the card
+        String gradient = "linear-gradient(to bottom right, " + card.getColor() + ", #fffde7 90%)";
+        cardBox.setStyle("-fx-background-radius: 18; -fx-background-color: " + gradient + "; -fx-effect: dropshadow(gaussian, #43e97b, 8, 0.12, 0, 2);");
+        cardBox.setPadding(new Insets(18, 12, 18, 12));
+        cardBox.setMinWidth(350);
+        cardBox.setMaxWidth(350);
+        cardBox.setMinHeight(180);
+        cardBox.setMaxHeight(180);
+        // Animated gradient effect inside card
+        javafx.scene.shape.Rectangle effectRect = new javafx.scene.shape.Rectangle();
+        effectRect.setWidth(200);
+        effectRect.setHeight(110);
+        effectRect.setArcWidth(28);
+        effectRect.setArcHeight(28);
+        effectRect.setMouseTransparent(true);
+        effectRect.setManaged(false);
+        effectRect.setFill(new javafx.scene.paint.LinearGradient(0, 0, 1, 1, true, javafx.scene.paint.CycleMethod.NO_CYCLE,
+            new javafx.scene.paint.Stop(0, javafx.scene.paint.Color.web("#ffffff33")),
+            new javafx.scene.paint.Stop(1, javafx.scene.paint.Color.TRANSPARENT)));
+        // Subtle animation: fade in and out
+        javafx.animation.FadeTransition fade = new javafx.animation.FadeTransition(javafx.util.Duration.seconds(2.5), effectRect);
+        fade.setFromValue(0.18);
+        fade.setToValue(0.38);
+        fade.setAutoReverse(true);
+        fade.setCycleCount(javafx.animation.Animation.INDEFINITE);
+        fade.play();
+        // Icon
         ImageView icon = new ImageView();
         try {
             icon.setImage(new Image(getClass().getResourceAsStream(card.getIconPath())));
         } catch (Exception e) {
             icon.setImage(null);
         }
-        icon.setFitWidth(72);
-        icon.setFitHeight(72);
-        icon.setStyle("-fx-background-color: #fffde7; -fx-background-radius: 36; -fx-border-radius: 36; -fx-border-color: #fff; -fx-border-width: 2; -fx-effect: dropshadow(gaussian, #fffde7, 8, 0.2, 0, 2);");
-        Label titleLabel = new Label(card.getTitle());
-        titleLabel.setFont(Font.font("Quicksand", FontWeight.BOLD, 22));
-        titleLabel.setTextFill(Color.web("#263238"));
-        titleLabel.setStyle("-fx-font-weight: bold;");
-        Label subtitleLabel = new Label(card.getSubtitle());
-        subtitleLabel.setFont(Font.font("Quicksand", 14));
-        subtitleLabel.setTextFill(Color.web("#424242"));
-        cardBox.getChildren().addAll(icon, titleLabel, subtitleLabel);
-        cardBox.setOnMouseClicked(e -> {
-            try {
-                card.getOnClick().run();
-            } catch (Exception ex) {
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Coming Soon");
-                alert.setHeaderText(null);
-                alert.setContentText("This section is coming soon!");
-                alert.showAndWait();
-            }
+        icon.setFitHeight(36);
+        icon.setFitWidth(36);
+        icon.setPreserveRatio(true);
+        // Title
+        Label title = new Label(card.getTitle());
+        title.setFont(Font.font("Quicksand", FontWeight.EXTRA_BOLD, 32));
+        title.setTextFill(Color.web("#22223b"));
+        title.setStyle("-fx-effect: dropshadow(gaussian,rgb(35, 35, 34), 8, 0.25, 0, 2);");
+        title.setWrapText(true);
+        title.setAlignment(Pos.CENTER);
+        title.setMaxWidth(320);
+        // Subtitle
+        Label subtitle = new Label(card.getSubtitle());
+        subtitle.setFont(Font.font("Quicksand", FontWeight.BOLD, 20));
+        subtitle.setTextFill(Color.web("#3a86ff"));
+        subtitle.setStyle("-fx-effect: dropshadow(gaussian,rgb(31, 31, 29), 6, 0.18, 0, 1);");
+        subtitle.setWrapText(true);
+        subtitle.setAlignment(Pos.CENTER);
+        subtitle.setMaxWidth(320);
+        VBox textBox = new VBox(8, title, subtitle);
+        textBox.setAlignment(Pos.CENTER);
+        textBox.setFillWidth(true);
+        javafx.scene.layout.StackPane cardContent = new javafx.scene.layout.StackPane(effectRect, new VBox(18, icon, textBox));
+        cardContent.setAlignment(Pos.CENTER);
+        cardBox.getChildren().clear();
+        cardBox.getChildren().add(cardContent);
+        cardBox.setOnMouseClicked(e -> card.getOnClick().run());
+        cardBox.setOnMouseEntered(e -> {
+            cardBox.setStyle("-fx-background-radius: 18; -fx-background-color: linear-gradient(to bottom right, derive(" + card.getColor() + ", 20%), #fffde7 90%); -fx-effect: dropshadow(gaussian, #43e97b, 32, 0.28, 0, 8); -fx-scale-x:1.06;-fx-scale-y:1.06;");
+            // Animate the effectRect to shimmer/brighten on hover
+            javafx.animation.FadeTransition hoverFade = new javafx.animation.FadeTransition(javafx.util.Duration.seconds(0.3), effectRect);
+            hoverFade.setFromValue(effectRect.getOpacity());
+            hoverFade.setToValue(0.7);
+            hoverFade.setAutoReverse(false);
+            hoverFade.setCycleCount(1);
+            hoverFade.play();
         });
-        cardBox.setOnMouseEntered(e -> cardBox.setStyle("-fx-background-color: linear-gradient(to bottom right, " + card.getColor() + ", #fffde7 80%); -fx-background-radius: 28; -fx-cursor: hand; -fx-scale-x:1.08;-fx-scale-y:1.08;-fx-effect: dropshadow(gaussian, #0288d1, 32, 0.3, 0, 10);"));
-        cardBox.setOnMouseExited(e -> cardBox.setStyle("-fx-background-color: linear-gradient(to bottom right, " + card.getColor() + ", #fffde7 80%); -fx-background-radius: 28; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, #bdbdbd, 16, 0.2, 0, 4);"));
+        cardBox.setOnMouseExited(e -> {
+            cardBox.setStyle("-fx-background-radius: 18; -fx-background-color: " + gradient + "; -fx-effect: dropshadow(gaussian, #43e97b, 8, 0.12, 0, 2);");
+            // Restore the effectRect to normal fade
+            javafx.animation.FadeTransition exitFade = new javafx.animation.FadeTransition(javafx.util.Duration.seconds(0.3), effectRect);
+            exitFade.setFromValue(effectRect.getOpacity());
+            exitFade.setToValue(0.28);
+            exitFade.setAutoReverse(false);
+            exitFade.setCycleCount(1);
+            exitFade.play();
+        });
         return cardBox;
     }
 
@@ -269,15 +366,6 @@ public class StudentDashboard extends VBox {
             alert.setContentText("This section is coming soon!");
             alert.showAndWait();
         }
-    }
-
-    // Show settings dialog or message (stub)
-    private void showSettingsDialog() {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Settings");
-        alert.setHeaderText(null);
-        alert.setContentText("Settings dialog coming soon!");
-        alert.showAndWait();
     }
 
     // Data classes
@@ -325,7 +413,7 @@ public class StudentDashboard extends VBox {
         // Mock providers for demonstration
         
         List<DashboardCard> cards = List.of(
-            new DashboardCard("\uD83D\uDCDA Modules", "3 new modules!", "#81c784", "/Assets/Images/module.png", () -> {
+            new DashboardCard("\uD83D\uDCDA Modules", "learn eco topices!", "#81c784", "/Assets/Images/module.png", () -> {
                 try {
                     ModulePage.show(primaryStage);
                 } catch (Exception e) {
@@ -336,7 +424,7 @@ public class StudentDashboard extends VBox {
                     alert.showAndWait();
                 }
             }),
-            new DashboardCard("\uD83E\uDDE9 Quiz & Puzzles", "2 quizzes pending!", "#ffd54f", "/Assets/Images/quiz.png", () -> {
+            new DashboardCard("\uD83E\uDDE9 Quiz & Puzzles", "test your eco skills!", "#ffd54f", "/Assets/Images/quiz.png", () -> {
                 try {
                     QuizPage.show(primaryStage, null);
                 } catch (Exception e) {
@@ -360,9 +448,9 @@ public class StudentDashboard extends VBox {
                     alert.showAndWait();
                 }
             }),
-            new DashboardCard("\uD83C\uDFC6 Leaderboard & Badges", "4 badges earned!", "#ffd54f", "/Assets/Images/leaderboard.png", () -> {
+            new DashboardCard("\uD83C\uDFC6 Leaderboard & Badges", "See your rank!", "#ffd54f", "/Assets/Images/leaderboard.png", () -> {
                 try {
-                    com.ecoedu.leaderboard.LeaderboardAndBadgesPage.show(primaryStage);
+                    com.ecoedu.leaderboard.LeaderboardModule.show(primaryStage);
                 } catch (Exception e) {
                     Alert alert = new Alert(Alert.AlertType.INFORMATION);
                     alert.setTitle("Coming Soon");
@@ -371,7 +459,7 @@ public class StudentDashboard extends VBox {
                     alert.showAndWait();
                 }
             }),
-            new DashboardCard("\uD83C\uDFAE Minigames", "1 new minigame!", "#ff8a65", "/Assets/Images/minigames.png", () -> {
+            new DashboardCard("\uD83C\uDFAE Minigames", "play & learn!", "#ff8a65", "/Assets/Images/minigames.png", () -> {
                 try {
                     com.ecoedu.minigames.TrashSortingGame.show(primaryStage);
                 } catch (Exception e) {
@@ -397,7 +485,7 @@ public class StudentDashboard extends VBox {
         List<String> quotes = Arrays.asList(
             "The Earth is what we all have in common. – Wendell Berry",
             "Small acts, when multiplied, can transform the world.",
-            "Be the change you wish to see in the world. – Gandhi",
+            "Be the change you wish to see in the world. ",
             "Every small eco-action counts!"
         );
 

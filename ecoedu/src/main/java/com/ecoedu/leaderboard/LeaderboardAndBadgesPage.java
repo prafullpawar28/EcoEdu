@@ -5,8 +5,6 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -15,7 +13,6 @@ import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import java.text.SimpleDateFormat;
 import java.util.List;
-import com.ecoedu.leaderboard.LeaderboardService;
 import javafx.scene.layout.Region;
 
 public class LeaderboardAndBadgesPage extends VBox {
@@ -54,35 +51,113 @@ public class LeaderboardAndBadgesPage extends VBox {
         lbTitle.setFont(Font.font("Quicksand", FontWeight.BOLD, 22));
         lbTitle.setTextFill(Color.web("#43a047"));
         leaderboardBox.getChildren().add(lbTitle);
-        List<LeaderboardService.UserStats> leaderboard = LeaderboardService.getInstance().getLeaderboard();
-        String currentUser = LeaderboardService.getInstance().getCurrentUser();
-        for (int i = 0; i < leaderboard.size(); i++) {
-            LeaderboardService.UserStats stats = leaderboard.get(i);
-            HBox row = new HBox(18);
-            row.setAlignment(Pos.CENTER_LEFT);
-            row.setPadding(new Insets(8));
-            Label rank = new Label("#" + (i + 1));
-            rank.setFont(Font.font("Quicksand", FontWeight.BOLD, 20));
-            Label name = new Label(stats.name);
-            name.setFont(Font.font("Quicksand", FontWeight.BOLD, 20));
-            name.setTextFill(stats.name.equals(currentUser) ? Color.web("#ffb300") : Color.web("#263238"));
-            Label score = new Label("Score: " + stats.score);
-            score.setFont(Font.font("Quicksand", 17));
-            // Show quizzes and minigames stats
-            Label quizStat = new Label("📝 Quizzes: " + stats.badges.stream().filter(b -> b.contains("Quiz Master")).count());
-            quizStat.setFont(Font.font("Quicksand", 15));
-            Label gameStat = new Label("🎮 Minigames: " + stats.badges.stream().filter(b -> b.contains("Minigame Master")).count());
-            gameStat.setFont(Font.font("Quicksand", 15));
-            HBox badges = new HBox(4);
-            for (String badge : stats.badges) {
-                Label badgeIcon = new Label(badge.contains("Quiz") ? "🏅" : "🎖");
-                badgeIcon.setFont(Font.font(22));
-                badges.getChildren().add(badgeIcon);
-            }
-            row.getChildren().addAll(rank, name, score, quizStat, gameStat, badges);
-            row.setStyle(stats.name.equals(currentUser) ? "-fx-background-color: #fffde7; -fx-background-radius: 18; -fx-effect: dropshadow(gaussian, #ffd54f, 10, 0.15, 0, 3);" : "-fx-background-radius: 18;");
-            leaderboardBox.getChildren().add(row);
+        // Tabs for leaderboard views
+        HBox tabBar = new HBox(18);
+        tabBar.setAlignment(Pos.CENTER);
+        tabBar.setPadding(new Insets(0, 0, 18, 0));
+        String[] tabNames = {"This Week", "All Time", "Friends Only"};
+        List<javafx.scene.control.Label> tabLabels = new java.util.ArrayList<>();
+        for (String tab : tabNames) {
+            javafx.scene.control.Label tabLabel = new javafx.scene.control.Label(tab);
+            tabLabel.setFont(Font.font("Quicksand", FontWeight.BOLD, 18));
+            tabLabel.setStyle("-fx-background-radius: 16; -fx-padding: 8 28; -fx-cursor: hand; -fx-background-color: #e0f7fa; -fx-text-fill: #388e3c;");
+            tabLabels.add(tabLabel);
+            tabBar.getChildren().add(tabLabel);
         }
+        leaderboardBox.getChildren().add(tabBar);
+        // Card pane and scroll
+        javafx.scene.layout.FlowPane cardPane = new javafx.scene.layout.FlowPane();
+        cardPane.setHgap(32);
+        cardPane.setVgap(24);
+        cardPane.setAlignment(Pos.CENTER);
+        cardPane.setPrefWrapLength(1100);
+        javafx.scene.control.ScrollPane scroll = new javafx.scene.control.ScrollPane(cardPane);
+        scroll.setFitToWidth(true);
+        scroll.setPrefHeight(420);
+        scroll.setStyle("-fx-background: transparent; -fx-background-color: transparent;");
+        leaderboardBox.getChildren().add(scroll);
+        // Data for tabs
+        List<LeaderboardService.UserStats> allTime = LeaderboardService.getInstance().getLeaderboard();
+        List<LeaderboardService.UserStats> thisWeek = new java.util.ArrayList<>(allTime);
+        java.util.Collections.shuffle(thisWeek); // Demo: shuffle for "This Week"
+        List<LeaderboardService.UserStats> friends = new java.util.ArrayList<>();
+        for (LeaderboardService.UserStats s : allTime) {
+            if (s.name.equals("Eco Kid") || s.name.equals("Green Guru")) friends.add(s);
+        }
+        String currentUser = LeaderboardService.getInstance().getCurrentUser();
+        // Search bar
+        HBox searchBar = new HBox(8);
+        searchBar.setAlignment(Pos.CENTER_LEFT);
+        searchBar.setPadding(new Insets(0, 0, 12, 0));
+        Label searchLabel = new Label("🔍");
+        searchLabel.setFont(Font.font("Quicksand", FontWeight.BOLD, 18));
+        javafx.scene.control.TextField searchField = new javafx.scene.control.TextField();
+        searchField.setPromptText("Search user...");
+        searchField.setPrefWidth(220);
+        searchBar.getChildren().addAll(searchLabel, searchField);
+        leaderboardBox.getChildren().add(searchBar);
+        // Helper to simulate achievements and level/xp
+        java.util.function.Function<String, Integer> getLevel = (name) -> 1 + (name.hashCode() % 5 + 5) % 5;
+        java.util.function.Function<String, Integer> getXP = (name) -> 10 + (name.hashCode() % 100 + 100) % 100;
+        java.util.function.Function<String, java.util.List<String>> getAchievements = (name) -> java.util.Arrays.asList(
+            "Completed 5 quizzes", "Won 3 minigames", "Planted 10 trees"
+        );
+        // Helper to render cards
+        java.util.function.Consumer<List<LeaderboardService.UserStats>> renderCards = (list) -> {
+            cardPane.getChildren().clear();
+            String filter = searchField.getText().trim().toLowerCase();
+            for (int i = 0, shown = 0; i < list.size(); i++) {
+                LeaderboardService.UserStats stats = list.get(i);
+                if (!filter.isEmpty() && !stats.name.toLowerCase().contains(filter)) continue;
+                int quizzes = (int) stats.badges.stream().filter(b -> b.contains("Quiz Master")).count();
+                int minigames = (int) stats.badges.stream().filter(b -> b.contains("Minigame Master")).count();
+                AvatarLeaderboardCard card = new AvatarLeaderboardCard(
+                    shown + 1,
+                    stats.name,
+                    stats.score,
+                    quizzes,
+                    minigames,
+                    stats.badges,
+                    stats.name.equals(currentUser),
+                    "/Assets/Images/avatar.png"
+                );
+                card.setOpacity(0);
+                javafx.animation.FadeTransition ft = new javafx.animation.FadeTransition(javafx.util.Duration.millis(400 + shown * 80), card);
+                ft.setFromValue(0);
+                ft.setToValue(1);
+                ft.play();
+                // Profile popover on click
+                card.setOnMouseClicked(ev -> {
+                    UserProfilePopover pop = new UserProfilePopover(
+                        stats.name,
+                        "/Assets/Images/avatar.png",
+                        getLevel.apply(stats.name),
+                        getXP.apply(stats.name),
+                        stats.badges,
+                        getAchievements.apply(stats.name)
+                    );
+                    pop.show();
+                });
+                cardPane.getChildren().add(card);
+                shown++;
+            }
+        };
+        // Tab switching logic
+        for (int i = 0; i < tabLabels.size(); i++) {
+            int idx = i;
+            tabLabels.get(i).setOnMouseClicked(e -> {
+                for (int j = 0; j < tabLabels.size(); j++) {
+                    tabLabels.get(j).setStyle("-fx-background-radius: 16; -fx-padding: 8 28; -fx-cursor: hand; -fx-background-color: #e0f7fa; -fx-text-fill: #388e3c;");
+                }
+                tabLabels.get(idx).setStyle("-fx-background-radius: 16; -fx-padding: 8 28; -fx-cursor: hand; -fx-background-color: linear-gradient(to right, #43e97b, #b2ff59); -fx-text-fill: #fffde7; -fx-effect: dropshadow(gaussian, #43e97b, 8, 0.18, 0, 2);");
+                if (idx == 0) renderCards.accept(thisWeek);
+                else if (idx == 1) renderCards.accept(allTime);
+                else renderCards.accept(friends);
+            });
+        }
+        // Default: All Time selected
+        tabLabels.get(1).setStyle("-fx-background-radius: 16; -fx-padding: 8 28; -fx-cursor: hand; -fx-background-color: linear-gradient(to right, #43e97b, #b2ff59); -fx-text-fill: #fffde7; -fx-effect: dropshadow(gaussian, #43e97b, 8, 0.18, 0, 2);");
+        renderCards.accept(allTime);
         getChildren().add(leaderboardBox);
 
         // Activity Feed
@@ -129,6 +204,17 @@ public class LeaderboardAndBadgesPage extends VBox {
         }
         myBox.getChildren().add(myBadges);
         getChildren().add(myBox);
+
+        // Search field listener
+        searchField.textProperty().addListener((obs, oldVal, newVal) -> {
+            int idx = 1;
+            for (int i = 0; i < tabLabels.size(); i++) {
+                if (tabLabels.get(i).getStyle().contains("linear-gradient")) idx = i;
+            }
+            if (idx == 0) renderCards.accept(thisWeek);
+            else if (idx == 1) renderCards.accept(allTime);
+            else renderCards.accept(friends);
+        });
     }
 
     public static void show(Stage primaryStage) {
