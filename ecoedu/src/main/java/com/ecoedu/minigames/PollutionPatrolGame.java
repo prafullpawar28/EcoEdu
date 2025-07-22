@@ -63,9 +63,9 @@ public class PollutionPatrolGame extends StackPane {
         gamePane.setPrefSize(1366, 768);
         // Load images from resources
         try {
-            trashImage = new Image(getClass().getResourceAsStream("/Assets/Images/trash1.png"));
+            trashImage = new Image(getClass().getResourceAsStream("/Assets/Images/trash.png"));
             trashVariety.add(trashImage);
-            trashVariety.add(new Image(getClass().getResourceAsStream("/Assets/Images/trashsorter.jpeg")));
+            trashVariety.add(new Image(getClass().getResourceAsStream("/Assets/Images/trash.png")));
             trashVariety.add(new Image(getClass().getResourceAsStream("/Assets/Images/trash.png")));
         } catch (Exception e) {
             trashImage = null;

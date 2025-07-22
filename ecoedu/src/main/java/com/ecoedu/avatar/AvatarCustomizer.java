@@ -27,12 +27,12 @@ import javafx.util.Duration;
 import javafx.scene.layout.StackPane;
 
 public class AvatarCustomizer extends StackPane {
-    private ImageView avatarFace, avatarHair, avatarAccessory, avatarClothes;
-    private int hairIndex = 0, faceIndex = 0, accessoryIndex = 0, clothesIndex = 0;
+    private ImageView avatarFace, avatarHair, avatarAccessory;
+    private int hairIndex = 0, faceIndex = 0, accessoryIndex =0;
     private static final String[] HAIR_OPTIONS = {"/Assets/Images/hair1.png", "/Assets/Images/hair2.png", "/Assets/Images/hair3.png"};
     private static final String[] FACE_OPTIONS = {"/Assets/Images/face1.png", "/Assets/Images/face2.png", "/Assets/Images/face3.png"};
-    private static final String[] ACCESSORY_OPTIONS = {"/Assets/Images/glasses1.png", "/Assets/Images/hat1.png", null};
-    private static final String[] CLOTHES_OPTIONS = {"/Assets/Images/shirt1.png", "/Assets/Images/shirt2.png", "/Assets/Images/shirt3.png"};
+    private static final String[] ACCESSORY_OPTIONS = {"/Assets/Images/glasses1.png", "/Assets/Images/glasses2.png", "/Assets/Images/glasses3.png"};
+    //private static final String[] CLOTHES_OPTIONS = {"/Assets/Images/shirt1.png", "/Assets/Images/shirt2.png", "/Assets/Images/shirt3.png"};
 
     public AvatarCustomizer() {
         // Animated eco background
@@ -70,8 +70,8 @@ public class AvatarCustomizer extends StackPane {
         avatarFace = new ImageView();
         avatarHair = new ImageView();
         avatarAccessory = new ImageView();
-        avatarClothes = new ImageView();
-        for (ImageView part : new ImageView[]{avatarClothes, avatarFace, avatarHair, avatarAccessory}) {
+       // avatarClothes = new ImageView();
+        for (ImageView part : new ImageView[]{ avatarFace, avatarHair, avatarAccessory}) {
             part.setFitWidth(160);
             part.setFitHeight(160);
             part.setPreserveRatio(true);
@@ -81,8 +81,8 @@ public class AvatarCustomizer extends StackPane {
         avatarFace.setClip(clip);
         avatarHair.setClip(clip);
         avatarAccessory.setClip(clip);
-        avatarClothes.setClip(clip);
-        VBox avatarStack = new VBox(avatarClothes, avatarFace, avatarHair, avatarAccessory);
+        //avatarClothes.setClip(clip);
+        VBox avatarStack = new VBox( avatarFace, avatarHair, avatarAccessory);
         avatarStack.setAlignment(Pos.CENTER);
         previewBox.getChildren().add(avatarStack);
         content.getChildren().add(previewBox);
@@ -100,10 +100,10 @@ public class AvatarCustomizer extends StackPane {
             accessoryIndex = i;
             updateAvatar();
         }));
-        content.getChildren().add(makeFeaturePicker("Clothes", CLOTHES_OPTIONS, i -> {
-            clothesIndex = i;
-            updateAvatar();
-        }));
+        // content.getChildren().add(makeFeaturePicker("Clothes", CLOTHES_OPTIONS, i -> {
+        //     clothesIndex = i;
+        //     updateAvatar();
+        // }));
 
         // Buttons
         HBox btnBox = new HBox(24);
@@ -116,7 +116,7 @@ public class AvatarCustomizer extends StackPane {
         resetBtn.setFont(Font.font("Quicksand", 16));
         resetBtn.setStyle("-fx-background-color: #ffd54f; -fx-text-fill: #263238; -fx-background-radius: 20; -fx-padding: 8 28; -fx-cursor: hand;");
         resetBtn.setOnAction(e -> {
-            hairIndex = faceIndex = accessoryIndex = clothesIndex = 0;
+            hairIndex = faceIndex = accessoryIndex  = 0;
             updateAvatar();
         });
         Button randomBtn = new Button("Randomize");
@@ -127,7 +127,7 @@ public class AvatarCustomizer extends StackPane {
             hairIndex = r.nextInt(HAIR_OPTIONS.length);
             faceIndex = r.nextInt(FACE_OPTIONS.length);
             accessoryIndex = r.nextInt(ACCESSORY_OPTIONS.length);
-            clothesIndex = r.nextInt(CLOTHES_OPTIONS.length);
+            //clothesIndex = r.nextInt(CLOTHES_OPTIONS.length);
             updateAvatar();
             animateAvatar();
         });
@@ -142,7 +142,7 @@ public class AvatarCustomizer extends StackPane {
         setImageSafe(avatarHair, HAIR_OPTIONS[hairIndex]);
         setImageSafe(avatarFace, FACE_OPTIONS[faceIndex]);
         setImageSafe(avatarAccessory, ACCESSORY_OPTIONS[accessoryIndex]);
-        setImageSafe(avatarClothes, CLOTHES_OPTIONS[clothesIndex]);
+        //setImageSafe(avatarClothes, CLOTHES_OPTIONS[clothesIndex]);
         animateAvatar();
     }
 

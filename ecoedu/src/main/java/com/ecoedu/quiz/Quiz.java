@@ -10,9 +10,9 @@ import javafx.stage.Stage;
 import java.util.List;
 
 public class Quiz extends Application {
-    private List<Question> questions = QuizData.getQuestions();
-    private int currentQuestion = 0;
-    private int score = 0;
+    List<Question> questions = QuizData.getQuestions();
+    int currentQuestion = 0;
+    int score = 0;
     private Label questionLabel;
     private Button[] optionButtons;
     private Label feedbackLabel;
@@ -97,7 +97,5 @@ public class Quiz extends Application {
         feedbackLabel.setText("");
         nextButton.setVisible(false);
     }
-
-    
-    }
+}
  
