@@ -31,6 +31,9 @@ import com.ecoedu.modules.ModulePage;
 import com.ecoedu.quiz.QuizPage;
 import javafx.stage.PopupWindow;
 import javafx.util.Pair;
+import javafx.scene.input.KeyCode;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
 
 public class StudentDashboard extends VBox {
     private Stage primaryStage;
@@ -100,15 +103,17 @@ public class StudentDashboard extends VBox {
         menuBox.setPrefWidth(220);
         String menuItemStyle = "-fx-font-size: 17; -fx-font-family: 'Quicksand'; -fx-background-radius: 14; -fx-padding: 10 24 10 18; -fx-cursor: hand; -fx-text-fill: #388e3c; -fx-alignment: center-left;";
         String menuItemHover = "-fx-background-color: linear-gradient(to right, #b2ff59 0%, #81d4fa 100%); -fx-text-fill: #0288d1;";
-        java.util.List<Pair<String, Runnable>> items = java.util.Arrays.asList(
-            new Pair<>("\uD83D\uDC64  Profile", () -> StudentProfileDialog.show(primaryStage, profile)),
-            new Pair<>("\uD83D\uDD13  Logout", () -> StudentLoginPage.show(primaryStage)),
-            new Pair<>("\uD83C\uDF08  Theme", () -> ThemeSelectorDialog.show(primaryStage)),
-            new Pair<>("\u2753  Help", () -> HelpDialog.show(primaryStage)),
-            new Pair<>("\uD83D\uDD0A  Sound", () -> SoundToggleDialog.show(primaryStage)),
-            new Pair<>("\uD83D\uDD12  Parental Controls", () -> ParentalControlsDialog.show(primaryStage))
+        java.util.List<javafx.util.Pair<String, Runnable>> items = java.util.Arrays.asList(
+            new javafx.util.Pair<>("\uD83D\uDC64  Profile", () -> StudentProfileDialog.show(primaryStage, new StudentProfileDialog.StudentProfile(
+                profile.getName(), profile.getAvatarPath(), profile.getEcoLevel(), profile.getBadges()
+            ))),
+            new javafx.util.Pair<>("\uD83D\uDD13  Logout", () -> StudentLoginPage.show(primaryStage)),
+            new javafx.util.Pair<>("\uD83C\uDF08  Theme", () -> ThemeSelectorDialog.show(primaryStage)),
+            new javafx.util.Pair<>("\u2753  Help", () -> HelpDialog.show(primaryStage)),
+            new javafx.util.Pair<>("\uD83D\uDD0A  Sound", () -> SoundToggleDialog.show(primaryStage)),
+            new javafx.util.Pair<>("\uD83D\uDD12  Parental Controls", () -> ParentalControlsDialog.show(primaryStage))
         );
-        for (Pair<String, Runnable> item : items) {
+        for (javafx.util.Pair<String, Runnable> item : items) {
             Label label = new Label(item.getKey());
             label.setStyle(menuItemStyle);
             label.setMinWidth(200);
@@ -151,30 +156,7 @@ public class StudentDashboard extends VBox {
         topBar.setPadding(new Insets(0, 0, 10, 0));
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
-        // MenuButton settingsMenu = new MenuButton(); // This line was removed as per the edit hint
-        // ImageView gearIcon = new ImageView(); // This line was removed as per the edit hint
-        // try { // This block was removed as per the edit hint
-        //     gearIcon.setImage(new Image(getClass().getResourceAsStream("/Assets/Images/settings.png"))); // This line was removed as per the edit hint
-        // } catch (Exception e) { // This line was removed as per the edit hint
-        //     gearIcon.setImage(null); // This line was removed as per the edit hint
-        // } // This block was removed as per the edit hint
-        // gearIcon.setFitWidth(32); // This line was removed as per the edit hint
-        // gearIcon.setFitHeight(32); // This line was removed as per the edit hint
-        // settingsMenu.setGraphic(gearIcon); // This line was removed as per the edit hint
-        // settingsMenu.setStyle("-fx-background-color: transparent; -fx-cursor: hand; -fx-padding: 0 8 0 8; -fx-background-radius: 16;"); // This line was removed as per the edit hint
-        // MenuItem profileItem = new MenuItem("Profile"); // This line was removed as per the edit hint
-        // profileItem.setOnAction(e -> StudentProfileDialog.show(primaryStage, profile)); // This line was removed as per the edit hint
-        // MenuItem logoutItem = new MenuItem("Logout"); // This line was removed as per the edit hint
-        // logoutItem.setOnAction(e -> com.ecoedu.dashboard.StudentLoginPage.show(primaryStage)); // This line was removed as per the edit hint
-        // MenuItem themeItem = new MenuItem("Change Theme"); // This line was removed as per the edit hint
-        // themeItem.setOnAction(e -> ThemeSelectorDialog.show(primaryStage)); // This line was removed as per the edit hint
-        // MenuItem helpItem = new MenuItem("Help"); // This line was removed as per the edit hint
-        // helpItem.setOnAction(e -> HelpDialog.show(primaryStage)); // This line was removed as per the edit hint
-        // MenuItem soundItem = new MenuItem("Sound"); // This line was removed as per the edit hint
-        // soundItem.setOnAction(e -> SoundToggleDialog.show(primaryStage)); // This line was removed as per the edit hint
-        // MenuItem parentItem = new MenuItem("Parental Controls"); // This line was removed as per the edit hint
-        // parentItem.setOnAction(e -> ParentalControlsDialog.show(primaryStage)); // This line was removed as per the edit hint
-        // settingsMenu.getItems().addAll(profileItem, logoutItem, themeItem, helpItem, soundItem, parentItem); // This line was removed as per the edit hint
+        
         topBar.getChildren().addAll(spacer); // This line was removed as per the edit hint
         getChildren().add(0, topBar);
 
@@ -183,13 +165,8 @@ public class StudentDashboard extends VBox {
         cards = new ArrayList<>();
         cards.add(new DashboardCard("\uD83D\uDCDA Modules", "Learn eco topics!", " #81c784", "/Assets/Images/module.png", () -> openSection(() -> com.ecoedu.modules.ModulePage.show(primaryStage))));
         cards.add(new DashboardCard("\uD83E\uDDE9 Quiz & Puzzles", " Test your eco skills!", "rgb(242, 86, 174)", "/Assets/Images/quiz.png", () -> openSection(() -> com.ecoedu.quiz.QuizHomePage.show(primaryStage))));
-        cards.add(new DashboardCard("\uD83E\uDDD1\u200D\uD83C\uDFA8 Avatar Customization", "Style your eco hero!", "#4fc3f7", "/Assets/Images/avatar.png", () -> openSection(() ->  {
-            com.ecoedu.avatar.AvatarCustomizer avatarCustomizer = new com.ecoedu.avatar.AvatarCustomizer();
-            Scene scene = new Scene(avatarCustomizer, 1366, 768);
-            primaryStage.setScene(scene);
-            primaryStage.setTitle("EcoEdu - Avatar Customization");
-        })));
-        cards.add(new DashboardCard("\uD83C\uDFC6 Leaderboard ", " See your rank!", "#ffd54f", "/Assets/Images/leaderboard.png", () -> openSection(() -> com.ecoedu.leaderboard.LeaderboardModule.show(primaryStage))));
+        cards.add(new DashboardCard("\uD83E\uDDD1\u200D\uD83C\uDFA8 Avatar Customization", "Style your eco hero!", "#4fc3f7", "/Assets/Images/avatar.png", () -> openSection(() -> com.ecoedu.avatar.AvatarCustomizer.show(primaryStage))));
+        cards.add(new DashboardCard("\uD83C\uDFC6 Leaderboard & Badges", "See your rank!", "#ffd54f", "/Assets/Images/leaderboard.png", () -> openSection(() -> showLeaderboardWithBack(primaryStage))));
         cards.add(new DashboardCard("\uD83C\uDFAE Minigames", "Play & learn!", "#ff8a65", "/Assets/Images/minigames.png", () -> openSection(() -> com.ecoedu.minigames.MinigamesPage.show(primaryStage))));
         cards.add(new DashboardCard("\uD83C\uDF31 Daily Challenge", "New eco tasks!", "#a1887f", "/Assets/Images/daily.png", () -> openSection(() -> com.ecoedu.dailytasks.DailyChallengePage.show(primaryStage))));
         quotes = Arrays.asList(
@@ -368,6 +345,44 @@ public class StudentDashboard extends VBox {
         }
     }
 
+    // Helper method to show leaderboard with back navigation
+    private void showLeaderboardWithBack(Stage primaryStage) {
+        com.ecoedu.leaderboard.LeaderboardAndBadgesPage leaderboardPage = new com.ecoedu.leaderboard.LeaderboardAndBadgesPage();
+        // Breadcrumb bar
+        HBox breadcrumb = new HBox();
+        breadcrumb.setAlignment(Pos.CENTER_LEFT);
+        breadcrumb.setSpacing(8);
+        Label dash = new Label("Dashboard");
+        Label sep = new Label("> ");
+        Label lead = new Label("Leaderboard & Badges");
+        breadcrumb.getChildren().addAll(dash, sep, lead);
+        breadcrumb.setStyle("-fx-font-size: 15; -fx-text-fill: #388e3c; -fx-padding: 0 0 8 0;");
+        leaderboardPage.getChildren().add(0, breadcrumb);
+        // Back button
+        Button backBtn = new Button("← Back to Dashboard");
+        backBtn.setFont(Font.font("Quicksand", FontWeight.BOLD, 16));
+        backBtn.setStyle("-fx-background-radius: 16; -fx-background-color: #43e97b; -fx-text-fill: white; -fx-cursor: hand; -fx-padding: 8 32;");
+        backBtn.setOnAction(e -> StudentDashboard.show(primaryStage));
+        leaderboardPage.getChildren().add(1, backBtn);
+        Scene scene = new Scene(leaderboardPage, 1366, 768);
+        // Keyboard shortcut for back
+        scene.setOnKeyPressed(event -> {
+            switch (event.getCode()) {
+                case ESCAPE:
+                case B:
+                    StudentDashboard.show(primaryStage);
+                    break;
+            }
+        });
+        primaryStage.setScene(scene);
+        primaryStage.setTitle("EcoEdu - Leaderboard & Badges");
+        // Fade-in animation
+        javafx.animation.FadeTransition ft = new javafx.animation.FadeTransition(javafx.util.Duration.millis(500), leaderboardPage);
+        ft.setFromValue(0);
+        ft.setToValue(1);
+        ft.play();
+    }
+
     // Data classes
     public static class StudentProfile {
         private String name;
@@ -410,85 +425,6 @@ public class StudentDashboard extends VBox {
     }
 
     public static void show(Stage primaryStage) {
-        // Mock providers for demonstration
-        
-        List<DashboardCard> cards = List.of(
-            new DashboardCard("\uD83D\uDCDA Modules", "learn eco topices!", "#81c784", "/Assets/Images/module.png", () -> {
-                try {
-                    ModulePage.show(primaryStage);
-                } catch (Exception e) {
-                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                    alert.setTitle("Coming Soon");
-                    alert.setHeaderText(null);
-                    alert.setContentText("This section is coming soon!");
-                    alert.showAndWait();
-                }
-            }),
-            new DashboardCard("\uD83E\uDDE9 Quiz & Puzzles", "test your eco skills!", "#ffd54f", "/Assets/Images/quiz.png", () -> {
-                try {
-                    QuizPage.show(primaryStage, null);
-                } catch (Exception e) {
-                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                    alert.setTitle("Coming Soon");
-                    alert.setHeaderText(null);
-                    alert.setContentText("This section is coming soon!");
-                    alert.showAndWait();
-                }
-            }),
-            new DashboardCard("\uD83E\uDDD1\u200D\uD83C\uDFA8 Avatar Customization", "Style your eco hero!", "#4fc3f7", "/Assets/Images/avatar.png", () -> {
-                try {
-                    com.ecoedu.avatar.AvatarCustomizer customizer = new com.ecoedu.avatar.AvatarCustomizer();
-                    customizer.start(primaryStage);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                    alert.setTitle("Coming Soon");
-                    alert.setHeaderText(null);
-                    alert.setContentText("This section is coming soon!");
-                    alert.showAndWait();
-                }
-            }),
-            new DashboardCard("\uD83C\uDFC6 Leaderboard & Badges", "See your rank!", "#ffd54f", "/Assets/Images/leaderboard.png", () -> {
-                try {
-                    com.ecoedu.leaderboard.LeaderboardModule.show(primaryStage);
-                } catch (Exception e) {
-                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                    alert.setTitle("Coming Soon");
-                    alert.setHeaderText(null);
-                    alert.setContentText("This section is coming soon!");
-                    alert.showAndWait();
-                }
-            }),
-            new DashboardCard("\uD83C\uDFAE Minigames", "play & learn!", "#ff8a65", "/Assets/Images/minigames.png", () -> {
-                try {
-                    com.ecoedu.minigames.TrashSortingGame.show(primaryStage);
-                } catch (Exception e) {
-                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                    alert.setTitle("Coming Soon");
-                    alert.setHeaderText(null);
-                    alert.setContentText("This section is coming soon!");
-                    alert.showAndWait();
-                }
-            }),
-            new DashboardCard("\uD83C\uDF31 Daily Challenge", "New eco tasks!", "#a1887f", "/Assets/Images/daily.png", () -> {
-                try {
-                    com.ecoedu.dailytasks.DailyChallengePage.show(primaryStage);
-                } catch (Exception e) {
-                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                    alert.setTitle("Coming Soon");
-                    alert.setHeaderText(null);
-                    alert.setContentText("This section is coming soon!");
-                    alert.showAndWait();
-                }
-            })
-        );
-        List<String> quotes = Arrays.asList(
-            "The Earth is what we all have in common. – Wendell Berry",
-            "Small acts, when multiplied, can transform the world.",
-            "Be the change you wish to see in the world. ",
-            "Every small eco-action counts!"
-        );
-
         StudentDashboard dashboard = new StudentDashboard(primaryStage);
         Scene scene = new Scene(dashboard, 1366, 768);
         primaryStage.setScene(scene);

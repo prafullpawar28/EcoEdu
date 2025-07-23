@@ -57,19 +57,19 @@ public class QuizHomePage extends VBox {
         progressTitle.setTextFill(Color.web("#43a047"));
         progressBox.getChildren().add(progressTitle);
         // Real progress tracking
-        LeaderboardService.UserStats me = LeaderboardService.getInstance().getCurrentUserStats();
-        int completed = 0;
-        for (String cat : QuizData.getQuizCategories()) {
-            if (me.badges.contains(cat + " Quiz Master")) completed++;
-        }
-        Label progress = new Label("Quizzes completed: " + completed + " / " + QuizData.getQuizCategories().size() + " | Badges: " + me.badges.size());
+        LeaderboardService.LeaderboardUserStats me = LeaderboardService.getInstance().getLeaderboardUsers().stream().filter(u -> u.isCurrentUser).findFirst().orElse(null);
+        int completed = me != null ? me.quizzesCompleted : 0;
+        int badgeCount = me != null ? me.badges.size() : 0;
+        Label progress = new Label("Quizzes completed: " + completed + " / " + QuizData.getQuizCategories().size() + " | Badges: " + badgeCount);
         progress.setFont(Font.font("Quicksand", 16));
         progressBox.getChildren().add(progress);
         HBox badgeBox = new HBox(4);
-        for (String badge : me.badges) {
-            Label badgeIcon = new Label("🏅 " + badge);
-            badgeIcon.setFont(Font.font(18));
-            badgeBox.getChildren().add(badgeIcon);
+        if (me != null) {
+            for (String badge : me.badges) {
+                Label badgeIcon = new Label(badge.equals("Quiz Master") ? "📝" : badge.equals("Minigame Master") ? "🎮" : "🏅");
+                badgeIcon.setFont(Font.font(18));
+                badgeBox.getChildren().add(badgeIcon);
+            }
         }
         progressBox.getChildren().add(badgeBox);
         getChildren().add(progressBox);

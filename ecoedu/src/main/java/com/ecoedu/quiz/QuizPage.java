@@ -164,6 +164,8 @@ public class QuizPage {
     }
 
     private static void showResult(Stage primaryStage, String category, int score, int total) {
+        // Optionally, update LeaderboardService here if you want to simulate a real-time update
+        // For now, just show the result UI
         VBox root = new VBox(36);
         root.setAlignment(Pos.CENTER);
         root.setStyle("-fx-background-color: #e1f5fe; -fx-padding: 80;");
@@ -172,11 +174,11 @@ public class QuizPage {
         Label result = new Label("Your Score: " + score + " / " + total);
         result.setStyle("-fx-font-size: 26px; -fx-text-fill: #0288d1;");
         Button tryAnother = new Button("Try Another Quiz");
-        tryAnother.setStyle("-fx-background-color: #ffd54f; -fx-font-size: 20px; -fx-background-radius: 18; -fx-padding: 12 40; -fx-cursor: hand;");
+        tryAnother.setStyle("-fx-background-color: #ffd54f; -fx-font-size: 20px; -fx-background-radius: 16; -fx-padding: 10 36; -fx-cursor: hand;");
         tryAnother.setOnAction(e -> show(primaryStage, null));
         Button backBtn = new Button("Back to Dashboard");
         backBtn.setStyle("-fx-background-color: #43e97b; -fx-text-fill: white; -fx-font-size: 18px; -fx-background-radius: 16; -fx-padding: 10 36; -fx-cursor: hand;");
-        backBtn.setOnAction(e -> StudentDashboard.show(primaryStage));
+        backBtn.setOnAction(e -> com.ecoedu.dashboard.StudentDashboard.show(primaryStage));
         root.getChildren().addAll(congrats, result, tryAnother, backBtn);
         Scene scene = new Scene(root, 1366, 768);
         primaryStage.setScene(scene);

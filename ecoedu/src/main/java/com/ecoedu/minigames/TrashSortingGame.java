@@ -273,6 +273,8 @@ public class TrashSortingGame extends VBox {
     }
 
     private void showGameOver() {
+        // Optionally, update LeaderboardService here if you want to simulate a real-time update
+        // For now, just show the game over UI
         StackPane overlay = new StackPane();
         overlay.setPrefSize(1366, 768);
         overlay.setStyle("-fx-background-color: rgba(0,0,0,0.45);");

@@ -16,7 +16,25 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 public class StudentProfileDialog {
-    public static void show(Stage owner, StudentDashboard.StudentProfile profile) {
+    // Minimal StudentProfile data class
+    public static class StudentProfile {
+        private String name;
+        private String avatarPath;
+        private String ecoLevel;
+        private int badges;
+        public StudentProfile(String name, String avatarPath, String ecoLevel, int badges) {
+            this.name = name;
+            this.avatarPath = avatarPath;
+            this.ecoLevel = ecoLevel;
+            this.badges = badges;
+        }
+        public String getName() { return name; }
+        public String getAvatarPath() { return avatarPath; }
+        public String getEcoLevel() { return ecoLevel; }
+        public int getBadges() { return badges; }
+    }
+
+    public static void show(Stage owner, StudentProfile profile) {
         Stage dialog = new Stage();
         dialog.initOwner(owner);
         dialog.initModality(Modality.WINDOW_MODAL);
