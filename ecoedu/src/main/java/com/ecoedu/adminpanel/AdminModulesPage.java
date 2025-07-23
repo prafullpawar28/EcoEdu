@@ -6,26 +6,25 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 
 public class AdminModulesPage extends VBox {
     private final ObservableList<AdminDataService.Module> modules;
     private final ListView<AdminDataService.Module> moduleListView;
 
     public AdminModulesPage() {
+        getStyleClass().add("main-content");
         setSpacing(24);
-        setPadding(new Insets(24));
+        setPadding(new Insets(32, 32, 32, 32));
         setAlignment(Pos.TOP_CENTER);
-        setStyle("-fx-background-color: transparent;");
 
+        VBox card = new VBox(16);
+        card.getStyleClass().add("card");
+        card.setPadding(new Insets(24));
         Label title = new Label("📚 Module Management");
-        title.setFont(Font.font("Quicksand", FontWeight.BOLD, 26));
-        title.setTextFill(Color.web("#388e3c"));
-
+        title.getStyleClass().add("label-section");
         modules = FXCollections.observableArrayList(AdminDataService.getInstance().getModules());
         moduleListView = new ListView<>(modules);
+        moduleListView.getStyleClass().add("top-list");
         moduleListView.setCellFactory(lv -> new ListCell<>() {
             @Override
             protected void updateItem(AdminDataService.Module module, boolean empty) {
@@ -34,27 +33,25 @@ public class AdminModulesPage extends VBox {
                     setText(null);
                     setGraphic(null);
                 } else {
-                    VBox v = new VBox(
+                    VBox info = new VBox(
                         new Label(module.title),
                         new Label(module.description)
                     );
-                    v.setSpacing(2);
-                    setGraphic(v);
+                    info.setSpacing(2);
+                    setGraphic(info);
                 }
             }
         });
-        moduleListView.setPrefHeight(320);
-
-        HBox btnBox = new HBox(12);
+        moduleListView.setPrefHeight(340);
+        HBox btnBox = new HBox(16);
         btnBox.setAlignment(Pos.CENTER);
         Button addBtn = new Button("Add Module");
         Button editBtn = new Button("Edit Module");
         Button removeBtn = new Button("Remove Module");
-        addBtn.setStyle("-fx-background-color: #43a047; -fx-text-fill: white; -fx-background-radius: 16; -fx-padding: 8 24;");
-        editBtn.setStyle("-fx-background-color: #4fc3f7; -fx-text-fill: white; -fx-background-radius: 16; -fx-padding: 8 24;");
-        removeBtn.setStyle("-fx-background-color: #d32f2f; -fx-text-fill: white; -fx-background-radius: 16; -fx-padding: 8 24;");
+        addBtn.getStyleClass().add("button");
+        editBtn.getStyleClass().add("button");
+        removeBtn.getStyleClass().add("button");
         btnBox.getChildren().addAll(addBtn, editBtn, removeBtn);
-
         addBtn.setOnAction(e -> showModuleDialog(null));
         editBtn.setOnAction(e -> {
             AdminDataService.Module selected = moduleListView.getSelectionModel().getSelectedItem();
@@ -67,20 +64,22 @@ public class AdminModulesPage extends VBox {
                 modules.setAll(AdminDataService.getInstance().getModules());
             }
         });
-
-        getChildren().addAll(title, moduleListView, btnBox);
+        card.getChildren().addAll(title, moduleListView, btnBox);
+        getChildren().add(card);
     }
 
     private void showModuleDialog(AdminDataService.Module module) {
         Dialog<AdminDataService.Module> dialog = new Dialog<>();
         dialog.setTitle(module == null ? "Add Module" : "Edit Module");
-        dialog.getDialogPane().setStyle("-fx-background-color: #fffde7;");
-        VBox box = new VBox(12);
-        box.setPadding(new Insets(16));
+        dialog.getDialogPane().getStyleClass().add("dialog-pane");
+        VBox box = new VBox(16);
+        box.setPadding(new Insets(18));
         box.setAlignment(Pos.CENTER_LEFT);
         TextField titleField = new TextField(module == null ? "" : module.title);
+        titleField.getStyleClass().add("text-field");
         titleField.setPromptText("Title");
         TextArea descField = new TextArea(module == null ? "" : module.description);
+        descField.getStyleClass().add("text-field");
         descField.setPromptText("Description");
         descField.setPrefRowCount(3);
         box.getChildren().addAll(new Label("Title:"), titleField, new Label("Description:"), descField);

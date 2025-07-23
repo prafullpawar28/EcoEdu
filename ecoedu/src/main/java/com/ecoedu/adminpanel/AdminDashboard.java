@@ -5,248 +5,224 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.Region;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.image.ImageView;
-import java.util.prefs.Preferences;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
+import javafx.scene.chart.PieChart;
+import javafx.scene.control.ListView;
 import java.util.List;
 import java.util.ArrayList;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import javafx.collections.FXCollections;
-import javafx.scene.control.TextField;
-import javafx.scene.control.ListView;
-import javafx.scene.control.Label;
-import javafx.scene.layout.VBox;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
-import javafx.stage.Stage;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.Region;
-import javafx.collections.ObservableList;
 
-public class AdminDashboard extends HBox {
-    private boolean darkMode = false;
-    private Preferences prefs = Preferences.userNodeForPackage(AdminDashboard.class);
-    private Button darkModeBtn;
-    private HBox topBar;
+public class AdminDashboard extends BorderPane {
     private VBox sidebar;
-    private StackPane mainContent;
+    private HBox header;
+    private GridPane cardGrid;
+    private VBox mainContent;
     private Stage primaryStage;
-    private TextField userSearchField;
-    private AdminUsersPage usersPage;
-    private List<LogEntry> mockLogs = new ArrayList<>();
 
     public AdminDashboard(Stage primaryStage) {
         this.primaryStage = primaryStage;
-        setSpacing(0);
-        loadPrefs();
-        setStyle(getBgStyle());
-
+        getStyleClass().add("root");
+        setPadding(new Insets(0));
         // Sidebar
-        sidebar = new VBox(18);
-        sidebar.setPadding(new Insets(36, 18, 36, 18));
-        sidebar.setAlignment(Pos.TOP_CENTER);
-        sidebar.setStyle(getSidebarStyle());
-        sidebar.setPrefWidth(220);
-        sidebar.getChildren().add(makeSidebarButton("👤 Users", "/Assets/Images/avatar.gif", this::showUsers));
-        sidebar.getChildren().add(makeSidebarButton("🎮 Games", "/Assets/Images/minigames.jpg", this::showGames));
-        sidebar.getChildren().add(makeSidebarButton("🏅 Badges", "/Assets/Images/boat.png", this::showBadges));
-        sidebar.getChildren().add(makeSidebarButton("📊 Analytics", "/Assets/Images/ocean.jpg", this::showAnalytics));
-        sidebar.getChildren().add(makeSidebarButton("🗒 Logs", "/Assets/Images/trash1.png", this::showLogs));
-        sidebar.getChildren().add(makeSidebarButton("📝 Feedback", "/Assets/Images/welcomepage.jpg", this::showFeedback));
-        sidebar.getChildren().add(makeSidebarButton("⚙️ Settings", "/Assets/Images/homepagef.jpg", this::showSettings));
-        sidebar.getChildren().add(makeSidebarButton("🚪 Logout", "/Assets/Images/trashsorter.jpeg", this::logout));
-
+        sidebar = createSidebar();
+        setLeft(sidebar);
+        // Header
+        header = createHeader();
+        setTop(header);
         // Main content
-        mainContent = new StackPane();
-        mainContent.setPadding(new Insets(36));
-        mainContent.setStyle(getCardStyle());
-        HBox.setHgrow(mainContent, Priority.ALWAYS);
-
-        VBox root = new VBox();
-        root.setSpacing(0);
-        // Top bar
-        topBar = new HBox();
-        topBar.setPadding(new Insets(0, 0, 0, 0));
-        topBar.setAlignment(Pos.CENTER_LEFT);
-        topBar.setStyle(getTopBarStyle());
-        topBar.setMinHeight(64);
-        Label panelLabel = new Label("Admin Panel");
-        panelLabel.setFont(Font.font("Quicksand", FontWeight.BOLD, 28));
-        panelLabel.setTextFill(darkMode ? Color.web("#b2dfdb") : Color.web("#fffde7"));
-        panelLabel.setPadding(new Insets(0, 0, 0, 32));
-        // Avatar/profile icon
-        ImageView avatar = new ImageView();
-        try {
-            avatar.setImage(new Image(getClass().getResourceAsStream("/Assets/Images/avatar.png")));
-        } catch (Exception e) {
-            avatar.setImage(null);
-        }
-        avatar.setFitHeight(40);
-        avatar.setFitWidth(40);
-        avatar.setPreserveRatio(true);
-        HBox avatarBox = new HBox(avatar);
-        avatarBox.setAlignment(Pos.CENTER_RIGHT);
-        avatarBox.setPadding(new Insets(0, 32, 0, 0));
-        avatarBox.setMinWidth(60);
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-        // Dark mode toggle
-        darkModeBtn = new Button(darkMode ? "☀️" : "🌙");
-        darkModeBtn.setStyle("-fx-background-color: transparent; -fx-font-size: 22; -fx-cursor: hand;");
-        darkModeBtn.setOnAction(e -> toggleDarkMode());
-        // Switch to Student Dashboard button (admin only)
-        Button switchToStudentBtn = new Button("Switch to Student Dashboard");
-        switchToStudentBtn.setStyle("-fx-background-color: #43a047; -fx-text-fill: white; -fx-background-radius: 16; -fx-padding: 8 24; -fx-font-size: 15; -fx-cursor: hand;");
-        switchToStudentBtn.setOnAction(e -> com.ecoedu.dashboard.StudentDashboard.show(primaryStage));
-        // Add hover effect
-        switchToStudentBtn.setOnMouseEntered(e -> switchToStudentBtn.setStyle("-fx-background-color: #66bb6a; -fx-text-fill: white; -fx-background-radius: 16; -fx-padding: 8 24; -fx-font-size: 15; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, #43a047, 8, 0.2, 0, 2); -fx-scale-x: 1.05; -fx-scale-y: 1.05;"));
-        switchToStudentBtn.setOnMouseExited(e -> switchToStudentBtn.setStyle("-fx-background-color: #43a047; -fx-text-fill: white; -fx-background-radius: 16; -fx-padding: 8 24; -fx-font-size: 15; -fx-cursor: hand;"));
-        topBar.getChildren().addAll(panelLabel, spacer, switchToStudentBtn, darkModeBtn, avatarBox);
-        // Main content (sidebar + mainContent)
-        HBox mainRow = new HBox();
-        mainRow.getChildren().addAll(sidebar, mainContent);
-        root.getChildren().addAll(topBar, mainRow);
-        getChildren().setAll(root);
-        showUsers();
+        mainContent = new VBox(24);
+        mainContent.setPadding(new Insets(32, 32, 32, 32));
+        mainContent.getChildren().addAll(createCardGrid(), createChartsRow());
+        setCenter(mainContent);
     }
 
-    private Button makeSidebarButton(String text, String iconPath, Runnable onClick) {
-        ImageView icon = new ImageView();
-        try {
-            icon.setImage(new Image(getClass().getResourceAsStream(iconPath)));
-        } catch (Exception e) {
-            icon.setImage(null);
+    private VBox createSidebar() {
+        VBox box = new VBox(8);
+        box.getStyleClass().add("sidebar");
+        box.setAlignment(Pos.TOP_CENTER);
+        box.setPrefWidth(90);
+        // Logo with null check
+        ImageView logo;
+        java.io.InputStream avatarStream = getClass().getResourceAsStream("/Assets/Images/avatar.png");
+        if (avatarStream != null) {
+            logo = new ImageView(new Image(avatarStream));
+        } else {
+            logo = new ImageView();
+            logo.setFitWidth(48);
+            logo.setFitHeight(48);
+            logo.setStyle("-fx-background-color: #e0e0e0; -fx-background-radius: 24;");
         }
-        icon.setFitHeight(28);
-        icon.setFitWidth(28);
-        icon.setPreserveRatio(true);
-        Button btn = new Button(text, icon);
-        btn.setFont(Font.font("Quicksand", FontWeight.BOLD, 16));
-        btn.setStyle(getSidebarBtnStyle());
+        logo.setFitWidth(48);
+        logo.setFitHeight(48);
+        logo.setPreserveRatio(true);
+        box.getChildren().add(logo);
+        // Sidebar buttons
+        box.getChildren().addAll(
+            makeSidebarButton("\uD83D\uDCCB", "Dashboard"),
+            makeSidebarButton("\uD83D\uDC64", "Users"),
+            makeSidebarButton("\uD83C\uDFAE", "Games"),
+            makeSidebarButton("\uD83C\uDFC5", "Badges"),
+            makeSidebarButton("\uD83D\uDCCA", "Analytics"),
+            makeSidebarButton("\uD83D\uDDD2", "Logs"),
+            makeSidebarButton("\u2699\uFE0F", "Settings")
+        );
+        return box;
+    }
+
+    private Button makeSidebarButton(String icon, String text) {
+        Button btn = new Button(icon + "  " + text);
+        btn.getStyleClass().add("button");
         btn.setMaxWidth(Double.MAX_VALUE);
-        btn.setOnAction(e -> onClick.run());
-        btn.addEventHandler(MouseEvent.MOUSE_ENTERED, e -> btn.setStyle(getSidebarBtnHoverStyle()));
-        btn.addEventHandler(MouseEvent.MOUSE_EXITED, e -> btn.setStyle(getSidebarBtnStyle()));
+        btn.setAlignment(Pos.CENTER_LEFT);
         return btn;
     }
 
-    private void showUsers() {
-        if (usersPage == null) usersPage = new AdminUsersPage();
-        VBox usersBox = new VBox(12);
-        usersBox.setAlignment(Pos.TOP_CENTER);
-        // Search bar
-        userSearchField = new TextField();
-        userSearchField.setPromptText("Search users by name or email...");
-        userSearchField.setMaxWidth(320);
-        userSearchField.textProperty().addListener((obs, oldVal, newVal) -> {
-            usersPage.filterUsers(newVal);
-        });
-        usersBox.getChildren().addAll(userSearchField, usersPage);
-        mainContent.getChildren().setAll(usersBox);
-    }
-    private void showGames() {
-        mainContent.getChildren().setAll(new Label("Games page coming soon!"));
-    }
-    private void showBadges() {
-        mainContent.getChildren().setAll(new Label("Badges page coming soon!"));
-    }
-    private void showAnalytics() {
-        mainContent.getChildren().setAll(new Label("Analytics page coming soon!"));
-    }
-    private void showLogs() {
-        VBox logsBox = new VBox(10);
-        logsBox.setAlignment(Pos.TOP_LEFT);
-        logsBox.setPadding(new Insets(16));
-        Label title = new Label("System Logs");
-        title.setFont(Font.font("Quicksand", FontWeight.BOLD, 22));
-        ListView<String> logList = new ListView<>();
-        logList.setPrefHeight(400);
-        // Mock logs
-        if (mockLogs.isEmpty()) {
-            for (int i = 0; i < 10; i++) {
-                mockLogs.add(new LogEntry("Admin action " + (i+1), new Date(System.currentTimeMillis() - i*60000)));
-            }
+    private HBox createHeader() {
+        HBox bar = new HBox();
+        bar.getStyleClass().add("top-bar");
+        bar.setAlignment(Pos.CENTER_LEFT);
+        bar.setSpacing(18);
+        Label title = new Label("Dashboard");
+        title.getStyleClass().add("header-title");
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        // User avatar with null check
+        ImageView avatar;
+        java.io.InputStream avatarStream = getClass().getResourceAsStream("/Assets/Images/avatar.png");
+        if (avatarStream != null) {
+            avatar = new ImageView(new Image(avatarStream));
+        } else {
+            avatar = new ImageView();
+            avatar.setFitWidth(36);
+            avatar.setFitHeight(36);
+            avatar.setStyle("-fx-background-color: #e0e0e0; -fx-background-radius: 18;");
         }
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        ObservableList<String> logItems = FXCollections.observableArrayList();
-        for (LogEntry log : mockLogs) {
-            logItems.add("[" + sdf.format(log.timestamp) + "] " + log.message);
+        avatar.setFitWidth(36);
+        avatar.setFitHeight(36);
+        avatar.setPreserveRatio(true);
+        bar.getChildren().addAll(title, spacer, avatar);
+        return bar;
+    }
+
+    private GridPane createCardGrid() {
+        cardGrid = new GridPane();
+        cardGrid.getStyleClass().add("card-grid");
+        cardGrid.setHgap(24);
+        cardGrid.setVgap(24);
+        // Stat cards
+        cardGrid.add(createStatCard("1256", "Students", "stat-card students"), 0, 0);
+        cardGrid.add(createStatCard("102", "Teachers", "stat-card teachers"), 1, 0);
+        cardGrid.add(createStatCard("102", "Private Teachers", "stat-card private"), 2, 0);
+        return cardGrid;
+    }
+
+    private VBox createStatCard(String number, String label, String styleClass) {
+        VBox card = new VBox(8);
+        card.getStyleClass().addAll(styleClass.split(" "));
+        card.setAlignment(Pos.CENTER_LEFT);
+        Label num = new Label(number);
+        num.getStyleClass().add("stat-number");
+        Label lbl = new Label(label);
+        lbl.getStyleClass().add("stat-label");
+        card.getChildren().addAll(num, lbl);
+        return card;
+    }
+
+    private HBox createChartsRow() {
+        HBox row = new HBox(24);
+        row.setAlignment(Pos.TOP_LEFT);
+        // Line chart (Management Value)
+        LineChart<Number, Number> lineChart = createLineChart();
+        lineChart.setPrefSize(400, 200);
+        // Pie chart (Breakdown)
+        PieChart pieChart = createPieChart();
+        pieChart.setPrefSize(200, 200);
+        // Subject Task (Bar chart style)
+        VBox subjectTask = createSubjectTask();
+        // Top Students list
+        VBox topList = createTopList();
+        row.getChildren().addAll(lineChart, pieChart, subjectTask, topList);
+        return row;
+    }
+
+    private LineChart<Number, Number> createLineChart() {
+        NumberAxis xAxis = new NumberAxis();
+        NumberAxis yAxis = new NumberAxis();
+        LineChart<Number, Number> chart = new LineChart<>(xAxis, yAxis);
+        chart.getStyleClass().add("chart");
+        chart.setLegendVisible(false);
+        XYChart.Series<Number, Number> series = new XYChart.Series<>();
+        series.getData().add(new XYChart.Data<>(1, 10));
+        series.getData().add(new XYChart.Data<>(2, 15));
+        series.getData().add(new XYChart.Data<>(3, 12));
+        series.getData().add(new XYChart.Data<>(4, 18));
+        series.getData().add(new XYChart.Data<>(5, 14));
+        chart.getData().add(series);
+        return chart;
+    }
+
+    private PieChart createPieChart() {
+        ObservableList<PieChart.Data> pieData = FXCollections.observableArrayList(
+            new PieChart.Data("Students", 60),
+            new PieChart.Data("Teachers", 25),
+            new PieChart.Data("Private Teachers", 15)
+        );
+        PieChart chart = new PieChart(pieData);
+        chart.getStyleClass().add("chart");
+        chart.setLegendVisible(false);
+        return chart;
+    }
+
+    private VBox createSubjectTask() {
+        VBox box = new VBox(8);
+        box.getStyleClass().add("card");
+        Label label = new Label("Subject Task");
+        label.getStyleClass().add("label-section");
+        box.getChildren().add(label);
+        // Simulate horizontal bars
+        for (int i = 1; i <= 4; i++) {
+            HBox row = new HBox(8);
+            Label subject = new Label("Week " + i);
+            subject.setPrefWidth(60);
+            javafx.scene.control.ProgressBar bar = new javafx.scene.control.ProgressBar(i * 0.2 + 0.2);
+            bar.getStyleClass().add("progress-bar");
+            bar.setPrefWidth(120);
+            row.getChildren().addAll(subject, bar);
+            box.getChildren().add(row);
         }
-        logList.setItems(logItems);
-        logsBox.getChildren().addAll(title, logList);
-        mainContent.getChildren().setAll(logsBox);
+        return box;
     }
-    private void showFeedback() {
-        mainContent.getChildren().setAll(new Label("Feedback page coming soon!"));
+
+    private VBox createTopList() {
+        VBox box = new VBox(8);
+        box.getStyleClass().add("top-list");
+        Label label = new Label("Top Students");
+        label.getStyleClass().add("label-section");
+        ListView<String> list = new ListView<>();
+        list.setPrefHeight(120);
+        list.setItems(FXCollections.observableArrayList(
+            "Lucas Jones", "Emma Smith", "Olivia Brown", "Noah Lee"
+        ));
+        box.getChildren().addAll(label, list);
+        return box;
     }
-    private void showSettings() {
-        mainContent.getChildren().setAll(new Label("Settings page coming soon!"));
-    }
-    private void logout() {
-        AdminLoginPage.show(primaryStage);
-    }
+
     public static void show(Stage primaryStage) {
         AdminDashboard dashboard = new AdminDashboard(primaryStage);
         Scene scene = new Scene(dashboard, 1366, 768);
+        scene.getStylesheets().add(AdminDashboard.class.getResource("/css/adminpanel-theme.css").toExternalForm());
         primaryStage.setScene(scene);
         primaryStage.setTitle("EcoEdu - Admin Panel");
         primaryStage.show();
-    }
-    // --- Theme and Style Helpers ---
-    private void toggleDarkMode() {
-        darkMode = !darkMode;
-        prefs.putBoolean("darkMode", darkMode);
-        setStyle(getBgStyle());
-        sidebar.setStyle(getSidebarStyle());
-        mainContent.setStyle(getCardStyle());
-        topBar.setStyle(getTopBarStyle());
-    }
-    private void loadPrefs() {
-        darkMode = prefs.getBoolean("darkMode", false);
-    }
-    private String getBgStyle() {
-        return darkMode ? "-fx-background-color: linear-gradient(to bottom right, #232526, #414345);" : "-fx-background-color: linear-gradient(to bottom right, #b2dfdb, #e0f7fa);";
-    }
-    private String getSidebarStyle() {
-        return darkMode ? "-fx-background-color: #263238; -fx-background-radius: 0 32 32 0;" : "-fx-background-color: #00796b; -fx-background-radius: 0 32 32 0;";
-    }
-    private String getTopBarStyle() {
-        return darkMode ? "-fx-background-color: #37474f; -fx-background-radius: 0 0 32 32; -fx-effect: dropshadow(gaussian, #232526, 8, 0.1, 0, 2);" : "-fx-background-color: #0097a7; -fx-background-radius: 0 0 32 32; -fx-effect: dropshadow(gaussian, #6a1b9a, 8, 0.1, 0, 2);";
-    }
-    private String getCardStyle() {
-        return darkMode ? "-fx-background-color: #263238; -fx-background-radius: 32; -fx-effect: dropshadow(gaussian, #232526, 16, 0.2, 0, 4);" : "-fx-background-color: white; -fx-background-radius: 32; -fx-effect: dropshadow(gaussian, #bdbdbdbd, 16, 0.2, 0, 4);";
-    }
-    private String getSidebarBtnStyle() {
-        return darkMode ? "-fx-background-color: transparent; -fx-text-fill: #b2dfdb; -fx-background-radius: 16; -fx-padding: 10 24; -fx-cursor: hand;" : "-fx-background-color: transparent; -fx-text-fill: white; -fx-background-radius: 16; -fx-padding: 10 24; -fx-cursor: hand;";
-    }
-    private String getSidebarBtnHoverStyle() {
-        return darkMode ? "-fx-background-color: #37474f; -fx-text-fill: #b2dfdb; -fx-background-radius: 16; -fx-padding: 10 24; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, #b2dfdb, 8, 0.2, 0, 2); -fx-scale-x: 1.05; -fx-scale-y: 1.05;" : "-fx-background-color: #b2dfdb; -fx-text-fill: #00796b; -fx-background-radius: 16; -fx-padding: 10 24; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, #0097a7, 8, 0.2, 0, 2); -fx-scale-x: 1.05; -fx-scale-y: 1.05;";
-    }
-    // --- Mock Log Entry ---
-    private static class LogEntry {
-        String message;
-        Date timestamp;
-        LogEntry(String message, Date timestamp) {
-            this.message = message;
-            this.timestamp = timestamp;
-        }
     }
 } 

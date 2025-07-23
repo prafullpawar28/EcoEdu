@@ -8,24 +8,23 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import java.text.SimpleDateFormat;
 
 public class AdminLogsPage extends VBox {
     public AdminLogsPage() {
+        getStyleClass().add("main-content");
         setSpacing(24);
-        setPadding(new Insets(24));
+        setPadding(new Insets(32, 32, 32, 32));
         setAlignment(Pos.TOP_CENTER);
-        setStyle("-fx-background-color: transparent;");
 
+        VBox card = new VBox(16);
+        card.getStyleClass().add("card");
+        card.setPadding(new Insets(24));
         Label title = new Label("🗒 Activity Logs");
-        title.setFont(Font.font("Quicksand", FontWeight.BOLD, 26));
-        title.setTextFill(Color.web("#d32f2f"));
-
+        title.getStyleClass().add("label-section");
         ObservableList<AdminDataService.LogEntry> logs = FXCollections.observableArrayList(AdminDataService.getInstance().getLogs());
         ListView<AdminDataService.LogEntry> logListView = new ListView<>(logs);
+        logListView.getStyleClass().add("top-list");
         logListView.setCellFactory(lv -> new ListCell<>() {
             @Override
             protected void updateItem(AdminDataService.LogEntry log, boolean empty) {
@@ -38,7 +37,8 @@ public class AdminLogsPage extends VBox {
                 }
             }
         });
-        logListView.setPrefHeight(320);
-        getChildren().addAll(title, logListView);
+        logListView.setPrefHeight(340);
+        card.getChildren().addAll(title, logListView);
+        getChildren().add(card);
     }
 } 

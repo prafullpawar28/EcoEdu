@@ -1,0 +1,113 @@
+/* Modern Dashboard Redesign */
+.root {
+    -fx-font-family: 'Quicksand', 'Segoe UI', sans-serif;
+    -fx-background-color: #f7f8fa;
+}
+
+.sidebar {
+    -fx-background-color: #fff;
+    -fx-background-radius: 18;
+    -fx-padding: 32 0 32 0;
+    -fx-effect: dropshadow(gaussian, #e0e0e0, 12, 0.12, 0, 2);
+    -fx-spacing: 8;
+}
+.sidebar .button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #7b7b93;
+    -fx-font-size: 16;
+    -fx-font-weight: 600;
+    -fx-background-radius: 12;
+    -fx-padding: 12 24;
+    -fx-alignment: center-left;
+    -fx-graphic-text-gap: 16;
+}
+.sidebar .button:selected, .sidebar .button:focused, .sidebar .button:hover {
+    -fx-background-color: #f0f4fa;
+    -fx-text-fill: #388e3c;
+}
+
+.top-bar {
+    -fx-background-color: #fff;
+    -fx-background-radius: 0 0 18 18;
+    -fx-effect: dropshadow(gaussian, #e0e0e0, 8, 0.10, 0, 2);
+    -fx-min-height: 64;
+    -fx-padding: 0 32 0 32;
+    -fx-alignment: center-left;
+}
+
+.header-title {
+    -fx-font-size: 28;
+    -fx-font-weight: bold;
+    -fx-text-fill: #22223b;
+}
+
+.card-grid {
+    -fx-spacing: 24;
+    -fx-padding: 24 0 0 0;
+}
+
+.stat-card {
+    -fx-background-radius: 18;
+    -fx-background-color: #fff;
+    -fx-effect: dropshadow(gaussian, #e0e0e0, 10, 0.12, 0, 2);
+    -fx-padding: 24 32;
+    -fx-min-width: 200;
+    -fx-min-height: 110;
+    -fx-alignment: center-left;
+}
+.stat-card.students { -fx-background-color: linear-gradient(120deg, #ffe0c6 60%, #fff 100%); }
+.stat-card.teachers { -fx-background-color: linear-gradient(120deg, #e0e7ff 60%, #fff 100%); }
+.stat-card.private { -fx-background-color: linear-gradient(120deg, #c6f7ff 60%, #fff 100%); }
+
+.stat-card .stat-number {
+    -fx-font-size: 32;
+    -fx-font-weight: bold;
+    -fx-text-fill: #22223b;
+}
+.stat-card .stat-label {
+    -fx-font-size: 16;
+    -fx-text-fill: #7b7b93;
+}
+
+.card {
+    -fx-background-radius: 18;
+    -fx-background-color: #fff;
+    -fx-effect: dropshadow(gaussian, #e0e0e0, 10, 0.12, 0, 2);
+    -fx-padding: 24 32;
+}
+
+.chart {
+    -fx-background-color: transparent;
+    -fx-padding: 0 0 0 0;
+}
+
+.progress-bar {
+    -fx-accent: #43e97b;
+    -fx-background-radius: 8;
+    -fx-pref-height: 16;
+}
+
+.top-list {
+    -fx-background-radius: 18;
+    -fx-background-color: #fff;
+    -fx-effect: dropshadow(gaussian, #e0e0e0, 10, 0.12, 0, 2);
+    -fx-padding: 18 24;
+}
+.top-list .list-cell {
+    -fx-background-color: transparent;
+    -fx-padding: 10 0 10 0;
+    -fx-font-size: 16;
+    -fx-border-width: 0 0 1 0;
+    -fx-border-color: #f0f0f0;
+}
+.top-list .list-cell:filled:selected, .top-list .list-cell:filled:hover {
+    -fx-background-color: #f0f4fa;
+    -fx-text-fill: #388e3c;
+}
+
+.label-section {
+    -fx-font-size: 20;
+    -fx-font-weight: bold;
+    -fx-text-fill: #388e3c;
+    -fx-padding: 0 0 12 0;
+} 
