@@ -1,0 +1,228 @@
+package com.ecoedu.adminpanel;
+
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.stage.Stage;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
+import javafx.scene.chart.PieChart;
+import javafx.scene.control.ListView;
+import java.util.List;
+import java.util.ArrayList;
+
+public class AdminDashboard extends BorderPane {
+    private VBox sidebar;
+    private HBox header;
+    private GridPane cardGrid;
+    private VBox mainContent;
+    private Stage primaryStage;
+
+    public AdminDashboard(Stage primaryStage) {
+        this.primaryStage = primaryStage;
+        getStyleClass().add("root");
+        setPadding(new Insets(0));
+        // Sidebar
+        sidebar = createSidebar();
+        setLeft(sidebar);
+        // Header
+        header = createHeader();
+        setTop(header);
+        // Main content
+        mainContent = new VBox(24);
+        mainContent.setPadding(new Insets(32, 32, 32, 32));
+        mainContent.getChildren().addAll(createCardGrid(), createChartsRow());
+        setCenter(mainContent);
+    }
+
+    private VBox createSidebar() {
+        VBox box = new VBox(8);
+        box.getStyleClass().add("sidebar");
+        box.setAlignment(Pos.TOP_CENTER);
+        box.setPrefWidth(90);
+        // Logo with null check
+        ImageView logo;
+        java.io.InputStream avatarStream = getClass().getResourceAsStream("/Assets/Images/avatar.png");
+        if (avatarStream != null) {
+            logo = new ImageView(new Image(avatarStream));
+        } else {
+            logo = new ImageView();
+            logo.setFitWidth(48);
+            logo.setFitHeight(48);
+            logo.setStyle("-fx-background-color: #e0e0e0; -fx-background-radius: 24;");
+        }
+        logo.setFitWidth(48);
+        logo.setFitHeight(48);
+        logo.setPreserveRatio(true);
+        box.getChildren().add(logo);
+        // Sidebar buttons
+        box.getChildren().addAll(
+            makeSidebarButton("\uD83D\uDCCB", "Dashboard"),
+            makeSidebarButton("\uD83D\uDC64", "Users"),
+            makeSidebarButton("\uD83C\uDFAE", "Games"),
+            makeSidebarButton("\uD83C\uDFC5", "Badges"),
+            makeSidebarButton("\uD83D\uDCCA", "Analytics"),
+            makeSidebarButton("\uD83D\uDDD2", "Logs"),
+            makeSidebarButton("\u2699\uFE0F", "Settings")
+        );
+        return box;
+    }
+
+    private Button makeSidebarButton(String icon, String text) {
+        Button btn = new Button(icon + "  " + text);
+        btn.getStyleClass().add("button");
+        btn.setMaxWidth(Double.MAX_VALUE);
+        btn.setAlignment(Pos.CENTER_LEFT);
+        return btn;
+    }
+
+    private HBox createHeader() {
+        HBox bar = new HBox();
+        bar.getStyleClass().add("top-bar");
+        bar.setAlignment(Pos.CENTER_LEFT);
+        bar.setSpacing(18);
+        Label title = new Label("Dashboard");
+        title.getStyleClass().add("header-title");
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        // User avatar with null check
+        ImageView avatar;
+        java.io.InputStream avatarStream = getClass().getResourceAsStream("/Assets/Images/avatar.png");
+        if (avatarStream != null) {
+            avatar = new ImageView(new Image(avatarStream));
+        } else {
+            avatar = new ImageView();
+            avatar.setFitWidth(36);
+            avatar.setFitHeight(36);
+            avatar.setStyle("-fx-background-color: #e0e0e0; -fx-background-radius: 18;");
+        }
+        avatar.setFitWidth(36);
+        avatar.setFitHeight(36);
+        avatar.setPreserveRatio(true);
+        bar.getChildren().addAll(title, spacer, avatar);
+        return bar;
+    }
+
+    private GridPane createCardGrid() {
+        cardGrid = new GridPane();
+        cardGrid.getStyleClass().add("card-grid");
+        cardGrid.setHgap(24);
+        cardGrid.setVgap(24);
+        // Stat cards
+        cardGrid.add(createStatCard("1256", "Students", "stat-card students"), 0, 0);
+        cardGrid.add(createStatCard("102", "Teachers", "stat-card teachers"), 1, 0);
+        cardGrid.add(createStatCard("102", "Private Teachers", "stat-card private"), 2, 0);
+        return cardGrid;
+    }
+
+    private VBox createStatCard(String number, String label, String styleClass) {
+        VBox card = new VBox(8);
+        card.getStyleClass().addAll(styleClass.split(" "));
+        card.setAlignment(Pos.CENTER_LEFT);
+        Label num = new Label(number);
+        num.getStyleClass().add("stat-number");
+        Label lbl = new Label(label);
+        lbl.getStyleClass().add("stat-label");
+        card.getChildren().addAll(num, lbl);
+        return card;
+    }
+
+    private HBox createChartsRow() {
+        HBox row = new HBox(24);
+        row.setAlignment(Pos.TOP_LEFT);
+        // Line chart (Management Value)
+        LineChart<Number, Number> lineChart = createLineChart();
+        lineChart.setPrefSize(400, 200);
+        // Pie chart (Breakdown)
+        PieChart pieChart = createPieChart();
+        pieChart.setPrefSize(200, 200);
+        // Subject Task (Bar chart style)
+        VBox subjectTask = createSubjectTask();
+        // Top Students list
+        VBox topList = createTopList();
+        row.getChildren().addAll(lineChart, pieChart, subjectTask, topList);
+        return row;
+    }
+
+    private LineChart<Number, Number> createLineChart() {
+        NumberAxis xAxis = new NumberAxis();
+        NumberAxis yAxis = new NumberAxis();
+        LineChart<Number, Number> chart = new LineChart<>(xAxis, yAxis);
+        chart.getStyleClass().add("chart");
+        chart.setLegendVisible(false);
+        XYChart.Series<Number, Number> series = new XYChart.Series<>();
+        series.getData().add(new XYChart.Data<>(1, 10));
+        series.getData().add(new XYChart.Data<>(2, 15));
+        series.getData().add(new XYChart.Data<>(3, 12));
+        series.getData().add(new XYChart.Data<>(4, 18));
+        series.getData().add(new XYChart.Data<>(5, 14));
+        chart.getData().add(series);
+        return chart;
+    }
+
+    private PieChart createPieChart() {
+        ObservableList<PieChart.Data> pieData = FXCollections.observableArrayList(
+            new PieChart.Data("Students", 60),
+            new PieChart.Data("Teachers", 25),
+            new PieChart.Data("Private Teachers", 15)
+        );
+        PieChart chart = new PieChart(pieData);
+        chart.getStyleClass().add("chart");
+        chart.setLegendVisible(false);
+        return chart;
+    }
+
+    private VBox createSubjectTask() {
+        VBox box = new VBox(8);
+        box.getStyleClass().add("card");
+        Label label = new Label("Subject Task");
+        label.getStyleClass().add("label-section");
+        box.getChildren().add(label);
+        // Simulate horizontal bars
+        for (int i = 1; i <= 4; i++) {
+            HBox row = new HBox(8);
+            Label subject = new Label("Week " + i);
+            subject.setPrefWidth(60);
+            javafx.scene.control.ProgressBar bar = new javafx.scene.control.ProgressBar(i * 0.2 + 0.2);
+            bar.getStyleClass().add("progress-bar");
+            bar.setPrefWidth(120);
+            row.getChildren().addAll(subject, bar);
+            box.getChildren().add(row);
+        }
+        return box;
+    }
+
+    private VBox createTopList() {
+        VBox box = new VBox(8);
+        box.getStyleClass().add("top-list");
+        Label label = new Label("Top Students");
+        label.getStyleClass().add("label-section");
+        ListView<String> list = new ListView<>();
+        list.setPrefHeight(120);
+        list.setItems(FXCollections.observableArrayList(
+            "Lucas Jones", "Emma Smith", "Olivia Brown", "Noah Lee"
+        ));
+        box.getChildren().addAll(label, list);
+        return box;
+    }
+
+    public static void show(Stage primaryStage) {
+        AdminDashboard dashboard = new AdminDashboard(primaryStage);
+        Scene scene = new Scene(dashboard, 1366, 768);
+        scene.getStylesheets().add(AdminDashboard.class.getResource("/css/adminpanel-theme.css").toExternalForm());
+        primaryStage.setScene(scene);
+        primaryStage.setTitle("EcoEdu - Admin Panel");
+        primaryStage.show();
+    }
+} 

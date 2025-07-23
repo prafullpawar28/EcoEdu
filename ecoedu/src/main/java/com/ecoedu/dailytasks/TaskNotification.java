@@ -193,7 +193,7 @@ public class TaskNotification {
 
         notificationBox.getChildren().addAll(headerLabel, messageLabel);
 
-        Scene scene = new Scene(notificationBox,900,700);
+        Scene scene = new Scene(notificationBox, 1366, 768);
         notificationStage.setScene(scene);
 
         // Position notification (top-right corner)

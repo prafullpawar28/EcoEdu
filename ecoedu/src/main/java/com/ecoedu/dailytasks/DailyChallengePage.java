@@ -19,6 +19,7 @@ import javafx.scene.shape.Circle;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import javafx.scene.image.Image;
 
 public class DailyChallengePage extends VBox {
     private Stage primaryStage;
@@ -57,8 +58,8 @@ public class DailyChallengePage extends VBox {
         backBtn.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14px; " +
                         "-fx-background-radius: 20; -fx-padding: 8 16; -fx-cursor: hand;");
         backBtn.setOnAction(e -> {
-            // Return to dashboard
-            com.ecoedu.Home.Dashboard.show(primaryStage);
+            // Return to student dashboard
+            com.ecoedu.dashboard.StudentDashboard.show(primaryStage);
         });
 
         // Title
@@ -185,6 +186,15 @@ public class DailyChallengePage extends VBox {
             }
         }
 
+        // Add a fun fact or tip below the challenges
+        Label funFact = new Label(getRandomFunFact());
+        funFact.setFont(Font.font("Comic Sans MS", FontWeight.BOLD, 15));
+        funFact.setTextFill(Color.web("#388E3C"));
+        funFact.setStyle("-fx-background-color: #A8E6CF; -fx-background-radius: 12; -fx-padding: 10 18; -fx-effect: dropshadow(gaussian, #A8E6CF, 6, 0.1, 0, 2);");
+        funFact.setWrapText(true);
+        funFact.setAlignment(Pos.CENTER);
+        tasksContainer.getChildren().add(funFact);
+
         updateProgress();
         updateMotivation();
     }
@@ -194,10 +204,8 @@ public class DailyChallengePage extends VBox {
         card.setPadding(new Insets(20));
         card.setPrefWidth(500);
         card.setAlignment(Pos.CENTER_LEFT);
-        
         String cardColor = task.isCompleted() ? "#E8F5E8" : "#FFFFFF";
         String borderColor = task.isCompleted() ? "#4CAF50" : "#E0E0E0";
-        
         card.setStyle("-fx-background-color: " + cardColor + "; " +
                      "-fx-background-radius: 15; " +
                      "-fx-border-color: " + borderColor + "; " +
@@ -209,7 +217,16 @@ public class DailyChallengePage extends VBox {
         HBox header = new HBox(15);
         header.setAlignment(Pos.CENTER_LEFT);
 
-        // Category icon placeholder
+        // Category icon placeholder (now with image if available)
+        ImageView iconView = new ImageView();
+        try {
+            iconView.setImage(new Image(getClass().getResourceAsStream(task.getIconPath())));
+            iconView.setFitWidth(32);
+            iconView.setFitHeight(32);
+        } catch (Exception e) {
+            // fallback to colored circle
+            iconView = null;
+        }
         Circle categoryIcon = new Circle(16, Color.web(task.getCategory().getColor()));
         categoryIcon.setEffect(new DropShadow(4, Color.web("#bdbdbd")));
 
@@ -237,26 +254,25 @@ public class DailyChallengePage extends VBox {
             refreshTasks();
         });
 
-        header.getChildren().addAll(categoryIcon, categoryInfo, completionCheck);
+        if (iconView != null) {
+            header.getChildren().addAll(iconView, categoryInfo, completionCheck);
+        } else {
+            header.getChildren().addAll(categoryIcon, categoryInfo, completionCheck);
+        }
         HBox.setHgrow(categoryInfo, Priority.ALWAYS);
 
         // Task content
         VBox content = new VBox(8);
-        
         Label titleLabel = new Label(task.getTitle());
         titleLabel.setFont(Font.font("Comic Sans MS", FontWeight.BOLD, 16));
         titleLabel.setTextFill(Color.web("#2E7D32"));
         titleLabel.setWrapText(true);
-
         Label descLabel = new Label(task.getDescription());
         descLabel.setFont(Font.font("Comic Sans MS", FontWeight.NORMAL, 12));
         descLabel.setTextFill(Color.web("#666666"));
         descLabel.setWrapText(true);
-
         content.getChildren().addAll(titleLabel, descLabel);
-
         card.getChildren().addAll(header, content);
-
         // Add hover and completion animation
         card.setOnMouseEntered(e -> {
             ScaleTransition st = new ScaleTransition(Duration.millis(200), card);
@@ -276,26 +292,51 @@ public class DailyChallengePage extends VBox {
             ft.setToValue(1.0);
             ft.play();
         }
-
         return card;
+    }
+
+    // Fun facts for kids
+    private String getRandomFunFact() {
+        String[] facts = new String[] {
+            "Did you know? Recycling one aluminum can saves enough energy to run a TV for 3 hours!",
+            "Turning off the tap while brushing your teeth can save up to 8 gallons of water a day.",
+            "Trees are the longest-living organisms on Earth!",
+            "Biking or walking instead of driving helps keep the air clean.",
+            "Composting helps reduce landfill waste and makes plants happy!",
+            "Plastic can take up to 1,000 years to decompose. Reuse and recycle!",
+            "Turning off lights when you leave a room saves energy and money.",
+            "Every little eco-action helps protect animals and nature!"
+        };
+        return "🌱 Fun Fact: " + facts[(int)(Math.random() * facts.length)];
     }
 
     private void updateProgress() {
         int completed = taskManager.getCompletedTasksCount();
         int total = taskManager.getTotalTasksCount();
         double percentage = taskManager.getCompletionPercentage();
-        
         progressLabel.setText(completed + "/" + total + " tasks completed");
         progressBar.setProgress(percentage / 100.0);
-        
         pointsLabel.setText("Today's Points: " + taskManager.getTodayPoints());
         streakLabel.setText("Streak: " + taskManager.getStreakDays() + " days");
-
         // Animate progress bar
         FadeTransition ft = new FadeTransition(Duration.millis(500), progressBar);
         ft.setFromValue(0.7);
         ft.setToValue(1.0);
         ft.play();
+        // Confetti animation when all tasks are completed
+        if (completed == total && total > 0) {
+            showConfetti();
+        }
+    }
+
+    // Simple confetti animation (expressive effect)
+    private void showConfetti() {
+        // For demo: show a dialog with confetti emoji
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Congratulations!");
+        alert.setHeaderText(null);
+        alert.setContentText("🎉 You completed all your daily eco challenges! 🎉");
+        alert.show();
     }
 
     private void updateMotivation() {
@@ -320,7 +361,7 @@ public class DailyChallengePage extends VBox {
     // --- Utility to launch daily challenge page ---
     public static void show(Stage primaryStage) {
         DailyChallengePage page = new DailyChallengePage(primaryStage);
-        Scene scene = new Scene(page, 900, 700);
+        Scene scene = new Scene(page, 1366, 768);
         primaryStage.setScene(scene);
         primaryStage.setTitle("EcoEdu - Daily Challenges");
         primaryStage.show();

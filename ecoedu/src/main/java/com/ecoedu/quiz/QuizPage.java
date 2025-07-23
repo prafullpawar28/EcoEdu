@@ -1,195 +1,188 @@
 package com.ecoedu.quiz;
 
-import javafx.animation.FadeTransition;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import javafx.util.Duration;
+import com.ecoedu.dashboard.StudentDashboard;
 import java.util.List;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.util.Duration;
 
-public class QuizPage extends VBox {
-    private Stage primaryStage;
-    private int currentQuestion = 0;
-    private int score = 0;
-    private List<Question> questions;
-    private Label questionLabel;
-    private ToggleGroup optionsGroup;
-    private Button nextButton;
-    private Label feedbackLabel;
-    private ProgressBar progressBar;
-    private VBox optionsBox;
-
-    public QuizPage(Stage primaryStage) {
-        this.primaryStage = primaryStage;
-        this.questions = QuizData.getQuestions();
-
-        setSpacing(24);
-        setPadding(new Insets(36, 36, 36, 36));
-        setAlignment(Pos.TOP_CENTER);
-        setStyle("-fx-background-color: linear-gradient(to bottom right, #e3f2fd, #fffde7);");
-
-        Label title = new Label("🌱 EcoEdu Quiz Challenge");
-        title.setFont(Font.font("Comic Sans MS", FontWeight.BOLD, 32));
-        title.setTextFill(Color.web("#0288d1"));
-        getChildren().add(title);
-
-        progressBar = new ProgressBar(0);
-        progressBar.setPrefWidth(400);
-        progressBar.setStyle("-fx-accent: #43a047; -fx-background-radius: 10; -fx-background-color: #E0E0E0;");
-        getChildren().add(progressBar);
-
-        questionLabel = new Label();
-        questionLabel.setFont(Font.font("Comic Sans MS", 20));
-        questionLabel.setWrapText(true);
-        questionLabel.setTextFill(Color.web("#263238"));
-        getChildren().add(questionLabel);
-
-        optionsGroup = new ToggleGroup();
-        optionsBox = new VBox(14);
-        optionsBox.setAlignment(Pos.CENTER_LEFT);
-        getChildren().add(optionsBox);
-
-        feedbackLabel = new Label();
-        feedbackLabel.setFont(Font.font("Comic Sans MS", 16));
-        feedbackLabel.setWrapText(true);
-        feedbackLabel.setPadding(new Insets(8, 0, 0, 0));
-        getChildren().add(feedbackLabel);
-
-        nextButton = new Button("Next");
-        nextButton.setFont(Font.font("Comic Sans MS", FontWeight.BOLD, 16));
-        nextButton.setStyle("-fx-background-color: #43a047; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 8 32;");
-        nextButton.setOnAction(e -> handleNext());
-        getChildren().add(nextButton);
-
-        showQuestion();
-    }
-
-    private void showQuestion() {
-        if (currentQuestion >= questions.size()) {
-            showResult();
-            return;
-        }
-        Question q = questions.get(currentQuestion);
-        questionLabel.setText((currentQuestion + 1) + ". " + q.getQuestionText());
-
-        optionsBox.getChildren().clear();
-        optionsGroup.getToggles().clear();
-
-        for (String option : q.getOptions()) {
-            RadioButton rb = new RadioButton(option);
-            rb.setFont(Font.font("Comic Sans MS", 16));
-            rb.setTextFill(Color.web("#1565c0"));
-            rb.setToggleGroup(optionsGroup);
-            rb.setStyle("-fx-background-radius: 12; -fx-padding: 6 18;");
-            optionsBox.getChildren().add(rb);
-        }
-        feedbackLabel.setText("");
-        feedbackLabel.setTextFill(Color.web("#263238"));
-        nextButton.setDisable(false);
-        progressBar.setProgress((double) currentQuestion / questions.size());
-
-        FadeTransition ft = new FadeTransition(Duration.millis(400), questionLabel);
-        ft.setFromValue(0.3);
-        ft.setToValue(1.0);
-        ft.play();
-    }
-
-    private void handleNext() {
-        Toggle selected = optionsGroup.getSelectedToggle();
-        if (selected == null) {
-            feedbackLabel.setText("Please select an answer.");
-            feedbackLabel.setTextFill(Color.web("#d84315"));
-            return;
-        }
-        String answer = ((RadioButton) selected).getText();
-        Question q = questions.get(currentQuestion);
-        String correctAnswer = q.getOptions()[q.getCorrectAnswerIndex()];
-        if (answer.equals(correctAnswer)) {
-            score++;
-            feedbackLabel.setText("Correct! 🎉");
-            feedbackLabel.setTextFill(Color.web("#43a047"));
+public class QuizPage {
+    public static void show(Stage primaryStage, Object arg) {
+        if (arg instanceof String) {
+            // Start the quiz for the given category
+            List<Question> questions = QuizData.getQuestionsForCategory((String) arg);
+            showQuiz(primaryStage, (String) arg, questions);
         } else {
-            feedbackLabel.setText("Incorrect. The correct answer is: " + correctAnswer);
-            feedbackLabel.setTextFill(Color.web("#d84315"));
+            // Show category selection
+            VBox root = new VBox(32);
+            root.setStyle("-fx-background-color: #fffde7; -fx-padding: 60;");
+            root.setAlignment(Pos.TOP_CENTER);
+            Label label = new Label("Select a Quiz Category:");
+            label.setStyle("-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #0288d1;");
+            root.getChildren().add(label);
+            List<String> categories = QuizData.getQuizCategories();
+            for (String cat : categories) {
+                Button btn = new Button(cat);
+                btn.setStyle("-fx-background-color: linear-gradient(to right, #ffd54f, #81d4fa); -fx-font-size: 22px; -fx-font-weight: bold; -fx-background-radius: 22; -fx-padding: 18 60; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, #ffd54f, 8, 0.2, 0, 2);");
+                btn.setOnAction(e -> show(primaryStage, cat));
+                root.getChildren().add(btn);
+            }
+            Button backBtn = new Button("Back to Dashboard");
+            backBtn.setStyle("-fx-background-color: #43e97b; -fx-text-fill: white; -fx-font-size: 18px; -fx-background-radius: 16; -fx-padding: 10 36; -fx-cursor: hand;");
+            backBtn.setOnAction(e -> StudentDashboard.show(primaryStage));
+            root.getChildren().add(backBtn);
+            Scene scene = new Scene(root, 1366, 768);
+            primaryStage.setScene(scene);
+            primaryStage.setTitle("EcoEdu - Quiz Categories");
+            primaryStage.show();
         }
+    }
+
+    private static void showQuiz(Stage primaryStage, String category, List<Question> questions) {
+        VBox root = new VBox(28);
+        root.setAlignment(Pos.TOP_CENTER);
+        root.setPadding(new Insets(60, 0, 0, 0));
+        Label title = new Label("Quiz: " + category);
+        title.setStyle("-fx-font-size: 30px; -fx-font-weight: bold; -fx-text-fill: #0288d1;");
+        Label progressLabel = new Label();
+        progressLabel.setStyle("-fx-font-size: 18px; -fx-text-fill: #388e3c;");
+        Label scoreLabel = new Label();
+        scoreLabel.setStyle("-fx-font-size: 18px; -fx-text-fill: #43a047;");
+        Label timerLabel = new Label();
+        timerLabel.setStyle("-fx-font-size: 18px; -fx-text-fill: #d32f2f;");
+        Label questionLabel = new Label();
+        questionLabel.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #263238;");
+        VBox optionsBox = new VBox(16);
+        optionsBox.setAlignment(Pos.CENTER);
+        Button[] optionButtons = new Button[4];
+        for (int i = 0; i < 4; i++) {
+            Button btn = new Button();
+            btn.setStyle("-fx-background-color: #aed581; -fx-font-size: 18px; -fx-background-radius: 14; -fx-padding: 10 32; -fx-cursor: hand;");
+            optionButtons[i] = btn;
+            optionsBox.getChildren().add(btn);
+        }
+        Label feedbackLabel = new Label("");
+        feedbackLabel.setStyle("-fx-font-size: 18px; -fx-text-fill: #388e3c;");
+        Button nextButton = new Button("Next");
+        nextButton.setStyle("-fx-background-color: #388e3c; -fx-text-fill: white; -fx-font-size: 18px; -fx-background-radius: 14; -fx-padding: 10 32; -fx-cursor: hand;");
         nextButton.setDisable(true);
+        Button backBtn = new Button("Back to Categories");
+        backBtn.setStyle("-fx-background-color: #ffd54f; -fx-text-fill: #0288d1; -fx-font-size: 16px; -fx-background-radius: 12; -fx-padding: 8 24; -fx-cursor: hand;");
+        root.getChildren().addAll(title, progressLabel, scoreLabel, timerLabel, questionLabel, optionsBox, feedbackLabel, nextButton, backBtn);
 
-        FadeTransition ft = new FadeTransition(Duration.millis(400), feedbackLabel);
-        ft.setFromValue(0.3);
-        ft.setToValue(1.0);
-        ft.play();
+        // Quiz state
+        final int[] currentQuestion = {0};
+        final int[] score = {0};
+        final Timeline[] timer = {null};
+        final int timePerQuestion = 20; // seconds
+        final int[] timeLeft = {timePerQuestion};
 
-        // Move to next question after a short delay
-        new Thread(() -> {
-            try { Thread.sleep(1200); } catch (InterruptedException ignored) {}
-            javafx.application.Platform.runLater(() -> {
-                currentQuestion++;
-                showQuestion();
+        Runnable loadQuestion = () -> {
+            if (timer[0] != null) timer[0].stop();
+            if (currentQuestion[0] < questions.size()) {
+                Question q = questions.get(currentQuestion[0]);
+                questionLabel.setText((currentQuestion[0] + 1) + ". " + q.getQuestionText());
+                String[] opts = q.getOptions();
+                for (int i = 0; i < 4; i++) {
+                    optionButtons[i].setText(opts[i]);
+                    optionButtons[i].setDisable(false);
+                }
+                feedbackLabel.setText("");
+                nextButton.setDisable(true);
+                progressLabel.setText("Question " + (currentQuestion[0] + 1) + " of " + questions.size());
+                scoreLabel.setText("Score: " + score[0]);
+                timeLeft[0] = timePerQuestion;
+                timerLabel.setText("Time left: " + timeLeft[0] + "s");
+                timer[0] = new Timeline(new KeyFrame(Duration.seconds(1), e -> {
+                    timeLeft[0]--;
+                    timerLabel.setText("Time left: " + timeLeft[0] + "s");
+                    if (timeLeft[0] <= 0) {
+                        timer[0].stop();
+                        for (Button btn : optionButtons) btn.setDisable(true);
+                        feedbackLabel.setText("Time's up! Correct answer: " + q.getOptions()[q.getCorrectAnswerIndex()]);
+                        feedbackLabel.setStyle("-fx-text-fill: #d32f2f; -fx-font-size: 18px;");
+                        nextButton.setDisable(false);
+                        if (currentQuestion[0] == questions.size() - 1) {
+                            nextButton.setText("Show Result");
+                        } else {
+                            nextButton.setText("Next");
+                        }
+                    }
+                }));
+                timer[0].setCycleCount(timePerQuestion);
+                timer[0].play();
+            } else {
+                showResult(primaryStage, category, score[0], questions.size());
+            }
+        };
+
+        for (int i = 0; i < 4; i++) {
+            final int idx = i;
+            optionButtons[i].setOnAction(e -> {
+                if (timer[0] != null) timer[0].stop();
+                Question q = questions.get(currentQuestion[0]);
+                for (Button btn : optionButtons) btn.setDisable(true);
+                if (idx == q.getCorrectAnswerIndex()) {
+                    score[0]++;
+                    feedbackLabel.setText("Correct!");
+                    feedbackLabel.setStyle("-fx-text-fill: #43a047; -fx-font-size: 18px;");
+                } else {
+                    feedbackLabel.setText("Wrong! Correct answer: " + q.getOptions()[q.getCorrectAnswerIndex()]);
+                    feedbackLabel.setStyle("-fx-text-fill: #d32f2f; -fx-font-size: 18px;");
+                }
+                nextButton.setDisable(false);
+                if (currentQuestion[0] == questions.size() - 1) {
+                    nextButton.setText("Show Result");
+                } else {
+                    nextButton.setText("Next");
+                }
+                scoreLabel.setText("Score: " + score[0]);
             });
-        }).start();
-    }
-
-    private void showResult() {
-        getChildren().clear();
-        VBox summaryCard = new VBox(18);
-        summaryCard.setAlignment(Pos.CENTER);
-        summaryCard.setPadding(new Insets(40));
-        summaryCard.setStyle("-fx-background-color: white; -fx-background-radius: 24; -fx-effect: dropshadow(gaussian, #b3e5fc, 16, 0.2, 0, 2);");
-
-        Label result = new Label("Quiz Complete!");
-        result.setFont(Font.font("Comic Sans MS", FontWeight.BOLD, 28));
-        result.setTextFill(Color.web("#0288d1"));
-        summaryCard.getChildren().add(result);
-
-        Label scoreLabel = new Label("Your score: " + score + " / " + questions.size());
-        scoreLabel.setFont(Font.font("Comic Sans MS", 22));
-        scoreLabel.setTextFill(Color.web("#43a047"));
-        summaryCard.getChildren().add(scoreLabel);
-
-        ProgressBar finalBar = new ProgressBar((double) score / questions.size());
-        finalBar.setPrefWidth(300);
-        finalBar.setStyle("-fx-accent: #43a047; -fx-background-radius: 10; -fx-background-color: #E0E0E0;");
-        summaryCard.getChildren().add(finalBar);
-
-        Label message = new Label();
-        if (score == questions.size()) {
-            message.setText("🌟 Perfect! You're an Eco Genius!");
-            message.setTextFill(Color.web("#ffb300"));
-        } else if (score >= questions.size() * 0.7) {
-            message.setText("Great job! Keep learning and helping the planet!");
-            message.setTextFill(Color.web("#43a047"));
-        } else {
-            message.setText("Keep practicing! Every step counts for Earth.");
-            message.setTextFill(Color.web("#0288d1"));
         }
-        message.setFont(Font.font("Comic Sans MS", 18));
-        summaryCard.getChildren().add(message);
 
-        Button backBtn = new Button("Back to Dashboard");
-        backBtn.setFont(Font.font("Comic Sans MS", FontWeight.BOLD, 16));
-        backBtn.setStyle("-fx-background-color: #0288d1; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 10 36;");
-        backBtn.setOnAction(e -> com.ecoedu.Home.Dashboard.show(primaryStage));
-        summaryCard.getChildren().add(backBtn);
-
-        FadeTransition ft = new FadeTransition(Duration.millis(600), summaryCard);
-        ft.setFromValue(0.3);
-        ft.setToValue(1.0);
-        ft.play();
-
-        getChildren().add(summaryCard);
+        nextButton.setOnAction(e -> {
+            currentQuestion[0]++;
+            loadQuestion.run();
+        });
+        backBtn.setOnAction(e -> {
+            if (timer[0] != null) timer[0].stop();
+            show(primaryStage, null);
+        });
+        loadQuestion.run();
+        Scene scene = new Scene(root, 1366, 768);
+        primaryStage.setScene(scene);
+        primaryStage.setTitle("EcoEdu - Quiz: " + category);
+        primaryStage.show();
     }
 
-    public static void show(Stage primaryStage) {
-        QuizPage page = new QuizPage(primaryStage);
-        Scene scene = new Scene(page, 900, 700);
+    private static void showResult(Stage primaryStage, String category, int score, int total) {
+        // Optionally, update LeaderboardService here if you want to simulate a real-time update
+        // For now, just show the result UI
+        VBox root = new VBox(36);
+        root.setAlignment(Pos.CENTER);
+        root.setStyle("-fx-background-color: #e1f5fe; -fx-padding: 80;");
+        Label congrats = new Label("Quiz Complete!");
+        congrats.setStyle("-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #43e97b;");
+        Label result = new Label("Your Score: " + score + " / " + total);
+        result.setStyle("-fx-font-size: 26px; -fx-text-fill: #0288d1;");
+        Button tryAnother = new Button("Try Another Quiz");
+        tryAnother.setStyle("-fx-background-color: #ffd54f; -fx-font-size: 20px; -fx-background-radius: 16; -fx-padding: 10 36; -fx-cursor: hand;");
+        tryAnother.setOnAction(e -> show(primaryStage, null));
+        Button backBtn = new Button("Back to Dashboard");
+        backBtn.setStyle("-fx-background-color: #43e97b; -fx-text-fill: white; -fx-font-size: 18px; -fx-background-radius: 16; -fx-padding: 10 36; -fx-cursor: hand;");
+        backBtn.setOnAction(e -> com.ecoedu.dashboard.StudentDashboard.show(primaryStage));
+        root.getChildren().addAll(congrats, result, tryAnother, backBtn);
+        Scene scene = new Scene(root, 1366, 768);
         primaryStage.setScene(scene);
-        primaryStage.setTitle("EcoEdu - Quiz");
+        primaryStage.setTitle("EcoEdu - Quiz Result");
         primaryStage.show();
     }
 } 
