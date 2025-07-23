@@ -70,4 +70,31 @@ public class AdminDataService {
         public Date date = new Date();
         public LogEntry(String message) { this.message = message; }
     }
+
+    // --- FIREBASE INTEGRATION TODOs ---
+    // To connect to Firebase, add your service account key and database URL below.
+    // Uncomment and implement the following methods using Firebase Admin SDK:
+    //
+    // private void initFirebase() {
+    //     // TODO: Initialize Firebase with service account and database URL
+    // }
+    //
+    // private void fetchUsersFromFirebase() {
+    //     // TODO: Fetch users from Firebase and update 'users' list
+    // }
+    // private void addUserToFirebase(User user) {
+    //     // TODO: Add user to Firebase
+    // }
+    // private void updateUserInFirebase(User user) {
+    //     // TODO: Update user in Firebase
+    // }
+    // private void removeUserFromFirebase(User user) {
+    //     // TODO: Remove user from Firebase
+    // }
+    //
+    // Repeat similar methods for modules, quizzes, logs, and notifications.
+    //
+    // For real-time updates, add listeners to Firebase and update the local lists/UI accordingly.
+    //
+    // See README or Firebase Admin SDK docs for setup details.
 } 

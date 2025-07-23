@@ -29,6 +29,139 @@ public class AdminDashboard extends BorderPane {
     private VBox mainContent;
     private Stage primaryStage;
 
+    private HBox createHeader() {
+        HBox bar = new HBox();
+        bar.getStyleClass().add("top-bar");
+        bar.setAlignment(Pos.CENTER_LEFT);
+        bar.setSpacing(18);
+        Label title = new Label("Dashboard");
+        title.getStyleClass().add("header-title");
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        // User avatar with null check
+        ImageView avatar;
+        java.io.InputStream avatarStream = getClass().getResourceAsStream("/Assets/Images/avatar.png");
+        if (avatarStream != null) {
+            avatar = new ImageView(new Image(avatarStream));
+        } else {
+            avatar = new ImageView();
+            avatar.setFitWidth(36);
+            avatar.setFitHeight(36);
+            avatar.setStyle("-fx-background-color: #e0e0e0; -fx-background-radius: 18;");
+        }
+        avatar.setFitWidth(36);
+        avatar.setFitHeight(36);
+        avatar.setPreserveRatio(true);
+        // Switch to Student Dashboard button (admin only)
+        Button switchBtn = new Button("Switch to Student Dashboard");
+        switchBtn.getStyleClass().add("button");
+        // Only show for admin role (stubbed for now)
+        boolean isAdmin = true; // TODO: Replace with real user role check
+        switchBtn.setVisible(isAdmin);
+        switchBtn.setOnAction(e -> com.ecoedu.dashboard.StudentDashboard.show(primaryStage));
+        // Logout button
+        Button logoutBtn = new Button("Logout");
+        logoutBtn.getStyleClass().add("button");
+        logoutBtn.setOnAction(e -> com.ecoedu.adminpanel.AdminLoginPage.show(primaryStage));
+        // Back button
+        Button backBtn = new Button("Back");
+        backBtn.getStyleClass().add("button");
+        backBtn.setOnAction(e -> com.ecoedu.adminpanel.AdminLoginPage.show(primaryStage));
+        bar.getChildren().addAll(backBtn, title, spacer, switchBtn, logoutBtn, avatar);
+        return bar;
+    }
+
+    private VBox createFunctionalFields() {
+        VBox box = new VBox(18);
+        box.setPadding(new Insets(0, 0, 0, 0));
+        // Admin profile card
+        HBox profileCard = new HBox(16);
+        profileCard.getStyleClass().add("card");
+        profileCard.setPadding(new Insets(18));
+        ImageView avatar;
+        java.io.InputStream avatarStream = getClass().getResourceAsStream("/Assets/Images/avatar.png");
+        if (avatarStream != null) {
+            avatar = new ImageView(new Image(avatarStream));
+        } else {
+            avatar = new ImageView();
+            avatar.setFitWidth(48);
+            avatar.setFitHeight(48);
+            avatar.setStyle("-fx-background-color: #e0e0e0; -fx-background-radius: 24;");
+        }
+        avatar.setFitWidth(48);
+        avatar.setFitHeight(48);
+        avatar.setPreserveRatio(true);
+        VBox info = new VBox(
+            new Label("Admin Name: John Doe"),
+            new Label("Role: Admin"),
+            new Label("Email: admin@ecoedu.com")
+        );
+        info.setSpacing(2);
+        profileCard.getChildren().addAll(avatar, info);
+        // Notifications
+        VBox notifications = new VBox(8);
+        notifications.getStyleClass().add("card");
+        notifications.setPadding(new Insets(18));
+        Label notifTitle = new Label("Notifications");
+        notifTitle.getStyleClass().add("label-section");
+        ListView<String> notifList = new ListView<>();
+        notifList.setPrefHeight(80);
+        notifList.setItems(javafx.collections.FXCollections.observableArrayList(
+            "New user registered", "Quiz submitted for review"
+        ));
+        notifications.getChildren().addAll(notifTitle, notifList);
+        // Quick actions
+        VBox quickActions = new VBox(8);
+        quickActions.getStyleClass().add("card");
+        quickActions.setPadding(new Insets(18));
+        Label quickTitle = new Label("Quick Actions");
+        quickTitle.getStyleClass().add("label-section");
+        Button addUserBtn = new Button("Add User");
+        addUserBtn.getStyleClass().add("button");
+        addUserBtn.setOnAction(e -> {
+            AddUserDialog dialog = new AddUserDialog();
+            dialog.showAndWait().ifPresent(user -> {
+                AdminDataService.getInstance().addUser(user);
+                notifList.getItems().add(0, "User added: " + user.name);
+                refreshDashboard();
+            });
+        });
+        Button addModuleBtn = new Button("Add Module");
+        addModuleBtn.getStyleClass().add("button");
+        addModuleBtn.setOnAction(e -> {
+            AddModuleDialog dialog = new AddModuleDialog();
+            dialog.showAndWait().ifPresent(module -> {
+                AdminDataService.getInstance().addModule(module);
+                notifList.getItems().add(0, "Module added: " + module.title);
+                refreshDashboard();
+            });
+        });
+        quickActions.getChildren().addAll(quickTitle, addUserBtn, addModuleBtn);
+        // Recent activity
+        VBox recentActivity = new VBox(8);
+        recentActivity.getStyleClass().add("card");
+        recentActivity.setPadding(new Insets(18));
+        Label recentTitle = new Label("Recent Activity");
+        recentTitle.getStyleClass().add("label-section");
+        ListView<String> recentList = new ListView<>();
+        recentList.setPrefHeight(80);
+        recentList.setItems(javafx.collections.FXCollections.observableArrayList(
+            "Module updated: Recycling", "Badge awarded: Eco Star"
+        ));
+        recentActivity.getChildren().addAll(recentTitle, recentList);
+        // Layout
+        HBox row = new HBox(18, profileCard, notifications, quickActions, recentActivity);
+        box.getChildren().add(row);
+        return box;
+    }
+
+    // Refresh dashboard data in real time
+    private void refreshDashboard() {
+        // For now, just refresh the main content (could be more granular)
+        mainContent.getChildren().clear();
+        mainContent.getChildren().addAll(createFunctionalFields(), createCardGrid(), createChartsRow());
+    }
+
     public AdminDashboard(Stage primaryStage) {
         this.primaryStage = primaryStage;
         getStyleClass().add("root");
@@ -42,7 +175,7 @@ public class AdminDashboard extends BorderPane {
         // Main content
         mainContent = new VBox(24);
         mainContent.setPadding(new Insets(32, 32, 32, 32));
-        mainContent.getChildren().addAll(createCardGrid(), createChartsRow());
+        mainContent.getChildren().addAll(createFunctionalFields(), createCardGrid(), createChartsRow());
         setCenter(mainContent);
     }
 
@@ -85,33 +218,6 @@ public class AdminDashboard extends BorderPane {
         btn.setMaxWidth(Double.MAX_VALUE);
         btn.setAlignment(Pos.CENTER_LEFT);
         return btn;
-    }
-
-    private HBox createHeader() {
-        HBox bar = new HBox();
-        bar.getStyleClass().add("top-bar");
-        bar.setAlignment(Pos.CENTER_LEFT);
-        bar.setSpacing(18);
-        Label title = new Label("Dashboard");
-        title.getStyleClass().add("header-title");
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-        // User avatar with null check
-        ImageView avatar;
-        java.io.InputStream avatarStream = getClass().getResourceAsStream("/Assets/Images/avatar.png");
-        if (avatarStream != null) {
-            avatar = new ImageView(new Image(avatarStream));
-        } else {
-            avatar = new ImageView();
-            avatar.setFitWidth(36);
-            avatar.setFitHeight(36);
-            avatar.setStyle("-fx-background-color: #e0e0e0; -fx-background-radius: 18;");
-        }
-        avatar.setFitWidth(36);
-        avatar.setFitHeight(36);
-        avatar.setPreserveRatio(true);
-        bar.getChildren().addAll(title, spacer, avatar);
-        return bar;
     }
 
     private GridPane createCardGrid() {
