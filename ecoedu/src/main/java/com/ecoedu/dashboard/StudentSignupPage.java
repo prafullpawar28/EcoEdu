@@ -17,6 +17,8 @@ import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.ecoedu.auth.FirebaseAuthService;
+
 // Add a static ProfileData class for demo purposes
 class ProfileData {
     public static String name = "";
@@ -139,7 +141,9 @@ public class StudentSignupPage extends VBox {
         signupBtn.setStyle("-fx-background-color: linear-gradient(to right, #43e97b, #00c6ff); -fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold; -fx-background-radius: 24; -fx-padding: 12 40; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, #43e97b, 8, 0.2, 0, 2); -fx-border-color: rgba(255,255,255,0.4); -fx-border-width: 2; -fx-border-radius: 24; -fx-background-insets: 0;");
         signupBtn.setOnAction(e -> handleSignup());
         signupBtn.setOnMouseEntered(e -> signupBtn.setStyle("-fx-background-color: linear-gradient(to right, #00c6ff, #43e97b); -fx-text-fill: #fff; -fx-font-size: 20px; -fx-font-weight: bold; -fx-background-radius: 24; -fx-padding: 12 40; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, #00c6ff, 12, 0.3, 0, 4); -fx-border-color: #fff; -fx-border-width: 2; -fx-border-radius: 24; -fx-background-insets: 0; -fx-scale-x:1.07;-fx-scale-y:1.07;"));
-        signupBtn.setOnMouseExited(e -> signupBtn.setStyle("-fx-background-color: linear-gradient(to right, #43e97b, #00c6ff); -fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold; -fx-background-radius: 24; -fx-padding: 12 40; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, #43e97b, 8, 0.2, 0, 2); -fx-border-color: rgba(255,255,255,0.4); -fx-border-width: 2; -fx-border-radius: 24; -fx-background-insets: 0;"));
+        signupBtn.setOnMouseExited(e -> {
+            signupBtn.setStyle("-fx-background-color: linear-gradient(to right, #43e97b, #00c6ff); -fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold; -fx-background-radius: 24; -fx-padding: 12 40; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, #43e97b, 8, 0.2, 0, 2); -fx-border-color: rgba(255,255,255,0.4); -fx-border-width: 2; -fx-border-radius: 24; -fx-background-insets: 0;");
+        });
 
         HBox links = new HBox(16);
         links.setAlignment(Pos.CENTER);

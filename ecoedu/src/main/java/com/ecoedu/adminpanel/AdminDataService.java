@@ -9,6 +9,8 @@ public class AdminDataService {
     private final List<Quiz> quizzes = new ArrayList<>();
     private final List<LogEntry> logs = new ArrayList<>();
     private final Map<String, Integer> analytics = new HashMap<>();
+    private final List<String> notifications = new ArrayList<>();
+    private final List<String> feedbacks = new ArrayList<>();
 
     public static AdminDataService getInstance() {
         if (instance == null) instance = new AdminDataService();
@@ -46,6 +48,11 @@ public class AdminDataService {
 
     // Logs
     public List<LogEntry> getLogs() { return new ArrayList<>(logs); }
+
+    // Notifications
+    public List<String> getNotifications() { return new ArrayList<>(notifications); }
+    // Feedbacks
+    public List<String> getFeedbacks() { return new ArrayList<>(feedbacks); }
 
     // Data classes
     public static class User {

@@ -28,6 +28,15 @@ public class AdminDashboard extends BorderPane {
     private GridPane cardGrid;
     private VBox mainContent;
     private Stage primaryStage;
+    // Keep references to pages for reuse
+    private AdminUsersPage usersPage;
+    private AdminModulesPage modulesPage;
+    private AdminAnalyticsPage analyticsPage;
+    private AdminLogsPage logsPage;
+    private AdminSettingsPage settingsPage;
+    private AdminNotificationsPage notificationsPage;
+    private AdminFeedbackPage feedbackPage;
+    private AdminParentalControlsPage parentalControlsPage;
 
     private HBox createHeader() {
         HBox bar = new HBox();
@@ -155,9 +164,14 @@ public class AdminDashboard extends BorderPane {
         return box;
     }
 
+    private void setMainContent(Pane page) {
+        mainContent.getChildren().clear();
+        mainContent.getChildren().add(page);
+    }
+
     // Refresh dashboard data in real time
     private void refreshDashboard() {
-        // For now, just refresh the main content (could be more granular)
+        // Stat cards and charts now use AdminDataService for real data
         mainContent.getChildren().clear();
         mainContent.getChildren().addAll(createFunctionalFields(), createCardGrid(), createChartsRow());
     }
@@ -175,7 +189,7 @@ public class AdminDashboard extends BorderPane {
         // Main content
         mainContent = new VBox(24);
         mainContent.setPadding(new Insets(32, 32, 32, 32));
-        mainContent.getChildren().addAll(createFunctionalFields(), createCardGrid(), createChartsRow());
+        refreshDashboard();
         setCenter(mainContent);
     }
 
@@ -199,17 +213,63 @@ public class AdminDashboard extends BorderPane {
         logo.setFitHeight(48);
         logo.setPreserveRatio(true);
         box.getChildren().add(logo);
-        // Sidebar buttons
+        // Sidebar buttons with navigation
+        Button dashboardBtn = makeSidebarButton("\uD83D\uDCCB", "Dashboard");
+        Button usersBtn = makeSidebarButton("\uD83D\uDC64", "Users");
+        Button modulesBtn = makeSidebarButton("\uD83D\uDCDA", "Modules");
+        Button analyticsBtn = makeSidebarButton("\uD83D\uDCCA", "Analytics");
+        Button logsBtn = makeSidebarButton("\uD83D\uDDD2", "Logs");
+        Button notificationsBtn = makeSidebarButton("\uD83D\uDD14", "Notifications");
+        Button feedbackBtn = makeSidebarButton("\uD83D\uDCEC", "Feedback");
+        Button parentalBtn = makeSidebarButton("\uD83D\uDC6A", "Parental Controls");
+        Button settingsBtn = makeSidebarButton("\u2699\uFE0F", "Settings");
+        dashboardBtn.setOnAction(e -> refreshDashboard());
+        usersBtn.setOnAction(e -> setMainContent(getUsersPage()));
+        modulesBtn.setOnAction(e -> setMainContent(getModulesPage()));
+        analyticsBtn.setOnAction(e -> setMainContent(getAnalyticsPage()));
+        logsBtn.setOnAction(e -> setMainContent(getLogsPage()));
+        notificationsBtn.setOnAction(e -> setMainContent(getNotificationsPage()));
+        feedbackBtn.setOnAction(e -> setMainContent(getFeedbackPage()));
+        parentalBtn.setOnAction(e -> setMainContent(getParentalControlsPage()));
+        settingsBtn.setOnAction(e -> setMainContent(getSettingsPage()));
         box.getChildren().addAll(
-            makeSidebarButton("\uD83D\uDCCB", "Dashboard"),
-            makeSidebarButton("\uD83D\uDC64", "Users"),
-            makeSidebarButton("\uD83C\uDFAE", "Games"),
-            makeSidebarButton("\uD83C\uDFC5", "Badges"),
-            makeSidebarButton("\uD83D\uDCCA", "Analytics"),
-            makeSidebarButton("\uD83D\uDDD2", "Logs"),
-            makeSidebarButton("\u2699\uFE0F", "Settings")
+            dashboardBtn, usersBtn, modulesBtn, analyticsBtn, logsBtn, notificationsBtn, feedbackBtn, parentalBtn, settingsBtn
         );
         return box;
+    }
+
+    private AdminUsersPage getUsersPage() {
+        if (usersPage == null) usersPage = new AdminUsersPage();
+        return usersPage;
+    }
+    private AdminModulesPage getModulesPage() {
+        if (modulesPage == null) modulesPage = new AdminModulesPage();
+        return modulesPage;
+    }
+    private AdminAnalyticsPage getAnalyticsPage() {
+        if (analyticsPage == null) analyticsPage = new AdminAnalyticsPage();
+        return analyticsPage;
+    }
+    private AdminLogsPage getLogsPage() {
+        if (logsPage == null) logsPage = new AdminLogsPage();
+        return logsPage;
+    }
+    private AdminSettingsPage getSettingsPage() {
+        if (settingsPage == null) settingsPage = new AdminSettingsPage();
+        return settingsPage;
+    }
+
+    private AdminNotificationsPage getNotificationsPage() {
+        if (notificationsPage == null) notificationsPage = new AdminNotificationsPage();
+        return notificationsPage;
+    }
+    private AdminFeedbackPage getFeedbackPage() {
+        if (feedbackPage == null) feedbackPage = new AdminFeedbackPage();
+        return feedbackPage;
+    }
+    private AdminParentalControlsPage getParentalControlsPage() {
+        if (parentalControlsPage == null) parentalControlsPage = new AdminParentalControlsPage();
+        return parentalControlsPage;
     }
 
     private Button makeSidebarButton(String icon, String text) {

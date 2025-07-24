@@ -13,6 +13,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
+import javafx.animation.FadeTransition;
+import javafx.collections.ListChangeListener;
+import javafx.scene.control.ProgressIndicator;
 
 public class LeaderboardAndBadgesPage extends VBox {
     private FlowPane leaderboardFlow;
@@ -21,6 +24,8 @@ public class LeaderboardAndBadgesPage extends VBox {
     private ComboBox<String> sortBox;
     private Button refreshBtn;
     private Label lastUpdatedLabel;
+    private ProgressIndicator loadingSpinner;
+    private VBox myRankBox;
 
     public LeaderboardAndBadgesPage() {
         setSpacing(24);
@@ -40,7 +45,6 @@ public class LeaderboardAndBadgesPage extends VBox {
         refreshBtn.setFont(Font.font("Quicksand", FontWeight.BOLD, 16));
         refreshBtn.setStyle("-fx-background-radius: 16; -fx-background-color: linear-gradient(to right, #b2ff59, #81d4fa); -fx-text-fill: #0288d1; -fx-cursor: hand;");
         refreshBtn.setOnAction(e -> {
-            LeaderboardService.getInstance().refreshData();
             refreshLeaderboard();
         });
         lastUpdatedLabel = new Label();
@@ -78,17 +82,37 @@ public class LeaderboardAndBadgesPage extends VBox {
         leaderboardScroll.setStyle("-fx-background: transparent; -fx-background-color: transparent; -fx-border-radius: 18;");
         StackPane leaderboardSection = new StackPane(leaderboardScroll);
         leaderboardSection.setStyle("-fx-background-radius: 24; -fx-background-color: linear-gradient(to bottom right, #e1f5fe 60%, #fffde7 100%); -fx-padding: 18 0 18 0;");
+        // Loading spinner
+        loadingSpinner = new ProgressIndicator();
+        loadingSpinner.setMaxSize(60, 60);
+        leaderboardSection.getChildren().add(loadingSpinner);
         getChildren().add(leaderboardSection);
+        // Sticky My Rank card
+        myRankBox = new VBox();
+        myRankBox.setAlignment(Pos.CENTER);
+        myRankBox.setPadding(new Insets(8));
+        getChildren().add(2, myRankBox);
+        // Listen for real-time updates
+        LeaderboardService.getInstance().getLeaderboardUsers().addListener((ListChangeListener<LeaderboardService.LeaderboardUserStats>) c -> {
+            refreshLeaderboard();
+        });
         refreshLeaderboard();
     }
 
     public void refreshLeaderboard() {
         leaderboardFlow.getChildren().clear();
+        myRankBox.getChildren().clear();
         List<LeaderboardService.LeaderboardUserStats> users = LeaderboardService.getInstance().getLeaderboardUsers();
+        if (users.isEmpty()) {
+            loadingSpinner.setVisible(true);
+            return;
+        } else {
+            loadingSpinner.setVisible(false);
+        }
         String search = searchField.getText() == null ? "" : searchField.getText().toLowerCase(Locale.ROOT);
         String sort = sortBox.getValue();
         // Filter
-        users = users.stream().filter(u -> u.username.toLowerCase(Locale.ROOT).contains(search)).collect(Collectors.toList());
+        users = users.stream().filter(u -> u.username != null && u.username.toLowerCase(Locale.ROOT).contains(search)).collect(Collectors.toList());
         // Sort
         if ("Quizzes".equals(sort)) {
             users.sort(Comparator.comparingInt((LeaderboardService.LeaderboardUserStats u) -> u.quizzesCompleted).reversed());
@@ -98,9 +122,26 @@ public class LeaderboardAndBadgesPage extends VBox {
             users.sort(Comparator.comparingInt((LeaderboardService.LeaderboardUserStats u) -> u.score).reversed());
         }
         lastUpdatedLabel.setText("Last updated: " + java.time.LocalTime.now().withNano(0));
+        // Sticky My Rank card
+        LeaderboardService.LeaderboardUserStats me = users.stream().filter(u -> u.isCurrentUser).findFirst().orElse(null);
+        if (me != null) {
+            VBox myCard = makeCard(me, me.rank - 1);
+            myCard.setStyle(myCard.getStyle() + "-fx-border-color: #ffb300; -fx-border-width: 4; -fx-border-radius: 22; -fx-effect: dropshadow(gaussian, #ffb300, 32, 0.38, 0, 8);");
+            Label sticky = new Label("My Rank");
+            sticky.setFont(Font.font("Quicksand", FontWeight.BOLD, 15));
+            sticky.setTextFill(Color.web("#ffb300"));
+            myRankBox.getChildren().addAll(sticky, myCard);
+        }
+        // Animate cards
         for (int i = 0; i < users.size(); i++) {
             LeaderboardService.LeaderboardUserStats user = users.get(i);
-            leaderboardFlow.getChildren().add(makeCard(user, i));
+            if (me != null && user.username.equals(me.username)) continue; // Already shown as sticky
+            VBox card = makeCard(user, i);
+            FadeTransition ft = new FadeTransition(javafx.util.Duration.millis(500), card);
+            ft.setFromValue(0);
+            ft.setToValue(1);
+            ft.play();
+            leaderboardFlow.getChildren().add(card);
         }
     }
 

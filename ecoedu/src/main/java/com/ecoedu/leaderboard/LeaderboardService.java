@@ -1,23 +1,40 @@
 package com.ecoedu.leaderboard;
 
-import java.util.ArrayList;
+import com.google.firebase.database.*;
+import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import java.util.Comparator;
-import java.util.List;
-import java.util.Random;
 
 public class LeaderboardService {
     private static LeaderboardService instance;
-    private String currentUser = "Daisy";
-    private final List<LeaderboardUserStats> users;
+    private final ObservableList<LeaderboardUserStats> users = FXCollections.observableArrayList();
+    private String currentUser = "";
 
     private LeaderboardService() {
-        users = new ArrayList<>();
-        // Simulate real-time data (could be replaced with DB/service calls)
-        users.add(new LeaderboardUserStats("Alice", 1500, 12, 8, List.of("Quiz Master"), false, 0.95));
-        users.add(new LeaderboardUserStats("Bob", 1200, 10, 7, List.of("Minigame Master"), false, 0.82));
-        users.add(new LeaderboardUserStats("Charlie", 1100, 8, 6, List.of(), false, 0.77));
-        users.add(new LeaderboardUserStats("Daisy", 950, 7, 5, List.of("Quiz Master", "Minigame Master"), true, 0.65));
-        users.add(new LeaderboardUserStats("Evan", 900, 6, 4, List.of(), false, 0.58));
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("leaderboard");
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                Platform.runLater(() -> {
+                    users.clear();
+                    int rank = 1;
+                    for (DataSnapshot child : snapshot.getChildren()) {
+                        LeaderboardUserStats user = child.getValue(LeaderboardUserStats.class);
+                        if (user != null) {
+                            user.rank = rank++;
+                            user.isCurrentUser = user.username != null && user.username.equals(currentUser);
+                            users.add(user);
+                        }
+                    }
+                    users.sort(Comparator.comparingInt(u -> -u.score));
+                });
+            }
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Handle error
+            }
+        });
     }
 
     public static LeaderboardService getInstance() {
@@ -25,24 +42,8 @@ public class LeaderboardService {
         return instance;
     }
 
-    public List<LeaderboardUserStats> getLeaderboardUsers() {
-        // Simulate real-time update (shuffle, update scores, etc.)
-        users.sort((a, b) -> Integer.compare(b.score, a.score));
-        int rank = 1;
-        for (LeaderboardUserStats u : users) {
-            u.rank = rank++;
-            u.isCurrentUser = u.username.equals(currentUser);
-        }
-        return new ArrayList<>(users);
-    }
-
-    public void refreshData() {
-        // Simulate a data refresh (could pull from DB or API)
-        Random rand = new Random();
-        for (LeaderboardUserStats u : users) {
-            u.score += rand.nextInt(10); // Simulate score change
-            u.progress = Math.min(1.0, u.progress + rand.nextDouble() * 0.01);
-        }
+    public ObservableList<LeaderboardUserStats> getLeaderboardUsers() {
+        return users;
     }
 
     public void setCurrentUser(String username) {
@@ -55,17 +56,9 @@ public class LeaderboardService {
         public int score;
         public int quizzesCompleted;
         public int minigamesPlayed;
-        public List<String> badges;
+        public java.util.List<String> badges;
         public boolean isCurrentUser;
         public double progress;
-        public LeaderboardUserStats(String username, int score, int quizzesCompleted, int minigamesPlayed, List<String> badges, boolean isCurrentUser, double progress) {
-            this.username = username;
-            this.score = score;
-            this.quizzesCompleted = quizzesCompleted;
-            this.minigamesPlayed = minigamesPlayed;
-            this.badges = badges;
-            this.isCurrentUser = isCurrentUser;
-            this.progress = progress;
-        }
+        public LeaderboardUserStats() {}
     }
 } 

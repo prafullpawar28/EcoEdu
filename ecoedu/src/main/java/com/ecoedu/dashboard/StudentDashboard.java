@@ -34,6 +34,8 @@ import javafx.util.Pair;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
+import java.io.InputStream;
+import javafx.scene.effect.GaussianBlur;
 
 public class StudentDashboard extends VBox {
     private Stage primaryStage;
@@ -51,7 +53,8 @@ public class StudentDashboard extends VBox {
         setSpacing(18);
         setPadding(new Insets(32, 40, 24, 40));
         setAlignment(Pos.TOP_CENTER);
-        setStyle("-fx-background-color: linear-gradient(to bottom right, #e1f5fe 60%, #fffde7 100%);");
+        // Remove background color from dashboard VBox
+        setStyle("-fx-background-color: transparent;");
 
         // --- Expressive Header (Footer at Top) ---
         HBox header = new HBox();
@@ -111,7 +114,8 @@ public class StudentDashboard extends VBox {
             new javafx.util.Pair<>("\uD83C\uDF08  Theme", () -> ThemeSelectorDialog.show(primaryStage)),
             new javafx.util.Pair<>("\u2753  Help", () -> HelpDialog.show(primaryStage)),
             new javafx.util.Pair<>("\uD83D\uDD0A  Sound", () -> SoundToggleDialog.show(primaryStage)),
-            new javafx.util.Pair<>("\uD83D\uDD12  Parental Controls", () -> ParentalControlsDialog.show(primaryStage))
+            new javafx.util.Pair<>("\uD83D\uDD12  Parental Controls", () -> ParentalControlsDialog.show(primaryStage)),
+            new javafx.util.Pair<>("\u2139\uFE0F  About Us", () -> AboutUs.show(primaryStage))
         );
         for (javafx.util.Pair<String, Runnable> item : items) {
             Label label = new Label(item.getKey());
@@ -146,6 +150,7 @@ public class StudentDashboard extends VBox {
                 ft.play();
             }
         });
+        // Restore header to previous state: only add settingsIcon to header (no settingsBox, no aboutUsLabel)
         header.getChildren().addAll(icon, welcome, headerSpacer, settingsIcon);
         // Add header as the very first node
         getChildren().add(0, header);
@@ -426,7 +431,23 @@ public class StudentDashboard extends VBox {
 
     public static void show(Stage primaryStage) {
         StudentDashboard dashboard = new StudentDashboard(primaryStage);
-        Scene scene = new Scene(dashboard, 1366, 768);
+        // Add background image as the bottom-most node
+        ImageView bgImage = new ImageView();
+        InputStream is = dashboard.getClass().getResourceAsStream("/Assets/Images/dashboard.jpg");
+        System.out.println("StudentDashboard BG image found? " + (is != null));
+        try {
+            bgImage.setImage(is != null ? new Image(is) : null);
+        } catch (Exception e) {
+            bgImage.setImage(null);
+        }
+        bgImage.setOpacity(1.0);
+        bgImage.fitWidthProperty().bind(primaryStage.widthProperty());
+        bgImage.fitHeightProperty().bind(primaryStage.heightProperty());
+        bgImage.setEffect(new GaussianBlur(12));
+        StackPane root = new StackPane(bgImage);
+        root.setPrefSize(1366, 768);
+        root.getChildren().add(dashboard);
+        Scene scene = new Scene(root, 1366, 768);
         primaryStage.setScene(scene);
         primaryStage.setTitle("EcoEdu - Student Dashboard");
         primaryStage.show();

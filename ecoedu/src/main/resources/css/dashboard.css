@@ -1,0 +1,82 @@
+/* dashboard.css - Modern Pastel Flat UI for EcoEdu Admin Dashboard */
+
+.root {
+    -fx-font-family: 'Quicksand', 'Segoe UI', sans-serif;
+    -fx-background-color: linear-gradient(to bottom, #f7f8fa 80%, #e0f7fa 100%);
+}
+
+.dashboard-section-title {
+    -fx-font-size: 20;
+    -fx-font-weight: bold;
+    -fx-text-fill: #388e3c;
+    -fx-padding: 0 0 12 0;
+}
+
+.stat-card, .notification-card, .quick-actions-box {
+    -fx-background-radius: 18;
+    -fx-background-color: white;
+    -fx-effect: dropshadow(gaussian, #e0e0e0, 10, 0.12, 0, 2);
+    -fx-padding: 24 32;
+}
+
+.stat-card {
+    -fx-background-color: linear-gradient(to right, #ffe0c6 60%, #fff 100%);
+}
+.stat-card.students { -fx-background-color: linear-gradient(to right, #ffe0c6 60%, #fff 100%); }
+.stat-card.teachers { -fx-background-color: linear-gradient(to right, #e0e7ff 60%, #fff 100%); }
+.stat-card.private { -fx-background-color: linear-gradient(to right, #c6f7ff 60%, #fff 100%); }
+
+.stat-card .stat-number {
+    -fx-font-size: 32;
+    -fx-font-weight: bold;
+    -fx-text-fill: #22223b;
+}
+.stat-card .stat-label {
+    -fx-font-size: 16;
+    -fx-text-fill: #7b7b93;
+}
+
+.notification-card {
+    -fx-background-radius: 14;
+    -fx-background-color: white;
+    -fx-effect: dropshadow(gaussian, #e0e0e0, 8, 0.10, 0, 2);
+    -fx-padding: 16 24;
+}
+
+.quick-actions-box {
+    -fx-background-radius: 14;
+    -fx-background-color: linear-gradient(to right, #e0f7fa 60%, #fff 100%);
+    -fx-effect: dropshadow(gaussian, #b2ebf2, 8, 0.10, 0, 2);
+    -fx-padding: 16 24;
+}
+
+.button {
+    -fx-background-radius: 12;
+    -fx-background-color: #43e97b;
+    -fx-text-fill: white;
+    -fx-font-size: 16;
+    -fx-font-weight: 600;
+    -fx-padding: 10 32;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, #43e97b, 8, 0.10, 0, 2);
+    -fx-border-width: 0;
+}
+.button:hover {
+    -fx-background-color: #38b6ff;
+    -fx-effect: dropshadow(gaussian, #38b6ff, 12, 0.18, 0, 4);
+}
+
+.chart {
+    -fx-background-color: transparent;
+    -fx-padding: 0 0 0 0;
+}
+
+/* Responsive tweaks */
+@media screen and (max-width: 900px) {
+    .stat-card, .notification-card, .quick-actions-box {
+        -fx-padding: 12 8;
+    }
+    .dashboard-section-title {
+        -fx-font-size: 16;
+    }
+} 

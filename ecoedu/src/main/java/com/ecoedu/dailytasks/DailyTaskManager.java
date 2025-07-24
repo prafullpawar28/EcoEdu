@@ -100,6 +100,46 @@ public class DailyTaskManager {
             "Take an online quiz about the environment and share your score", 50, DailyTask.TaskCategory.EDUCATION));
         allTasks.add(new DailyTask(30, "Draw Your Dream Green City", 
             "Draw a picture of an eco-friendly city and show your family", 55, DailyTask.TaskCategory.EDUCATION));
+
+        // --- NEW CHALLENGES ---
+        // Recycling
+        allTasks.add(new DailyTask(31, "Upcycle a Plastic Bottle", "Turn a used plastic bottle into something useful (e.g., a bird feeder)", 70, DailyTask.TaskCategory.RECYCLING));
+        allTasks.add(new DailyTask(32, "Host a Recycling Race", "Challenge your family to see who can sort recyclables fastest", 60, DailyTask.TaskCategory.RECYCLING));
+        // Energy
+        allTasks.add(new DailyTask(33, "Digital Detox Evening", "Spend an evening with no screens to save energy", 65, DailyTask.TaskCategory.ENERGY));
+        allTasks.add(new DailyTask(34, "Solar Power Research", "Find out how solar panels work and share a fact", 50, DailyTask.TaskCategory.ENERGY));
+        // Water
+        allTasks.add(new DailyTask(35, "Greywater for Plants", "Use leftover water from washing veggies to water plants", 40, DailyTask.TaskCategory.WATER));
+        allTasks.add(new DailyTask(36, "Shower Song Challenge", "Play a 4-minute song and finish your shower before it ends", 55, DailyTask.TaskCategory.WATER));
+        // Transportation
+        allTasks.add(new DailyTask(37, "Car-Free Day", "Go a whole day without using a car", 90, DailyTask.TaskCategory.TRANSPORTATION));
+        allTasks.add(new DailyTask(38, "Map Your Route", "Draw a map of your walk or bike ride and share it", 45, DailyTask.TaskCategory.TRANSPORTATION));
+        // Waste
+        allTasks.add(new DailyTask(39, "Zero-Waste Lunch", "Pack a lunch with no disposable packaging", 70, DailyTask.TaskCategory.WASTE));
+        allTasks.add(new DailyTask(40, "Community Clean-Up", "Pick up litter in a park or public space (with permission)", 80, DailyTask.TaskCategory.WASTE));
+        // Education
+        allTasks.add(new DailyTask(41, "Eco-Friendly Art", "Create art using only recycled or natural materials", 60, DailyTask.TaskCategory.EDUCATION));
+        allTasks.add(new DailyTask(42, "Plant a Tree", "Help plant a tree or care for a young plant", 100, DailyTask.TaskCategory.EDUCATION));
+
+        // --- EVEN MORE NEW CHALLENGES ---
+        // Recycling
+        allTasks.add(new DailyTask(43, "Recycling Detective", "Find 3 items at home that can be recycled and put them in the correct bin", 55, DailyTask.TaskCategory.RECYCLING));
+        allTasks.add(new DailyTask(44, "Eco Poster", "Create a poster about recycling and display it in your home or school", 60, DailyTask.TaskCategory.RECYCLING));
+        // Energy
+        allTasks.add(new DailyTask(45, "Fan-Free Day", "Go a whole day without using a fan or air conditioner", 70, DailyTask.TaskCategory.ENERGY));
+        allTasks.add(new DailyTask(46, "LED Hunt", "Check your home for old bulbs and suggest switching to LEDs", 40, DailyTask.TaskCategory.ENERGY));
+        // Water
+        allTasks.add(new DailyTask(47, "Water the Plants", "Water your plants early in the morning to save water", 35, DailyTask.TaskCategory.WATER));
+        allTasks.add(new DailyTask(48, "No Running Tap", "Brush your teeth without leaving the tap running", 30, DailyTask.TaskCategory.WATER));
+        // Transportation
+        allTasks.add(new DailyTask(49, "Carpool Challenge", "Share a ride with friends or family to reduce pollution", 65, DailyTask.TaskCategory.TRANSPORTATION));
+        allTasks.add(new DailyTask(50, "Public Transport Day", "Use only public transport for a day", 80, DailyTask.TaskCategory.TRANSPORTATION));
+        // Waste
+        allTasks.add(new DailyTask(51, "No Plastic Day", "Avoid using any single-use plastic for a whole day", 90, DailyTask.TaskCategory.WASTE));
+        allTasks.add(new DailyTask(52, "Repair a Toy", "Fix a broken toy instead of throwing it away", 50, DailyTask.TaskCategory.WASTE));
+        // Education
+        allTasks.add(new DailyTask(53, "Eco Book Reading", "Read a book about the environment and share a fact you learned", 60, DailyTask.TaskCategory.EDUCATION));
+        allTasks.add(new DailyTask(54, "Green Pledge", "Write and share your own eco-friendly pledge", 55, DailyTask.TaskCategory.EDUCATION));
     }
 
     public void generateDailyTasks() {

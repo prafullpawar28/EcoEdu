@@ -14,10 +14,10 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
-import javafx.scene.control.Hyperlink;
 import javafx.animation.FadeTransition;
 import javafx.util.Duration;
 import com.ecoedu.adminpanel.AdminPanelMain;
+import com.ecoedu.auth.FirebaseAuthService;
 
 public class StudentLoginPage extends VBox {
     private Stage primaryStage;
@@ -136,14 +136,22 @@ public class StudentLoginPage extends VBox {
             messageLabel.setText("Please enter both email and password.");
             return;
         }
-        // TODO: Add real authentication logic here
-        boolean loginSuccess = true; // Replace with real check
+         FirebaseAuthService fb = new FirebaseAuthService();
+        boolean loginSuccess = fb.login(email, password);
         if (loginSuccess) {
-            System.out.println("Student login successful. Navigating to dashboard on stage: " + primaryStage);
-            com.ecoedu.Home.Home.showStudentDashboard(primaryStage);
-        } else {
-            messageLabel.setText("Invalid email or password.");
+                System.out.println("Login successful.");
+                messageLabel.setText("Login successful!");
+                messageLabel.setStyle("-fx-text-fill: green; -fx-font-size: 14px; -fx-font-weight: bold;");
+                com.ecoedu.dashboard.StudentDashboard.show(primaryStage);
+                return ;
+            } else {
+                messageLabel.setText("Incorrect username or password.");
+                messageLabel.setStyle("-fx-text-fill: red; -fx-font-size: 14px; -fx-font-weight: bold;");
+        System.out.println("Invalid credentials.");
+        return ;
         }
+        
+       
     }
 
     // --- Forgot Password Logic ---
