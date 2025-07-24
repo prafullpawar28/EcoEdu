@@ -56,6 +56,21 @@ public class PollutionPatrolGame extends StackPane {
     private Rectangle missedBar;
     private StackPane overlayPane = new StackPane();
     private boolean gameStarted = false;
+    // --- NEW FIELDS FOR ENHANCED GAMEPLAY ---
+    private int combo = 0;
+    private int maxCombo = 0;
+    private int multiplier = 1;
+    private boolean doublePointsActive = false;
+    private boolean slowMotionActive = false;
+    private long powerUpEndTime = 0;
+    private ArrayList<Image> powerUpImages = new ArrayList<>();
+    private ArrayList<Image> allTrashImages = new ArrayList<>();
+    private ArrayList<ScorePopup> scorePopups = new ArrayList<>();
+    private VBox leaderboardBox = new VBox(8);
+    private ArrayList<Integer> leaderboard = new ArrayList<>();
+    private Button pauseBtn = new Button("Pause");
+    private boolean paused = false;
+    private StackPane pauseOverlay = new StackPane();
 
     public PollutionPatrolGame(Stage primaryStage) {
         setAlignment(Pos.CENTER);
@@ -65,10 +80,13 @@ public class PollutionPatrolGame extends StackPane {
         try {
             trashImage = new Image(getClass().getResourceAsStream("/Assets/Images/trash1.png"));
             trashVariety.add(trashImage);
-           
-        } catch (Exception e) {
-            trashImage = null;
-        }
+            allTrashImages.add(trashImage);
+           // allTrashImages.add(new Image(getClass().getResourceAsStream("/Assets/Images/trashsorter.jpeg")));
+            allTrashImages.add(new Image(getClass().getResourceAsStream("/Assets/Images/trash1.png")));
+            // Add more trash images as desired
+            
+            // Use glasses as a power-up icon for demo
+        } catch (Exception e) {}
         try {
             boatImage = new Image(getClass().getResourceAsStream("/Assets/Images/boat.png"));
         } catch (Exception e) {
@@ -123,6 +141,22 @@ public class PollutionPatrolGame extends StackPane {
         startBox.getChildren().addAll(startTitle, startDesc, startBtn);
         overlayPane.getChildren().add(startBox);
         getChildren().add(overlayPane);
+        // Add pause button to overlay
+        pauseBtn.setFont(Font.font("Quicksand", 18));
+        pauseBtn.setStyle("-fx-background-color: #0288d1; -fx-text-fill: white; -fx-background-radius: 18; -fx-padding: 8 32; -fx-cursor: hand;");
+        pauseBtn.setOnAction(e -> togglePause());
+        pauseBtn.setLayoutX(WIDTH - 120);
+        pauseBtn.setLayoutY(20);
+        gamePane.getChildren().add(pauseBtn);
+        // Pause overlay
+        pauseOverlay.setPrefSize(1366, 768);
+        pauseOverlay.setStyle("-fx-background-color: rgba(0,0,0,0.45);");
+        Text pauseText = new Text("Paused");
+        pauseText.setFont(Font.font("Quicksand", 48));
+        pauseText.setFill(Color.web("#fffde7"));
+        pauseOverlay.getChildren().add(pauseText);
+        pauseOverlay.setVisible(false);
+        getChildren().add(pauseOverlay);
     }
 
     private void setupGame(Stage primaryStage) {
@@ -170,8 +204,8 @@ public class PollutionPatrolGame extends StackPane {
         gamePane.getChildren().addAll(boat, scoreText, timerText);
 
         gamePane.setOnMouseMoved(e -> {
-            if (!gameOver && gameStarted)
-                boat.setX(e.getX() - boat.getFitWidth() / 2);
+            if (!gameOver && gameStarted && !paused)
+                boat.setX(Math.max(0, Math.min(e.getX() - boat.getFitWidth() / 2, WIDTH - boat.getFitWidth())));
         });
 
         gameLoop = new AnimationTimer() {
@@ -179,6 +213,7 @@ public class PollutionPatrolGame extends StackPane {
             public void handle(long now) {
                 if (!gameStarted) return;
                 if (gameOver) return;
+                if (paused) return;
                 if (lastUpdate > 0) {
                     double deltaSeconds = (now - lastUpdate) / 1_000_000_000.0;
                     if (now - lastDifficultyIncreaseTime > difficultyIncreaseInterval) {
@@ -228,12 +263,18 @@ public class PollutionPatrolGame extends StackPane {
     }
 
     private void spawnTrash() {
-        if (trashVariety.isEmpty()) {
+        if (allTrashImages.isEmpty()) {
             System.err.println("Error: No trash images loaded. Cannot spawn trash.");
             return;
         }
-        Image img = trashVariety.get(random.nextInt(trashVariety.size()));
+        if (random.nextDouble() < 0.08) {
+            spawnPowerUp();
+            return;
+        }
+        Image img = allTrashImages.get(random.nextInt(allTrashImages.size()));
         ImageView trash = new ImageView(img);
+        // Animate trash (rotation)
+        trash.setRotate(random.nextInt(360));
         trash.setFitWidth(40);
         trash.setFitHeight(40);
         trash.setX(random.nextInt(WIDTH - 40));
@@ -245,7 +286,8 @@ public class PollutionPatrolGame extends StackPane {
 
     private void moveTrash(double deltaSeconds) {
         for (ImageView trash : trashItems) {
-            trash.setY(trash.getY() + trashSpeed * deltaSeconds);
+            trash.setY(trash.getY() + trashSpeed * deltaSeconds * (slowMotionActive ? 0.5 : 1.0));
+            trash.setRotate(trash.getRotate() + 2);
         }
     }
 
@@ -253,15 +295,31 @@ public class PollutionPatrolGame extends StackPane {
         Iterator<ImageView> iterator = trashItems.iterator();
         while (iterator.hasNext()) {
             ImageView trash = iterator.next();
+            if ("powerup".equals(trash.getUserData())) {
+                activatePowerUp();
+                gamePane.getChildren().remove(trash);
+                iterator.remove();
+                continue;
+            }
             if (trash.getBoundsInParent().intersects(boat.getBoundsInParent())) {
                 gamePane.getChildren().remove(trash);
                 iterator.remove();
-                score += 10;
+                int points = 10 * multiplier * (doublePointsActive ? 2 : 1);
+                score += points;
+                combo++;
+                maxCombo = Math.max(maxCombo, combo);
+                showScorePopup(trash.getX(), trash.getY(), "+" + points);
                 scoreText.setText("Score: " + score);
+                if (combo % 5 == 0) {
+                    multiplier++;
+                    showScorePopup(trash.getX(), trash.getY() - 20, "Combo! x" + multiplier);
+                }
             } else if (trash.getY() > HEIGHT) {
                 gamePane.getChildren().remove(trash);
                 iterator.remove();
                 missedTrash++;
+                combo = 0;
+                multiplier = 1;
                 if (missedTrash >= maxMissedTrash) {
                     endGame(primaryStage);
                 }
@@ -310,6 +368,18 @@ public class PollutionPatrolGame extends StackPane {
         backButton.setLayoutY(HEIGHT / 2.0 + 60);
         backButton.setOnAction(e -> MinigamesPage.show(primaryStage));
         gamePane.getChildren().addAll(gameOverText, restartButton, backButton);
+        // Update leaderboard and show
+        leaderboard.add(score);
+        leaderboard.sort((a, b) -> b - a);
+        while (leaderboard.size() > 5) leaderboard.remove(leaderboard.size() - 1);
+        leaderboardBox.getChildren().clear();
+        leaderboardBox.getChildren().add(new Text("Leaderboard (Top 5):"));
+        for (int i = 0; i < leaderboard.size(); i++) {
+            leaderboardBox.getChildren().add(new Text((i + 1) + ". " + leaderboard.get(i)));
+        }
+        gamePane.getChildren().add(leaderboardBox);
+        leaderboardBox.setLayoutX(WIDTH / 2.0 - 100);
+        leaderboardBox.setLayoutY(HEIGHT / 2.0 + 100);
     }
 
     public static void show(Stage primaryStage) {
@@ -318,5 +388,76 @@ public class PollutionPatrolGame extends StackPane {
         primaryStage.setScene(scene);
         primaryStage.setTitle("Pollution Patrol");
         primaryStage.show();
+    }
+
+    // Add spawnPowerUp():
+    private void spawnPowerUp() {
+        Image img = powerUpImages.get(random.nextInt(powerUpImages.size()));
+        ImageView powerUp = new ImageView(img);
+        powerUp.setFitWidth(36);
+        powerUp.setFitHeight(36);
+        powerUp.setX(random.nextInt(WIDTH - 36));
+        powerUp.setY(0);
+        powerUp.setUserData("powerup");
+        trashItems.add(powerUp);
+        gamePane.getChildren().add(powerUp);
+    }
+
+    // Add showScorePopup():
+    private void showScorePopup(double x, double y, String text) {
+        ScorePopup popup = new ScorePopup(x, y, text);
+        scorePopups.add(popup);
+        gamePane.getChildren().add(popup);
+        popup.play(() -> {
+            gamePane.getChildren().remove(popup);
+            scorePopups.remove(popup);
+        });
+    }
+
+    // Add ScorePopup class:
+    private static class ScorePopup extends Text {
+        public ScorePopup(double x, double y, String text) {
+            super(text);
+            setFont(Font.font("Quicksand", 22));
+            setFill(Color.web("#43e97b"));
+            setX(x);
+            setY(y);
+        }
+        public void play(Runnable onFinish) {
+            FadeTransition ft = new FadeTransition(Duration.seconds(1.2), this);
+            ft.setFromValue(1.0);
+            ft.setToValue(0.0);
+            ft.setOnFinished(e -> onFinish.run());
+            ft.play();
+        }
+    }
+
+    // Add activatePowerUp():
+    private void activatePowerUp() {
+        if (random.nextBoolean()) {
+            doublePointsActive = true;
+            powerUpEndTime = System.currentTimeMillis() + 8000;
+            showScorePopup(WIDTH / 2.0, 80, "Double Points!");
+        } else {
+            slowMotionActive = true;
+            powerUpEndTime = System.currentTimeMillis() + 8000;
+            showScorePopup(WIDTH / 2.0, 80, "Slow Motion!");
+        }
+    }
+
+    // In gameLoop handle(), check power-up expiration:
+    private void togglePause() {
+        paused = !paused;
+        pauseOverlay.setVisible(paused);
+    }
+
+    // In gameLoop handle(), check power-up expiration:
+    private void resizeGame() {
+        double scaleX = getWidth() / 1366.0;
+        double scaleY = getHeight() / 768.0;
+        gamePane.setScaleX(scaleX);
+        gamePane.setScaleY(scaleY);
+        overlayPane.setPrefSize(getWidth(), getHeight());
+        pauseOverlay.setPrefSize(getWidth(), getHeight());
     }
 } 

@@ -6,6 +6,10 @@ import javafx.scene.Scene;
 
 public class Main  {
     public static void main(String[] args) {
+        // Initialize Firebase
+        com.ecoedu.auth.FirebaseInitializer.initialize();
+
+        
        Application.launch(Home.class,args);
     }
 
@@ -13,4 +17,3 @@ public class Main  {
         scene.getStylesheets().add(Main.class.getResource("/css/ecoedu-theme.css").toExternalForm());
     }
 }
-// shivling

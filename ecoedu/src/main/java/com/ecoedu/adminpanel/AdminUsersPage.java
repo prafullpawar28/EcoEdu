@@ -45,7 +45,16 @@ public class AdminUsersPage extends VBox {
                     HBox row = new HBox(12);
                     row.setAlignment(Pos.CENTER_LEFT);
                     // Avatar (placeholder)
-                    ImageView avatar = new ImageView(new Image(getClass().getResourceAsStream("/Assets/Images/avatar.png")));
+                    java.io.InputStream avatarStream = getClass().getResourceAsStream("/Assets/Images/avatar.png");
+                    ImageView avatar;
+                    if (avatarStream != null) {
+                        avatar = new ImageView(new Image(avatarStream));
+                    } else {
+                        avatar = new ImageView();
+                        avatar.setFitWidth(32);
+                        avatar.setFitHeight(32);
+                        avatar.setStyle("-fx-background-color: #e0e0e0; -fx-background-radius: 16;");
+                    }
                     avatar.setFitWidth(32);
                     avatar.setFitHeight(32);
                     avatar.setPreserveRatio(true);

@@ -30,6 +30,11 @@ public class DailyChallengePage extends VBox {
     private Label streakLabel;
     private ProgressBar progressBar;
     private Label motivationLabel;
+    // Add field for summary card
+    // Remove summaryCard and related code
+    // Remove tasksScrollPane and use tasksContainer directly
+    // Restore reset button style in createFooter()
+    // Restore createTasksSection() to add tasksContainer directly
 
     public DailyChallengePage(Stage primaryStage) {
         this.primaryStage = primaryStage;
@@ -44,6 +49,7 @@ public class DailyChallengePage extends VBox {
         createProgressSection();
         createMotivationSection();
         createTasksSection();
+        // createSummaryCard(); // Removed as per edit hint
         createFooter();
         
         refreshTasks();
@@ -137,9 +143,15 @@ public class DailyChallengePage extends VBox {
         tasksContainer = new VBox(15);
         tasksContainer.setAlignment(Pos.CENTER);
 
+        section.getChildren().clear();
         section.getChildren().addAll(sectionTitle, tasksContainer);
         getChildren().add(section);
     }
+
+    // Remove summaryCard and related code
+    // Remove tasksScrollPane and use tasksContainer directly
+    // Restore reset button style in createFooter()
+    // Restore createTasksSection() to add tasksContainer directly
 
     private void createFooter() {
         HBox footer = new HBox(20);
@@ -151,8 +163,8 @@ public class DailyChallengePage extends VBox {
         refreshBtn.setOnAction(e -> refreshTasks());
 
         Button resetBtn = new Button("🔄 Reset All");
-        resetBtn.setStyle("-fx-background-color: #FF5722; -fx-text-fill: white; -fx-font-size: 14px; " +
-                        "-fx-background-radius: 20; -fx-padding: 10 20; -fx-cursor: hand;");
+        resetBtn.setStyle("-fx-background-color: linear-gradient(to right, #FF5722, #FF9800); -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 24; -fx-padding: 12 32; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, #FF9800, 8, 0.18, 0, 2);");
+        resetBtn.setTooltip(new Tooltip("Reset all daily challenges for today"));
         resetBtn.setOnAction(e -> {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("Reset Tasks");
@@ -167,7 +179,22 @@ public class DailyChallengePage extends VBox {
             });
         });
 
-        footer.getChildren().addAll(refreshBtn, resetBtn);
+        Button reResetBtn = new Button("�� Re-Reset Tasks");
+        reResetBtn.setStyle("-fx-background-color: #FF9800; -fx-text-fill: white; -fx-font-size: 14px; -fx-background-radius: 20; -fx-padding: 10 20; -fx-cursor: hand;");
+        reResetBtn.setOnAction(e -> {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Re-Reset Tasks");
+            alert.setHeaderText("Re-Reset All Tasks?");
+            alert.setContentText("This will regenerate your daily tasks for today. Are you sure?");
+            alert.showAndWait().ifPresent(response -> {
+                if (response == ButtonType.OK) {
+                    taskManager.resetDailyTasks();
+                    refreshTasks();
+                }
+            });
+        });
+
+        footer.getChildren().addAll(refreshBtn, resetBtn, reResetBtn);
         getChildren().add(footer);
     }
 

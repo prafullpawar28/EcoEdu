@@ -9,6 +9,8 @@ public class AdminDataService {
     private final List<Quiz> quizzes = new ArrayList<>();
     private final List<LogEntry> logs = new ArrayList<>();
     private final Map<String, Integer> analytics = new HashMap<>();
+    private final List<String> notifications = new ArrayList<>();
+    private final List<String> feedbacks = new ArrayList<>();
 
     public static AdminDataService getInstance() {
         if (instance == null) instance = new AdminDataService();
@@ -47,6 +49,11 @@ public class AdminDataService {
     // Logs
     public List<LogEntry> getLogs() { return new ArrayList<>(logs); }
 
+    // Notifications
+    public List<String> getNotifications() { return new ArrayList<>(notifications); }
+    // Feedbacks
+    public List<String> getFeedbacks() { return new ArrayList<>(feedbacks); }
+
     // Data classes
     public static class User {
         public String name, email, role, password;
@@ -70,4 +77,31 @@ public class AdminDataService {
         public Date date = new Date();
         public LogEntry(String message) { this.message = message; }
     }
+
+    // --- FIREBASE INTEGRATION TODOs ---
+    // To connect to Firebase, add your service account key and database URL below.
+    // Uncomment and implement the following methods using Firebase Admin SDK:
+    //
+    // private void initFirebase() {
+    //     // TODO: Initialize Firebase with service account and database URL
+    // }
+    //
+    // private void fetchUsersFromFirebase() {
+    //     // TODO: Fetch users from Firebase and update 'users' list
+    // }
+    // private void addUserToFirebase(User user) {
+    //     // TODO: Add user to Firebase
+    // }
+    // private void updateUserInFirebase(User user) {
+    //     // TODO: Update user in Firebase
+    // }
+    // private void removeUserFromFirebase(User user) {
+    //     // TODO: Remove user from Firebase
+    // }
+    //
+    // Repeat similar methods for modules, quizzes, logs, and notifications.
+    //
+    // For real-time updates, add listeners to Firebase and update the local lists/UI accordingly.
+    //
+    // See README or Firebase Admin SDK docs for setup details.
 } 

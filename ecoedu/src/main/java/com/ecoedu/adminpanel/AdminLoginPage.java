@@ -20,6 +20,9 @@ import javafx.stage.Stage;
 import javafx.scene.layout.StackPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+
+import com.ecoedu.auth.FirebaseAuthService;
+
 import javafx.geometry.Insets;
 
 public class AdminLoginPage extends VBox {
@@ -114,7 +117,10 @@ public class AdminLoginPage extends VBox {
         Button loginBtn = new Button("Login");
         loginBtn.setFont(Font.font("Quicksand", FontWeight.BOLD, 18));
         loginBtn.setStyle("-fx-background-color: #6a1b9a; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 10 36; -fx-cursor: hand;");
-        loginBtn.setOnAction(e -> handleLogin());
+        loginBtn.setOnAction(e ->{
+            handleLogin();
+
+        });
         loginBtn.setDefaultButton(true);
 
         // Keyboard accessibility
@@ -149,40 +155,54 @@ public class AdminLoginPage extends VBox {
     }
 
     private void handleLogin() {
-        String email = emailField.getText();
-        String password = isPasswordVisible ? passwordVisibleField.getText() : passwordField.getText();
+        String email = emailField.getText().trim();
+        String password = isPasswordVisible ? passwordVisibleField.getText().trim() : passwordField.getText().trim();
         messageLabel.setText("");
         if (email.isEmpty() || password.isEmpty()) {
             messageLabel.setText("Please enter both email and password.");
-            return;
+            return ;
         }
         if (!email.contains("@") || !email.contains(".")) {
             messageLabel.setText("Please enter a valid email address.");
-            return;
+            return ;
         }
-        loadingIndicator.setVisible(true);
-        new Thread(() -> {
-            try { Thread.sleep(800); } catch (InterruptedException ignored) {}
-            javafx.application.Platform.runLater(() -> {
-                loadingIndicator.setVisible(false);
-                AdminDataService.User found = null;
-                for (AdminDataService.User u : AdminDataService.getInstance().getUsers()) {
-                    if (u.email.equalsIgnoreCase(email)) {
-                        found = u;
-                        break;
-                    }
-                }
-                if (found == null) {
-                    messageLabel.setText("No such user.");
-                } else if (!found.password.equals(password)) {
-                    messageLabel.setText("Incorrect password.");
-                } else if (!"Admin".equals(found.role)) {
-                    messageLabel.setText("Not an admin user.");
-                } else {
-                    AdminDashboard.show(primaryStage);
-                }
-            });
-        }).start();
+        // loadingIndicator.setVisible(true);
+        // new Thread(() -> {
+        //     try { Thread.sleep(800); } catch (InterruptedException ignored) {}
+        //     javafx.application.Platform.runLater(() -> {
+        //         loadingIndicator.setVisible(false);
+        //         AdminDataService.User found = null;
+        //         for (AdminDataService.User u : AdminDataService.getInstance().getUsers()) {
+        //             if (u.email.equalsIgnoreCase(email)) {
+        //                 found = u;
+        //                 break;
+        //             }
+        //         }
+        //         if (found == null) {
+        //             messageLabel.setText("No such user.");
+        //         } else if (!found.password.equals(password)) {
+        //             messageLabel.setText("Incorrect password.");
+        //         } else if (!"Admin".equals(found.role)) {
+        //             messageLabel.setText("Not an admin user.");
+        //         } else {
+        //             AdminDashboard.show(primaryStage);
+        //         }
+        //     });
+        // }).start();
+        FirebaseAuthService fb = new FirebaseAuthService();
+        boolean loggedIn = fb.login(email, password);
+        if (loggedIn) {
+                System.out.println("Login successful.");
+                messageLabel.setText("Login successful!");
+        messageLabel.setStyle("-fx-text-fill: green; -fx-font-size: 14px; -fx-font-weight: bold;");
+        com.ecoedu.adminpanel.AdminDashboard.show(primaryStage);
+                return;
+            } else {
+        System.out.println("Invalid credentials.");
+        messageLabel.setText("Incorrect username or password.");
+        messageLabel.setStyle("-fx-text-fill: red; -fx-font-size: 14px; -fx-font-weight: bold;");
+        return ;
+        }
     }
 
     public static void show(Stage primaryStage) {

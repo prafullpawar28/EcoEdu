@@ -55,9 +55,9 @@
     -fx-min-height: 110;
     -fx-alignment: center-left;
 }
-.stat-card.students { -fx-background-color: linear-gradient(120deg, #ffe0c6 60%, #fff 100%); }
-.stat-card.teachers { -fx-background-color: linear-gradient(120deg, #e0e7ff 60%, #fff 100%); }
-.stat-card.private { -fx-background-color: linear-gradient(120deg, #c6f7ff 60%, #fff 100%); }
+.stat-card.students { -fx-background-color: linear-gradient(to right, #ffe0c6 60%, #fff 100%); }
+.stat-card.teachers { -fx-background-color: linear-gradient(to right, #e0e7ff 60%, #fff 100%); }
+.stat-card.private { -fx-background-color: linear-gradient(to right, #c6f7ff 60%, #fff 100%); }
 
 .stat-card .stat-number {
     -fx-font-size: 32;

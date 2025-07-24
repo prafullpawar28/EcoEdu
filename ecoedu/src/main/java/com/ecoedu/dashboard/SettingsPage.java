@@ -65,6 +65,15 @@ public class SettingsPage extends VBox {
         messageLabel.getStyleClass().add("eco-error");
 
         getChildren().addAll(title, themeBox, notifBox, accountBox, saveBtn, messageLabel);
+
+        // After messageLabel, add About Us button for students
+        if (!isAdmin) {
+            Button aboutBtn = new Button("About Us");
+            aboutBtn.getStyleClass().add("eco-btn");
+            aboutBtn.setStyle("-fx-background-color: #0288d1; -fx-text-fill: white; -fx-font-size: 16px; -fx-background-radius: 20; -fx-padding: 10 32; -fx-cursor: hand;");
+            aboutBtn.setOnAction(e -> AboutUs.show(primaryStage));
+            getChildren().add(aboutBtn);
+        }
     }
 
     private void handleLogout() {
