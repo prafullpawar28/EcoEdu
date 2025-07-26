@@ -9,7 +9,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.shape.Circle;
+
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -44,6 +44,7 @@ public class StudentSignupPage extends VBox {
     private PasswordField confirmPasswordField;
     private Label messageLabel;
     private TextField nameField; // Make nameField a class field
+    private ComboBox<String> roleDropdown;
 
     public StudentSignupPage(Stage primaryStage) {
         this.primaryStage = primaryStage;
@@ -128,7 +129,8 @@ public class StudentSignupPage extends VBox {
         confirmBox.setAlignment(Pos.CENTER_LEFT);
         confirmBox.getChildren().addAll(confirmIcon, confirmPasswordField);
 
-        ComboBox<String> roleDropdown = new ComboBox<>();
+        // ComboBox<String> roleDropdown = new ComboBox<>();
+        roleDropdown = new ComboBox<>();
         roleDropdown.getItems().addAll("Child", "Parent", "Teacher");
         roleDropdown.setPromptText("Select Role");
         roleDropdown.getStyleClass().add("eco-dropdown");
@@ -168,7 +170,7 @@ public class StudentSignupPage extends VBox {
         String password = passwordField.getText();
         String confirmPassword = confirmPasswordField.getText();
         String name = nameField.getText();
-        String role = ((ComboBox<String>) ((VBox) getChildren().get(0)).lookup(".combo-box")).getValue();
+        String role = roleDropdown.getValue();
         messageLabel.setText("");
         if (email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() || name.isEmpty()) {
             messageLabel.setText("Please fill all fields.");
@@ -192,7 +194,17 @@ public class StudentSignupPage extends VBox {
                 messageLabel.setText("Email already registered. Please use a different email.");
                 return;
             }
+         boolean success = FirebaseAuthService.registerUser(name, email, password, role);
+        
+        
+      if (success) {
+        messageLabel.setText("Signup successful! Redirecting to login...");
+        StudentLoginPage.show(primaryStage);
+    } else {
+        messageLabel.setText("Signup failed! Email may already exist.");
+    }
         }
+        
         // Save to ProfileData
         ProfileData.name = name;
         ProfileData.email = email;

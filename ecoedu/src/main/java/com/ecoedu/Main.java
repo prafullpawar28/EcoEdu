@@ -9,7 +9,6 @@ public class Main  {
         // Initialize Firebase
         com.ecoedu.auth.FirebaseInitializer.initialize();
 
-        
        Application.launch(Home.class,args);
     }
 
@@ -17,3 +16,5 @@ public class Main  {
         scene.getStylesheets().add(Main.class.getResource("/css/ecoedu-theme.css").toExternalForm());
     }
 }
+
+   

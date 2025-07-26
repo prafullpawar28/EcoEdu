@@ -61,4 +61,9 @@ public class FirebaseAuthService {
             return false;
         }
     }
+
+    public static boolean registerUser(String name, String email, String password, String role) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'registerUser'");
+    }
 }

@@ -27,12 +27,6 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import com.ecoedu.modules.ModulePage;
-import com.ecoedu.quiz.QuizPage;
-import javafx.stage.PopupWindow;
-import javafx.util.Pair;
-import javafx.scene.input.KeyCode;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import java.io.InputStream;
 import javafx.scene.effect.GaussianBlur;
@@ -170,8 +164,8 @@ public class StudentDashboard extends VBox {
         cards = new ArrayList<>();
         cards.add(new DashboardCard("\uD83D\uDCDA Modules", "Learn eco topics!", " #81c784", "/Assets/Images/module.png", () -> openSection(() -> com.ecoedu.modules.ModulePage.show(primaryStage))));
         cards.add(new DashboardCard("\uD83E\uDDE9 Quiz & Puzzles", " Test your eco skills!", "rgb(242, 86, 174)", "/Assets/Images/quiz.png", () -> openSection(() -> com.ecoedu.quiz.QuizHomePage.show(primaryStage))));
-        cards.add(new DashboardCard("\uD83E\uDDD1\u200D\uD83C\uDFA8 Avatar Customization", "Style your eco hero!", "#4fc3f7", "/Assets/Images/avatar.png", () -> openSection(() -> com.ecoedu.avatar.AvatarCustomizer.show(primaryStage))));
-        cards.add(new DashboardCard("\uD83C\uDFC6 Leaderboard & Badges", "See your rank!", "#ffd54f", "/Assets/Images/leaderboard.png", () -> openSection(() -> showLeaderboardWithBack(primaryStage))));
+        cards.add(new DashboardCard("\uD83E\uDDD1\u200D\uD83C\uDFA8 Avatar", "Style your eco hero!", "#4fc3f7", "/Assets/Images/avatar.png", () -> openSection(() -> com.ecoedu.avatar.AvatarCustomizer.show(primaryStage))));
+        cards.add(new DashboardCard("\uD83C\uDFC6 Leaderboard ", "See your rank!", "#ffd54f", "/Assets/Images/leaderboard.png", () -> openSection(() -> showLeaderboardWithBack(primaryStage))));
         cards.add(new DashboardCard("\uD83C\uDFAE Minigames", "Play & learn!", "#ff8a65", "/Assets/Images/minigames.png", () -> openSection(() -> com.ecoedu.minigames.MinigamesPage.show(primaryStage))));
         cards.add(new DashboardCard("\uD83C\uDF31 Daily Challenge", "New eco tasks!", "#a1887f", "/Assets/Images/daily.png", () -> openSection(() -> com.ecoedu.dailytasks.DailyChallengePage.show(primaryStage))));
         quotes = Arrays.asList(
@@ -264,7 +258,7 @@ public class StudentDashboard extends VBox {
         // Title
         Label title = new Label(card.getTitle());
         title.setFont(Font.font("Quicksand", FontWeight.EXTRA_BOLD, 32));
-        title.setTextFill(Color.web("#22223b"));
+        title.setTextFill(Color.web("#e5ebf2ff"));
         title.setStyle("-fx-effect: dropshadow(gaussian,rgb(35, 35, 34), 8, 0.25, 0, 2);");
         title.setWrapText(true);
         title.setAlignment(Pos.CENTER);
@@ -272,7 +266,7 @@ public class StudentDashboard extends VBox {
         // Subtitle
         Label subtitle = new Label(card.getSubtitle());
         subtitle.setFont(Font.font("Quicksand", FontWeight.BOLD, 20));
-        subtitle.setTextFill(Color.web("#3a86ff"));
+        subtitle.setTextFill(Color.web("#d5ddeaff"));
         subtitle.setStyle("-fx-effect: dropshadow(gaussian,rgb(31, 31, 29), 6, 0.18, 0, 1);");
         subtitle.setWrapText(true);
         subtitle.setAlignment(Pos.CENTER);
@@ -359,7 +353,7 @@ public class StudentDashboard extends VBox {
         breadcrumb.setSpacing(8);
         Label dash = new Label("Dashboard");
         Label sep = new Label("> ");
-        Label lead = new Label("Leaderboard & Badges");
+        Label lead = new Label("Leaderboard \n& Badges");
         breadcrumb.getChildren().addAll(dash, sep, lead);
         breadcrumb.setStyle("-fx-font-size: 15; -fx-text-fill: #388e3c; -fx-padding: 0 0 8 0;");
         leaderboardPage.getChildren().add(0, breadcrumb);

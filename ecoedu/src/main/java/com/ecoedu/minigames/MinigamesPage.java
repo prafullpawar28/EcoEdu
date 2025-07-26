@@ -42,7 +42,7 @@ public class MinigamesPage extends VBox {
         VBox oceanCard = makeGameCard("Ocean Cleaner Game", "Clean up the ocean!", "/Assets/Images/ocean.jpg", () -> OceanCleanupGame.show(primaryStage));
         VBox pollutionCard = makeGameCard(
             "Pollution Patrol",
-            "Catch falling trash, steer your boat, and save the sea!",
+            "Catch falling trash, steer your boat,\n and save the sea!",
             "/Assets/Images/boat.png",
             () -> PollutionPatrolGame.show(primaryStage)
         );

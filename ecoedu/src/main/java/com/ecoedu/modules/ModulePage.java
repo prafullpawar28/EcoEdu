@@ -15,6 +15,8 @@ import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import com.ecoedu.dashboard.StudentDashboard;
 import java.util.List;
+import com.ecoedu.adminpanel.AdminDataService;
+import java.util.ArrayList;
 
 public class ModulePage {
     public static void show(Stage primaryStage) {
@@ -51,8 +53,23 @@ public class ModulePage {
         VBox moduleList = new VBox(32);
         moduleList.setAlignment(Pos.TOP_CENTER);
         moduleList.setPadding(new Insets(40, 0, 40, 0));
-        List<Module> modules = ModuleData.getModules();
-        for (Module module : modules) {
+        // Combine static and admin modules
+        ArrayList<Module> allModules = new ArrayList<>();
+        allModules.addAll(ModuleData.getModules());
+        // Add admin modules (convert to Module)
+        for (AdminDataService.Module adminMod : AdminDataService.getInstance().getModules()) {
+            // Use a default icon and no lessons for admin modules
+            Module mod = new Module(
+                -1, // id for admin modules
+                adminMod.title,
+                adminMod.description,
+                "🌱", // default icon for admin modules
+                new ArrayList<>() // no lessons
+            );
+            allModules.add(mod);
+        }
+        int index = 0;
+        for (Module module : allModules) {
             HBox card = new HBox(24);
             card.setAlignment(Pos.CENTER_LEFT);
             card.setPadding(new Insets(24));
@@ -71,10 +88,27 @@ public class ModulePage {
             Button openBtn = new Button("View Lessons");
             openBtn.setStyle("-fx-background-color: linear-gradient(to right, #43e97b, #00c6ff); -fx-text-fill: white; -fx-font-size: 17px; -fx-font-weight: bold; -fx-background-radius: 18; -fx-padding: 10 36; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, #43e97b, 8, 0.2, 0, 2);");
             openBtn.setOnAction(e -> showLessonList(primaryStage, module));
-            card.setOnMouseEntered(e -> card.setStyle("-fx-background-color: #e0f7fa; -fx-background-radius: 24; -fx-border-radius: 24; -fx-border-color: #00c6ff; -fx-border-width: 2.5; -fx-effect: dropshadow(gaussian, #00c6ff, 18, 0.22, 0, 8);"));
-            card.setOnMouseExited(e -> card.setStyle("-fx-background-color: white; -fx-background-radius: 24; -fx-border-radius: 24; -fx-border-color: #b3e5fc; -fx-border-width: 2.5; -fx-effect: dropshadow(gaussian, #b3e5fc, 12, 0.15, 0, 4);"));
+            // If admin module, add badge and animation
+            if (module.getId() == -1) {
+                Label badge = new Label("Admin");
+                badge.setStyle("-fx-background-color: linear-gradient(to right, #43e97b, #00c6ff); -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-background-radius: 12; -fx-padding: 4 16; -fx-effect: dropshadow(gaussian, #43e97b, 6, 0.18, 0, 1);");
+                badge.setRotate(-8);
+                badge.setTranslateY(-18);
+                // Subtle fade-in animation
+                javafx.animation.FadeTransition fade = new javafx.animation.FadeTransition(javafx.util.Duration.seconds(1.2), card);
+                fade.setFromValue(0.0);
+                fade.setToValue(1.0);
+                fade.setDelay(javafx.util.Duration.millis(100 * index));
+                fade.play();
+                info.getChildren().add(badge);
+                // Add a glowing border effect
+                card.setStyle(card.getStyle() + "; -fx-border-color: #43e97b; -fx-border-width: 3; -fx-effect: dropshadow(gaussian, #43e97b, 18, 0.22, 0, 8);");
+            }
+            card.setOnMouseEntered(e -> card.setStyle("-fx-background-color: #e0f7fa; -fx-background-radius: 24; -fx-border-radius: 24; -fx-border-color: #00c6ff; -fx-border-width: 2.5; -fx-effect: dropshadow(gaussian, #00c6ff, 18, 0.22, 0, 8);" + (module.getId() == -1 ? "; -fx-border-color: #43e97b; -fx-border-width: 3;" : "")));
+            card.setOnMouseExited(e -> card.setStyle("-fx-background-color: white; -fx-background-radius: 24; -fx-border-radius: 24; -fx-border-color: #b3e5fc; -fx-border-width: 2.5; -fx-effect: dropshadow(gaussian, #b3e5fc, 12, 0.15, 0, 4);" + (module.getId() == -1 ? "; -fx-border-color: #43e97b; -fx-border-width: 3;" : "")));
             card.getChildren().addAll(modIcon, info, openBtn);
             moduleList.getChildren().add(card);
+            index++;
         }
         root.getChildren().add(moduleList);
         Scene scene = new Scene(root, 1366, 768);
