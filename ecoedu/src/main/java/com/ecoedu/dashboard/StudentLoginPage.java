@@ -18,6 +18,9 @@ import javafx.animation.FadeTransition;
 import javafx.util.Duration;
 import com.ecoedu.adminpanel.AdminPanelMain;
 import com.ecoedu.auth.FirebaseAuthService;
+import com.ecoedu.modules.POJO;
+
+import io.netty.util.internal.shaded.org.jctools.util.PortableJvmInfo;
 
 public class StudentLoginPage extends VBox {
     private Stage primaryStage;
@@ -139,6 +142,7 @@ public class StudentLoginPage extends VBox {
          FirebaseAuthService fb = new FirebaseAuthService();
         boolean loginSuccess = fb.login(email, password);
         if (loginSuccess) {
+                com.ecoedu.modules.POJO.instance=new POJO(email, email, "1234567890", "Student");
                 System.out.println("Login successful.");
                 messageLabel.setText("Login successful!");
                 messageLabel.setStyle("-fx-text-fill: green; -fx-font-size: 14px; -fx-font-weight: bold;");

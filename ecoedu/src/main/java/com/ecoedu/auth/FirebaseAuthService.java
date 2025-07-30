@@ -2,14 +2,25 @@ package com.ecoedu.auth;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Scanner;
+import java.util.*;
+import java.util.concurrent.ExecutionException;
 
+import com.google.firebase.auth.ExportedUserRecord;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.ListUsersPage;
 import com.google.firebase.auth.UserRecord;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
+import com.ecoedu.modules.POJO;
+import com.google.api.core.ApiFuture;
+import com.google.auth.oauth2.GdchCredentials;
+import com.google.cloud.firestore.DocumentReference;
+import com.google.cloud.firestore.DocumentSnapshot;
+import com.google.cloud.firestore.Firestore;
+import com.google.cloud.firestore.QueryDocumentSnapshot;
+import com.google.cloud.firestore.QuerySnapshot;
+import com.google.cloud.firestore.WriteResult;
 public class FirebaseAuthService {
     private static final String API_KEY ="AIzaSyB1P0XyqI6PXykgV4e21LUT6dHC5TyeSqY";
      private final FirebaseAuth auth = FirebaseAuth.getInstance();
@@ -62,8 +73,69 @@ public class FirebaseAuthService {
         }
     }
 
-    public static boolean registerUser(String name, String email, String password, String role) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'registerUser'");
+    // public static boolean registerUser(String name, String email, String password, String role) {
+    //     // TODO Auto-generated method stub
+    //     throw new UnsupportedOperationException("Unimplemented method 'registerUser'");
+    // }
+    public String[][] getAllStudents(String collectionName) {
+        Firestore db=FirebaseInitializer.db;
+        if(db==null){
+                db = FirebaseInitializer.getFirestore();
+                FirebaseInitializer.db=db;
+        }
+        ApiFuture<QuerySnapshot> future = db.collection(collectionName).get();
+            String[][]answer;
+        try {
+            List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+            answer=new String[documents.size()][];
+            int itr=0;
+            for (QueryDocumentSnapshot doc : documents) {
+                System.out.println("Document ID: " + doc.getId());
+                HashMap<String, Object> data = (HashMap<String, Object>) doc.getData();
+                long score1=(Long)( data.get ("game1") != null ? data.get("game1") :0);
+                long score2=(Long)( data.get ("game2") != null ? data.get("game2"): 0);
+                long score3=(Long)( data.get ("game3") != null ? data.get("game3") :0);
+                answer[itr] = new String[]{
+                    doc.getId(),
+                    data.get("name") != null ? data.get("name").toString() : "N/A",
+                   score1+"",
+                   score2+"",
+                   score3+"",
+                   score1+score2+score3+""     
+            };
+                itr++;
+            }
+
+        } catch (InterruptedException | ExecutionException e) {
+            answer = new String[0][];
+            e.printStackTrace();
+        }
+        return answer;
+    }
+    public void updateGameScore(String key,int value) {
+        Firestore db=FirebaseInitializer.db;
+        if(db==null){
+                db = FirebaseInitializer.getFirestore();
+                FirebaseInitializer.db=db;
+        }
+         try {
+        String docId = POJO.instance.getEmail(); // Replace with actual user ID
+        String collection = "Student"; // Replace with actual collection name
+        DocumentReference docRef = db.collection(collection).document(docId);
+         ApiFuture<DocumentSnapshot> future = docRef.get();
+        DocumentSnapshot document = future.get();
+        long score=(Long)document.getData().get(key);
+        score=Long.max(score,value);
+        Map<String, Object> updates = new HashMap<>();
+        updates.put(key, score);
+        ApiFuture<WriteResult> writeResult = docRef.update(updates);
+       
+            writeResult.get();  // Wait for update to complete
+            System.out.println("Updated " + key + " successfully!");
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+
+        
     }
 }

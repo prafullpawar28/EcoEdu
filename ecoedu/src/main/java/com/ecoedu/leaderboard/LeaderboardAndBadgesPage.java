@@ -9,13 +9,18 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
+
+import com.ecoedu.auth.FirebaseAuthService;
+import com.google.firebase.FirebaseApp;
+
 import javafx.animation.FadeTransition;
 import javafx.collections.ListChangeListener;
-import javafx.scene.control.ProgressIndicator;
 
 public class LeaderboardAndBadgesPage extends VBox {
     private FlowPane leaderboardFlow;
@@ -28,6 +33,10 @@ public class LeaderboardAndBadgesPage extends VBox {
     private VBox myRankBox;
 
     public LeaderboardAndBadgesPage() {
+        FirebaseAuthService firebaseAuthService = new FirebaseAuthService();
+                String [][]list=firebaseAuthService.getAllStudents("Student");  
+                System.out.println("Fetching...");  
+                 Arrays.sort(list, (a, b) -> b[5].compareTo(a[5]));
         setSpacing(24);
         setPadding(new Insets(32, 40, 24, 40));
         setAlignment(Pos.TOP_CENTER);

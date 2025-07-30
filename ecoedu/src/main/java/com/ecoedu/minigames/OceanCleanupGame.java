@@ -21,6 +21,10 @@ import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import java.util.*;
+
+import com.ecoedu.auth.FirebaseAuthService;
+import com.google.firebase.auth.FirebaseAuth;
+
 import javafx.scene.layout.HBox;
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
@@ -40,7 +44,8 @@ import javafx.animation.AnimationTimer;
 
 public class OceanCleanupGame extends VBox {
     private Stage primaryStage;
-    private int score = 0;
+    private static int finalScore=0;
+    private static int score = 0;
     private Label scoreLabel;
     private Pane oceanPane;
     private List<TrashSprite> trashSprites;
@@ -189,7 +194,15 @@ public class OceanCleanupGame extends VBox {
         backBtn.setStyle("-fx-background-color: #43a047; -fx-text-fill: white; -fx-background-radius: 18; -fx-padding: 8 32; -fx-cursor: hand;");
         backBtn.setOnMouseEntered(e -> backBtn.setStyle("-fx-background-color: #388e3c; -fx-text-fill: #fffde7; -fx-background-radius: 18; -fx-padding: 8 32; -fx-cursor: hand; -fx-scale-x:1.07;-fx-scale-y:1.07;"));
         backBtn.setOnMouseExited(e -> backBtn.setStyle("-fx-background-color: #43a047; -fx-text-fill: white; -fx-background-radius: 18; -fx-padding: 8 32; -fx-cursor: hand;"));
-        backBtn.setOnAction(e -> com.ecoedu.minigames.MinigamesPage.show(primaryStage));
+        backBtn.setOnAction(e -> {
+        finalScore=Integer.max(score,finalScore);
+            new Thread(() -> {
+                FirebaseAuthService fb = new FirebaseAuthService();
+                fb.updateGameScore("game2",finalScore);
+               System.out.println("game2 score updated");
+            }).start();
+        com.ecoedu.minigames.MinigamesPage.show(primaryStage);
+        });
         gameVBox.getChildren().add(backBtn);
         getChildren().add(mainStack);
 
@@ -197,6 +210,7 @@ public class OceanCleanupGame extends VBox {
     }
 
     private void resetGame() {
+        finalScore=Integer.max(score,finalScore);
         score = 0;
         gameOverShown = false;
         updateScore(0);
@@ -293,6 +307,13 @@ public class OceanCleanupGame extends VBox {
         backBtn.setOnMouseEntered(e -> backBtn.setStyle("-fx-background-color: #00c6ff; -fx-text-fill: #fffde7; -fx-background-radius: 20; -fx-padding: 8 24; -fx-cursor: hand; -fx-scale-x:1.07;-fx-scale-y:1.07;"));
         backBtn.setOnMouseExited(e -> backBtn.setStyle("-fx-background-color: #0288d1; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 8 24; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, #0288d1, 4, 0.2, 0, 1);"));
         backBtn.setOnAction(e -> {
+             finalScore=Integer.max(score,finalScore);
+            new Thread(() -> {
+                FirebaseAuthService fb = new FirebaseAuthService();
+                fb.updateGameScore("game2",finalScore);
+               System.out.println("game2 score updated");
+            }).start();
+        
             javafx.stage.Stage stage = (javafx.stage.Stage) getScene().getWindow();
             com.ecoedu.minigames.MinigamesPage.show(stage);
         });
@@ -315,7 +336,15 @@ public class OceanCleanupGame extends VBox {
         topBar.setAlignment(Pos.TOP_LEFT);
         Button backBtn = new Button("← Back to Minigames");
         backBtn.setStyle("-fx-background-color: #0288d1; -fx-text-fill: white; -fx-font-size: 15px; -fx-background-radius: 20; -fx-padding: 8 24; -fx-cursor: hand;");
-        backBtn.setOnAction(e -> com.ecoedu.minigames.MinigamesPage.show(primaryStage));
+        backBtn.setOnAction(e -> {
+            finalScore=Integer.max(score,finalScore);
+            new Thread(() -> {
+                FirebaseAuthService fb = new FirebaseAuthService();
+                fb.updateGameScore("game2",finalScore);
+               System.out.println("game2 score updated");
+            }).start();
+            com.ecoedu.minigames.MinigamesPage.show(primaryStage);
+        });
         topBar.getChildren().add(backBtn);
         root.getChildren().add(topBar);
         root.getChildren().add(game);
