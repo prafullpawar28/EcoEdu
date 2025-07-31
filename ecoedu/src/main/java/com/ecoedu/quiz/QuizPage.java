@@ -8,6 +8,8 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
+import com.ecoedu.auth.FirebaseAuthService;
 import com.ecoedu.dashboard.StudentDashboard;
 import java.util.List;
 import javafx.animation.KeyFrame;
@@ -120,6 +122,11 @@ public class QuizPage {
                 timer[0].setCycleCount(timePerQuestion);
                 timer[0].play();
             } else {
+                FirebaseAuthService fb=new FirebaseAuthService();
+                int sum=0;
+                for(int x:score)sum+=x;
+                int cat= QuizData.getCategory(category);
+                fb.updateGameScore("quiz"+cat,sum);
                 showResult(primaryStage, category, score[0], questions.size());
             }
         };

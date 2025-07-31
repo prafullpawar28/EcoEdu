@@ -10,6 +10,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.ListUsersPage;
 import com.google.firebase.auth.UserRecord;
+import com.google.firebase.cloud.FirestoreClient;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.ecoedu.modules.POJO;
@@ -56,6 +57,24 @@ public class FirebaseAuthService {
             System.err.println("Login failed: " + e.getMessage());
             return false;
         }
+    }
+        public static Map<String, Object> getDocumentData(String collectionName, String documentId) {
+        try {
+            Firestore db = FirebaseInitializer.getFirestore();
+            DocumentReference docRef = db.collection(collectionName).document(documentId);
+            ApiFuture<DocumentSnapshot> future = docRef.get();
+            DocumentSnapshot document = future.get();
+            if (document.exists()) {
+                return document.getData();  // returns a Map<String, Object>
+            } else {
+                System.out.println("No such document!");
+                return null;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+            
     }
 
     public boolean addUser(String email, String password) {

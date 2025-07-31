@@ -16,6 +16,9 @@ import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import javafx.animation.FadeTransition;
 import javafx.util.Duration;
+
+import java.util.Map;
+
 import com.ecoedu.adminpanel.AdminPanelMain;
 import com.ecoedu.auth.FirebaseAuthService;
 import com.ecoedu.modules.POJO;
@@ -115,7 +118,7 @@ public class StudentLoginPage extends VBox {
         Button adminLoginBtn = new Button("Admin Login");
         adminLoginBtn.setFont(Font.font("Quicksand", FontWeight.BOLD, 15));
         adminLoginBtn.setStyle("-fx-background-color: #FFD3B6; -fx-text-fill: white; -fx-background-radius: 16; -fx-padding: 8 32; -fx-cursor: hand; margin-top: 8px;");
-        adminLoginBtn.setOnAction(e -> com.ecoedu.adminpanel.AdminLoginPage.show(primaryStage));
+        adminLoginBtn.setOnAction(e -> handleLogin());
         adminLoginBtn.setOnMouseEntered(e -> adminLoginBtn.setStyle("-fx-background-color: #ffb74d; -fx-text-fill:  #388E3C; -fx-background-radius: 16; -fx-padding: 8 32; -fx-cursor: hand; margin-top: 8px; -fx-scale-x:1.07;-fx-scale-y:1.07; -fx-effect: dropshadow(gaussian, #ffb74d, 12, 0.3, 0, 4);"));
         adminLoginBtn.setOnMouseExited(e -> adminLoginBtn.setStyle("-fx-background-color:  #FFD3B6; -fx-text-fill: white; -fx-background-radius: 16; -fx-padding: 8 32; -fx-cursor: hand; margin-top: 8px;"));
         Button backBtn = new Button("Back");
@@ -140,15 +143,31 @@ public class StudentLoginPage extends VBox {
             return;
         }
          FirebaseAuthService fb = new FirebaseAuthService();
-        boolean loginSuccess = fb.login(email, password);
-        if (loginSuccess) {
-                com.ecoedu.modules.POJO.instance=new POJO(email, email, "1234567890", "Student");
-                System.out.println("Login successful.");
-                messageLabel.setText("Login successful!");
+        Map<String, Object> userData = fb.getDocumentData("Admin", email);
+        if(userData == null) userData = fb.getDocumentData("Student", email);
+        String role = userData.get("role").toString();
+        System.out.println(role);
+        if (userData!=null) {
                 messageLabel.setStyle("-fx-text-fill: green; -fx-font-size: 14px; -fx-font-weight: bold;");
+                String userName=userData.get("name").toString();
+                String contact=userData.get("contact").toString();
+                String mail= userData.get("email").toString();
+                POJO user = new POJO(userName,mail,contact,role);
+                POJO.instance = user;
+                if(role.equals("Admin")){
+                     System.out.println(POJO.instance.getUserName() + " logged in as Admin");
+                        System.out.println("Email: " + POJO.instance.getEmail());
+                        System.out.println("Contact: " + POJO.instance.getContactNo());
+                        System.out.println("Role: " + POJO.instance.getRole());
+                       com.ecoedu.adminpanel.AdminDashboard.show(primaryStage);
+               }else{
+                    System.out.println(POJO.instance.getUserName() + " logged in as Student");
+                        System.out.println("Email: " + POJO.instance.getEmail());
+                        System.out.println("Contact: " + POJO.instance.getContactNo());
+                        System.out.println("Role: " + POJO.instance.getRole());
                 com.ecoedu.dashboard.StudentDashboard.show(primaryStage);
-                return ;
-            } else {
+                }
+        }else {
                 messageLabel.setText("Incorrect username or password.");
                 messageLabel.setStyle("-fx-text-fill: red; -fx-font-size: 14px; -fx-font-weight: bold;");
         System.out.println("Invalid credentials.");

@@ -38,7 +38,7 @@ public class QuizHomePage extends VBox {
 
         // Quiz category cards
         GridPane grid = new GridPane();
-        grid.setHgap(40);
+        grid.setHgap(60);
         grid.setVgap(40);
         grid.setAlignment(Pos.CENTER);
         List<String> categories = QuizData.getQuizCategories();

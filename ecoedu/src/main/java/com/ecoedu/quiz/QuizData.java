@@ -86,4 +86,22 @@ public class QuizData {
         // Return a default set of questions (Eco Basics)
         return getQuestionsForCategory("Eco Basics");
     }
+    public static int getCategory(String category) {
+        switch (category) {
+            case "Eco Basics":
+                return 1;
+            case "Ocean Life":
+                return 2;
+            case "Recycling":
+                return 3;
+            case "Energy":
+                return 4;
+            case "Wildlife":
+                return 5;
+            case "Climate Change":
+                return 6;
+            default:
+                return 1;
+        }
+    }      
 } 
