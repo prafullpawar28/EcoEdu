@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 
+import com.ecoedu.dashboard.StudentLoginPage;
+
 public class AdminDashboard extends BorderPane {
     private VBox sidebar;
     private HBox header;
@@ -92,14 +94,14 @@ public class AdminDashboard extends BorderPane {
         // Logout button
         Button logoutBtn = new Button("Logout");
         logoutBtn.getStyleClass().add("button");
-        logoutBtn.setOnAction(e -> com.ecoedu.adminpanel.AdminLoginPage.show(primaryStage));
+        logoutBtn.setOnAction(e -> StudentLoginPage.show(primaryStage));
         
         // Back button
-        Button backBtn = new Button("Back");
-        backBtn.getStyleClass().add("button");
-        backBtn.setOnAction(e -> com.ecoedu.adminpanel.AdminLoginPage.show(primaryStage));
+        // Button backBtn = new Button("Back");
+        // backBtn.getStyleClass().add("button");
+        // backBtn.setOnAction(e ->  StudentLoginPage.show(primaryStage));
         
-        bar.getChildren().addAll(backBtn, title, spacer, switchBtn, logoutBtn, avatar);
+        bar.getChildren().addAll(title, spacer, switchBtn, logoutBtn, avatar);
         return bar;
     }
 
@@ -282,7 +284,7 @@ public class AdminDashboard extends BorderPane {
 
     private void startRealTimeUpdates() {
         refreshTimeline = new Timeline(
-            new KeyFrame(Duration.seconds(30), e -> {
+            new KeyFrame(Duration.seconds(300), e -> {
                 refreshDashboard();
             })
         );

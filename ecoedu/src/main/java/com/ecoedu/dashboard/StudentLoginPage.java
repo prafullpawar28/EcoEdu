@@ -65,7 +65,7 @@ public class StudentLoginPage extends VBox {
             "-fx-effect: dropshadow(gaussian, #00000055, 32, 0.18, 0, 8);");
         // Lottie animation placeholder (replace with real Lottie integration if available)
 
-        Label welcome = new Label("Welcome, Student");
+        Label welcome = new Label("Welcome ");
         welcome.setFont(Font.font("Quicksand", FontWeight.BOLD, 35));
         welcome.setTextFill(Color.web("rgb(37, 9, 54)"));
         welcome.setStyle("-fx-effect: dropshadow(gaussian, #fff, 8, 0.2, 0, 2); -fx-padding: 0 0 18 0;");
@@ -113,23 +113,23 @@ public class StudentLoginPage extends VBox {
         messageLabel.getStyleClass().add("eco-error");
 
         // --- Admin Login and Back ---
-        HBox adminBackBox = new HBox(24);
-        adminBackBox.setAlignment(Pos.CENTER);
-        Button adminLoginBtn = new Button("Admin Login");
-        adminLoginBtn.setFont(Font.font("Quicksand", FontWeight.BOLD, 15));
-        adminLoginBtn.setStyle("-fx-background-color: #FFD3B6; -fx-text-fill: white; -fx-background-radius: 16; -fx-padding: 8 32; -fx-cursor: hand; margin-top: 8px;");
-        adminLoginBtn.setOnAction(e -> handleLogin());
-        adminLoginBtn.setOnMouseEntered(e -> adminLoginBtn.setStyle("-fx-background-color: #ffb74d; -fx-text-fill:  #388E3C; -fx-background-radius: 16; -fx-padding: 8 32; -fx-cursor: hand; margin-top: 8px; -fx-scale-x:1.07;-fx-scale-y:1.07; -fx-effect: dropshadow(gaussian, #ffb74d, 12, 0.3, 0, 4);"));
-        adminLoginBtn.setOnMouseExited(e -> adminLoginBtn.setStyle("-fx-background-color:  #FFD3B6; -fx-text-fill: white; -fx-background-radius: 16; -fx-padding: 8 32; -fx-cursor: hand; margin-top: 8px;"));
+        // HBox adminBackBox = new HBox(24);
+        // adminBackBox.setAlignment(Pos.CENTER);
+        // Button adminLoginBtn = new Button("Admin Login");
+        // adminLoginBtn.setFont(Font.font("Quicksand", FontWeight.BOLD, 15));
+        // adminLoginBtn.setStyle("-fx-background-color: #FFD3B6; -fx-text-fill: white; -fx-background-radius: 16; -fx-padding: 8 32; -fx-cursor: hand; margin-top: 8px;");
+        // adminLoginBtn.setOnAction(e -> handleLogin());
+        // adminLoginBtn.setOnMouseEntered(e -> adminLoginBtn.setStyle("-fx-background-color: #ffb74d; -fx-text-fill:  #388E3C; -fx-background-radius: 16; -fx-padding: 8 32; -fx-cursor: hand; margin-top: 8px; -fx-scale-x:1.07;-fx-scale-y:1.07; -fx-effect: dropshadow(gaussian, #ffb74d, 12, 0.3, 0, 4);"));
+        // adminLoginBtn.setOnMouseExited(e -> adminLoginBtn.setStyle("-fx-background-color:  #FFD3B6; -fx-text-fill: white; -fx-background-radius: 16; -fx-padding: 8 32; -fx-cursor: hand; margin-top: 8px;"));
         Button backBtn = new Button("Back");
         backBtn.getStyleClass().add("eco-btn");
         backBtn.setStyle("-fx-background-color: #FFD3B6; -fx-text-fill: #388E3C; -fx-font-size: 15px; -fx-background-radius: 20; -fx-padding: 6 24; -fx-cursor: hand;");
         backBtn.setOnAction(e -> com.ecoedu.Home.Home.showHome(primaryStage));
         backBtn.setOnMouseEntered(e -> backBtn.setStyle("-fx-background-color: #ffb74d; -fx-text-fill: #fff; -fx-font-size: 15px; -fx-background-radius: 20; -fx-padding: 6 24; -fx-cursor: hand; -fx-scale-x:1.07;-fx-scale-y:1.07; -fx-effect: dropshadow(gaussian, #ffb74d, 12, 0.3, 0, 4);"));
         backBtn.setOnMouseExited(e -> backBtn.setStyle("-fx-background-color: #FFD3B6; -fx-text-fill: #388E3C; -fx-font-size: 15px; -fx-background-radius: 20; -fx-padding: 6 24; -fx-cursor: hand;"));
-        adminBackBox.getChildren().addAll(adminLoginBtn, backBtn);
+       // adminBackBox.getChildren().addAll(adminLoginBtn, backBtn);
 
-        card.getChildren().addAll(welcome, emailBox, passBox, loginBtn, links, messageLabel, adminBackBox);
+        card.getChildren().addAll(welcome, emailBox, passBox, loginBtn, links, messageLabel,backBtn );
         root.getChildren().addAll(bgImage, card);
         getChildren().add(root);
     }

@@ -39,16 +39,16 @@ public class AdminDataService {
     private void initializeRealisticData() {
         // Initialize with realistic user data
         users.addAll(Arrays.asList(
-            new User("Admin", "admin@ecoedu.com", "Admin", "admin123", "Active", LocalDateTime.now().minusDays(30)),
-            new User("Sarah Johnson", "sarah.j@ecoedu.com", "Teacher", "password123", "Active", LocalDateTime.now().minusDays(25)),
-            new User("Michael Chen", "michael.c@ecoedu.com", "Teacher", "password123", "Active", LocalDateTime.now().minusDays(20)),
-            new User("Emma Wilson", "emma.w@ecoedu.com", "Student", "password123", "Active", LocalDateTime.now().minusDays(15)),
-            new User("Lucas Brown", "lucas.b@ecoedu.com", "Student", "password123", "Active", LocalDateTime.now().minusDays(10)),
-            new User("Olivia Davis", "olivia.d@ecoedu.com", "Student", "password123", "Active", LocalDateTime.now().minusDays(8)),
-            new User("Noah Miller", "noah.m@ecoedu.com", "Student", "password123", "Active", LocalDateTime.now().minusDays(5)),
-            new User("Ava Garcia", "ava.g@ecoedu.com", "Student", "password123", "Active", LocalDateTime.now().minusDays(3)),
-            new User("William Rodriguez", "william.r@ecoedu.com", "Student", "password123", "Active", LocalDateTime.now().minusDays(2)),
-            new User("Sophia Martinez", "sophia.m@ecoedu.com", "Student", "password123", "Active", LocalDateTime.now().minusDays(1))
+            new User("Admin", "prafull@gmail.com", "Admin", "123456", "Active", LocalDateTime.now().minusDays(30)),
+            new User(" Aditya Mogal", "aditya@gmail.com", "Teacher", "123456", "Active", LocalDateTime.now().minusDays(25)),
+            new User("Krushna Sangle ", "krushna@gmail.com", "Teacher", "123456", "Active", LocalDateTime.now().minusDays(20)),
+            new User("Neev Bagal", "neev@gmail.com", "Student", "123456", "Active", LocalDateTime.now().minusDays(15)),
+            new User("Rushi Pawar ", "rushi@gmail.com", "Student", "123456", "Active", LocalDateTime.now().minusDays(10)),
+            new User("Shivling Biradar", "shivling@gmail.com", "Student", "123456", "Active", LocalDateTime.now().minusDays(8)),
+            new User("Shraddha Choughule", "shraddha@gmail.com", "Student", "123456", "Active", LocalDateTime.now().minusDays(5)),
+            new User("Smita Shinde", "smita@gmail.com", "Student", "123456", "Active", LocalDateTime.now().minusDays(3)),
+            new User("Tanmay Bodhale", "tanmay@gmail.com", "Student", "123456", "Active", LocalDateTime.now().minusDays(2)),
+            new User("Sarvesh Ingle", "sarvesh@gmail.com", "Student", "123456", "Active", LocalDateTime.now().minusDays(1))
         ));
 
         // Initialize with realistic modules
@@ -71,25 +71,25 @@ public class AdminDataService {
 
         // Initialize notifications
         notifications.addAll(Arrays.asList(
-            new Notification("New student registration", "Emma Wilson has joined the platform", "Info", LocalDateTime.now().minusHours(2)),
-            new Notification("Quiz completion", "Lucas Brown completed Recycling Basics Quiz with 85%", "Success", LocalDateTime.now().minusHours(1)),
+            new Notification("New student registration", "Neev Bagal has joined the platform", "Info", LocalDateTime.now().minusHours(2)),
+            new Notification("Quiz completion", "Tanmay Bodhale completed Recycling Basics Quiz with 85%", "Success", LocalDateTime.now().minusHours(1)),
             new Notification("Module update", "Water Conservation module has been updated", "Info", LocalDateTime.now().minusMinutes(30)),
             new Notification("System maintenance", "Scheduled maintenance completed successfully", "Info", LocalDateTime.now().minusMinutes(15))
         ));
 
         // Initialize feedback
         feedbacks.addAll(Arrays.asList(
-            new Feedback("Great learning experience!", "The recycling module was very informative", "Emma Wilson", 5, LocalDateTime.now().minusDays(1)),
-            new Feedback("Could be more interactive", "Would love to see more hands-on activities", "Lucas Brown", 4, LocalDateTime.now().minusDays(2)),
-            new Feedback("Excellent content", "The water conservation lessons are well-structured", "Olivia Davis", 5, LocalDateTime.now().minusDays(3))
+            new Feedback("Great learning experience!", "The recycling module was very informative", "Rushi Pawar", 5, LocalDateTime.now().minusDays(1)),
+            new Feedback("Could be more interactive", "Would love to see more hands-on activities", "Shraddha Choughule", 4, LocalDateTime.now().minusDays(2)),
+            new Feedback("Excellent content", "The water conservation lessons are well-structured", "Sarvesh Ingle", 5, LocalDateTime.now().minusDays(3))
         ));
 
         // Initialize student progress
         studentProgress.addAll(Arrays.asList(
-            new StudentProgress("Emma Wilson", "Introduction to Recycling", 85, LocalDateTime.now().minusDays(1)),
-            new StudentProgress("Lucas Brown", "Water Conservation", 92, LocalDateTime.now().minusDays(2)),
-            new StudentProgress("Olivia Davis", "Renewable Energy", 78, LocalDateTime.now().minusDays(3)),
-            new StudentProgress("Noah Miller", "Sustainable Living", 88, LocalDateTime.now().minusDays(4))
+            new StudentProgress("Rushi Pawar", "Introduction to Recycling", 85, LocalDateTime.now().minusDays(1)),
+            new StudentProgress("Shivling Biradar", "Water Conservation", 92, LocalDateTime.now().minusDays(2)),
+            new StudentProgress("Tanmay Bodhale", "Renewable Energy", 78, LocalDateTime.now().minusDays(3)),
+            new StudentProgress("Smita Shinde", "Sustainable Living", 88, LocalDateTime.now().minusDays(4))
         ));
 
         // Initialize analytics
