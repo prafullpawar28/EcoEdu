@@ -39,7 +39,7 @@ public class DailyChallengePage extends VBox {
     public DailyChallengePage(Stage primaryStage) {
         this.primaryStage = primaryStage;
         this.taskManager = DailyTaskManager.getInstance();
-        
+
         setSpacing(24);
         setPadding(new Insets(36, 36, 36, 36));
         setAlignment(Pos.TOP_CENTER);
@@ -51,7 +51,7 @@ public class DailyChallengePage extends VBox {
         createTasksSection();
         // createSummaryCard(); // Removed as per edit hint
         createFooter();
-        
+
         refreshTasks();
     }
 
@@ -62,7 +62,7 @@ public class DailyChallengePage extends VBox {
         // Back button
         Button backBtn = new Button("← Back to Dashboard");
         backBtn.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14px; " +
-                        "-fx-background-radius: 20; -fx-padding: 8 16; -fx-cursor: hand;");
+                "-fx-background-radius: 20; -fx-padding: 8 16; -fx-cursor: hand;");
         backBtn.setOnAction(e -> {
             // Return to student dashboard
             com.ecoedu.dashboard.StudentDashboard.show(primaryStage);
@@ -92,7 +92,7 @@ public class DailyChallengePage extends VBox {
         progressSection.setAlignment(Pos.CENTER);
         progressSection.setPadding(new Insets(20));
         progressSection.setStyle("-fx-background-color: white; -fx-background-radius: 15; " +
-                               "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);");
+                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);");
 
         // Progress bar
         progressBar = new ProgressBar(0);
@@ -133,6 +133,19 @@ public class DailyChallengePage extends VBox {
     }
 
     private void createTasksSection() {
+        // VBox section = new VBox(15);
+        // section.setAlignment(Pos.CENTER);
+
+        // Label sectionTitle = new Label("Today's Challenges");
+        // sectionTitle.setFont(Font.font("Comic Sans MS", FontWeight.BOLD, 20));
+        // sectionTitle.setTextFill(Color.web("#2E7D32"));
+
+        // tasksContainer = new VBox(15);
+        // tasksContainer.setAlignment(Pos.CENTER);
+
+        // section.getChildren().clear();
+        // section.getChildren().addAll(sectionTitle, tasksContainer);
+        // getChildren().add(section);
         VBox section = new VBox(15);
         section.setAlignment(Pos.CENTER);
 
@@ -141,11 +154,20 @@ public class DailyChallengePage extends VBox {
         sectionTitle.setTextFill(Color.web("#2E7D32"));
 
         tasksContainer = new VBox(15);
-        tasksContainer.setAlignment(Pos.CENTER);
+        tasksContainer.setAlignment(Pos.TOP_CENTER);
+        tasksContainer.setPadding(new Insets(20));
+
+        ScrollPane scrollPane = new ScrollPane(tasksContainer);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.setPrefViewportHeight(400); // adjust height as needed
+        scrollPane.setStyle("-fx-background: transparent; -fx-background-color: transparent;");
 
         section.getChildren().clear();
-        section.getChildren().addAll(sectionTitle, tasksContainer);
+        section.getChildren().addAll(sectionTitle, scrollPane);
         getChildren().add(section);
+
     }
 
     // Remove summaryCard and related code
@@ -159,18 +181,19 @@ public class DailyChallengePage extends VBox {
 
         Button refreshBtn = new Button("🔄 Refresh Tasks");
         refreshBtn.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-size: 14px; " +
-                          "-fx-background-radius: 20; -fx-padding: 10 20; -fx-cursor: hand;");
+                "-fx-background-radius: 20; -fx-padding: 10 20; -fx-cursor: hand;");
         refreshBtn.setOnAction(e -> refreshTasks());
 
         Button resetBtn = new Button("🔄 Reset All");
-        resetBtn.setStyle("-fx-background-color: linear-gradient(to right, #FF5722, #FF9800); -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 24; -fx-padding: 12 32; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, #FF9800, 8, 0.18, 0, 2);");
+        resetBtn.setStyle(
+                "-fx-background-color: linear-gradient(to right, #FF5722, #FF9800); -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 24; -fx-padding: 12 32; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, #FF9800, 8, 0.18, 0, 2);");
         resetBtn.setTooltip(new Tooltip("Reset all daily challenges for today"));
         resetBtn.setOnAction(e -> {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("Reset Tasks");
             alert.setHeaderText("Reset All Tasks?");
             alert.setContentText("This will mark all tasks as incomplete. Are you sure?");
-            
+
             alert.showAndWait().ifPresent(response -> {
                 if (response == ButtonType.OK) {
                     taskManager.resetDailyTasks();
@@ -180,7 +203,8 @@ public class DailyChallengePage extends VBox {
         });
 
         Button reResetBtn = new Button("�� Re-Reset Tasks");
-        reResetBtn.setStyle("-fx-background-color: #FF9800; -fx-text-fill: white; -fx-font-size: 14px; -fx-background-radius: 20; -fx-padding: 10 20; -fx-cursor: hand;");
+        reResetBtn.setStyle(
+                "-fx-background-color: #FF9800; -fx-text-fill: white; -fx-font-size: 14px; -fx-background-radius: 20; -fx-padding: 10 20; -fx-cursor: hand;");
         reResetBtn.setOnAction(e -> {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("Re-Reset Tasks");
@@ -217,7 +241,8 @@ public class DailyChallengePage extends VBox {
         Label funFact = new Label(getRandomFunFact());
         funFact.setFont(Font.font("Comic Sans MS", FontWeight.BOLD, 15));
         funFact.setTextFill(Color.web("#388E3C"));
-        funFact.setStyle("-fx-background-color: #A8E6CF; -fx-background-radius: 12; -fx-padding: 10 18; -fx-effect: dropshadow(gaussian, #A8E6CF, 6, 0.1, 0, 2);");
+        funFact.setStyle(
+                "-fx-background-color: #A8E6CF; -fx-background-radius: 12; -fx-padding: 10 18; -fx-effect: dropshadow(gaussian, #A8E6CF, 6, 0.1, 0, 2);");
         funFact.setWrapText(true);
         funFact.setAlignment(Pos.CENTER);
         tasksContainer.getChildren().add(funFact);
@@ -234,11 +259,11 @@ public class DailyChallengePage extends VBox {
         String cardColor = task.isCompleted() ? "#E8F5E8" : "#FFFFFF";
         String borderColor = task.isCompleted() ? "#4CAF50" : "#E0E0E0";
         card.setStyle("-fx-background-color: " + cardColor + "; " +
-                     "-fx-background-radius: 15; " +
-                     "-fx-border-color: " + borderColor + "; " +
-                     "-fx-border-radius: 15; " +
-                     "-fx-border-width: 2; " +
-                     "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);");
+                "-fx-background-radius: 15; " +
+                "-fx-border-color: " + borderColor + "; " +
+                "-fx-border-radius: 15; " +
+                "-fx-border-width: 2; " +
+                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);");
 
         // Header with category and points
         HBox header = new HBox(15);
@@ -325,16 +350,16 @@ public class DailyChallengePage extends VBox {
     // Fun facts for kids
     private String getRandomFunFact() {
         String[] facts = new String[] {
-            "Did you know? Recycling one aluminum can saves enough energy to run a TV for 3 hours!",
-            "Turning off the tap while brushing your teeth can save up to 8 gallons of water a day.",
-            "Trees are the longest-living organisms on Earth!",
-            "Biking or walking instead of driving helps keep the air clean.",
-            "Composting helps reduce landfill waste and makes plants happy!",
-            "Plastic can take up to 1,000 years to decompose. Reuse and recycle!",
-            "Turning off lights when you leave a room saves energy and money.",
-            "Every little eco-action helps protect animals and nature!"
+                "Did you know? Recycling one aluminum can saves enough energy to run a TV for 3 hours!",
+                "Turning off the tap while brushing your teeth can save up to 8 gallons of water a day.",
+                "Trees are the longest-living organisms on Earth!",
+                "Biking or walking instead of driving helps keep the air clean.",
+                "Composting helps reduce landfill waste and makes plants happy!",
+                "Plastic can take up to 1,000 years to decompose. Reuse and recycle!",
+                "Turning off lights when you leave a room saves energy and money.",
+                "Every little eco-action helps protect animals and nature!"
         };
-        return "🌱 Fun Fact: " + facts[(int)(Math.random() * facts.length)];
+        return "🌱 Fun Fact: " + facts[(int) (Math.random() * facts.length)];
     }
 
     private void updateProgress() {
@@ -388,9 +413,15 @@ public class DailyChallengePage extends VBox {
     // --- Utility to launch daily challenge page ---
     public static void show(Stage primaryStage) {
         DailyChallengePage page = new DailyChallengePage(primaryStage);
+        ScrollPane scrollPane = new ScrollPane(page);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setFitToHeight(false); // Allows vertical scrolling
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollPane.setStyle("-fx-background: transparent; -fx-background-color: transparent;");
         Scene scene = new Scene(page, 1366, 768);
         primaryStage.setScene(scene);
         primaryStage.setTitle("EcoEdu - Daily Challenges");
         primaryStage.show();
     }
-} 
+}

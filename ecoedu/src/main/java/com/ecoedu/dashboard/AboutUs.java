@@ -130,8 +130,8 @@ public class AboutUs extends VBox {
         teamTitle.setTextFill(Color.web("#1b5e20"));
 
         Label teamDesc = new Label(
-            "We are a passionate group of final-year students driven by the vision of bringing environmental awareness to children through engaging tech platforms. " +
-            "From UI design to database handling, each member has contributed their strengths to make EcoEdu a reality."
+           "We are a dedicated team of students committed to promoting environmental awareness among children through innovative tech platforms."+
+           " Each member has brought their unique skills—from UI design to database management—to help bring EcoEdu to life."
         );
         teamDesc.setFont(Font.font("Quicksand", 16));
         teamDesc.setWrapText(true);

@@ -152,7 +152,7 @@ public class DailyTaskManager {
             
             // Generate 3 random tasks for the day
             List<DailyTask> availableTasks = new ArrayList<>(allTasks);
-            for (int i = 0; i < 3 && !availableTasks.isEmpty(); i++) {
+            for (int i = 0; i < 10 && !availableTasks.isEmpty(); i++) {
                 int randomIndex = random.nextInt(availableTasks.size());
                 DailyTask selectedTask = availableTasks.get(randomIndex);
                 

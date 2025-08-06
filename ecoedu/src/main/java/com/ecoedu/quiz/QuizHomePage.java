@@ -96,7 +96,7 @@ public class QuizHomePage extends VBox {
         QuizHomePage page = new QuizHomePage(primaryStage);
         Scene scene = new Scene(page, 1366, 768);
         primaryStage.setScene(scene);
-        primaryStage.setTitle("EcoEdu - Quizzes & Puzzles");
+        primaryStage.setTitle("EcoEdu - Quizzes");
         primaryStage.show();
     }
 } 

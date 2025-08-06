@@ -111,16 +111,18 @@ public class FirebaseAuthService {
             for (QueryDocumentSnapshot doc : documents) {
                 System.out.println("Document ID: " + doc.getId());
                 HashMap<String, Object> data = (HashMap<String, Object>) doc.getData();
+                String name=(String)( data.get ("name") != null ? data.get("name") :"User");
                 long score1=(Long)( data.get ("game1") != null ? data.get("game1") :0);
                 long score2=(Long)( data.get ("game2") != null ? data.get("game2"): 0);
                 long score3=(Long)( data.get ("game3") != null ? data.get("game3") :0);
                 answer[itr] = new String[]{
-                    doc.getId(),
+                    name,
                     data.get("name") != null ? data.get("name").toString() : "N/A",
                    score1+"",
                    score2+"",
                    score3+"",
-                   score1+score2+score3+""     
+                   score1+score2+score3+"",
+
             };
                 itr++;
             }
@@ -130,6 +132,40 @@ public class FirebaseAuthService {
             e.printStackTrace();
         }
         return answer;
+    }
+    public ArrayList<Object>[] getAllStudentsQuiz(String collectionName) {
+        Firestore db=FirebaseInitializer.db;
+        if(db==null){
+                db = FirebaseInitializer.getFirestore();
+                FirebaseInitializer.db=db;
+        }
+        ApiFuture<QuerySnapshot> future = db.collection(collectionName).get();
+            ArrayList<Object>[] scores;
+        try {
+            List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+            scores=new ArrayList[documents.size()];
+            int itr=0;
+            for (QueryDocumentSnapshot doc : documents) {
+                System.out.println("Document ID: " + doc.getId());
+                HashMap<String, Object> data = (HashMap<String, Object>) doc.getData();
+                String name=(String)( data.get ("name") != null ? data.get("name") :"User");
+                ArrayList<Object> score = (ArrayList<Object>) data.get("quiz1");
+                long totalScore = (Long)score.get(0)+ (Long)score.get(1)+
+                        (Long)score.get(2)+
+                        (Long)score.get(3)+
+                        (Long)score.get(4)+
+                        (Long)score.get(5);
+                score.add(0,name);
+                score.add(totalScore);
+                scores[itr] = score;
+                itr++;
+            }
+
+        } catch (InterruptedException | ExecutionException e) {
+            scores = new ArrayList[0];
+            e.printStackTrace();
+        }
+        return scores;
     }
     public void updateGameScore(String key,int value) {
         Firestore db=FirebaseInitializer.db;

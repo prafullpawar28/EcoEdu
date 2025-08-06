@@ -27,6 +27,9 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import com.ecoedu.modules.POJO;
+
 import javafx.scene.layout.StackPane;
 import java.io.InputStream;
 import javafx.scene.effect.GaussianBlur;
@@ -100,9 +103,10 @@ public class StudentDashboard extends VBox {
         menuBox.setPrefWidth(220);
         String menuItemStyle = "-fx-font-size: 17; -fx-font-family: 'Quicksand'; -fx-background-radius: 14; -fx-padding: 10 24 10 18; -fx-cursor: hand; -fx-text-fill: #388e3c; -fx-alignment: center-left;";
         String menuItemHover = "-fx-background-color: linear-gradient(to right, #b2ff59 0%, #81d4fa 100%); -fx-text-fill: #0288d1;";
+        POJO p= POJO.instance;
         java.util.List<javafx.util.Pair<String, Runnable>> items = java.util.Arrays.asList(
             new javafx.util.Pair<>("\uD83D\uDC64  Profile", () -> StudentProfileDialog.show(primaryStage, new StudentProfileDialog.StudentProfile(
-                profile.getName(), profile.getAvatarPath(), profile.getEcoLevel(), profile.getBadges()
+               p.getUserName(),p.getRole(), "A+", 5
             ))),
             new javafx.util.Pair<>("\uD83D\uDD13  Logout", () -> StudentLoginPage.show(primaryStage)),
             new javafx.util.Pair<>("\uD83C\uDF08  Theme", () -> ThemeSelectorDialog.show(primaryStage)),
@@ -341,6 +345,7 @@ public class StudentDashboard extends VBox {
             alert.setHeaderText(null);
             alert.setContentText("This section is coming soon!");
             alert.showAndWait();
+            e.printStackTrace();
         }
     }
 
