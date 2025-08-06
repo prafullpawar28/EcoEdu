@@ -317,11 +317,13 @@ public class DailyChallengePage extends VBox {
         VBox content = new VBox(8);
         Label titleLabel = new Label(task.getTitle());
         titleLabel.setFont(Font.font("Comic Sans MS", FontWeight.BOLD, 16));
-        titleLabel.setTextFill(Color.web("#2E7D32"));
+        // titleLabel.setTextFill(Color.web("#2E7D32"));
+        titleLabel.setTextFill(Color.web("#1B5E20"));
         titleLabel.setWrapText(true);
         Label descLabel = new Label(task.getDescription());
         descLabel.setFont(Font.font("Comic Sans MS", FontWeight.NORMAL, 12));
-        descLabel.setTextFill(Color.web("#666666"));
+        // descLabel.setTextFill(Color.web("#302d2dff"));
+        descLabel.setTextFill(Color.web("#212121"));
         descLabel.setWrapText(true);
         content.getChildren().addAll(titleLabel, descLabel);
         card.getChildren().addAll(header, content);

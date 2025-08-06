@@ -133,64 +133,146 @@ public class FirebaseAuthService {
         }
         return answer;
     }
+    // ---------------------
+    // public ArrayList<Object>[] getAllStudentsQuiz(String collectionName) {
+    //     Firestore db=FirebaseInitializer.db;
+    //     if(db==null){
+    //             db = FirebaseInitializer.getFirestore();
+    //             FirebaseInitializer.db=db;
+    //     }
+    //     ApiFuture<QuerySnapshot> future = db.collection(collectionName).get();
+    //         ArrayList<Object>[] scores;
+    //     try {
+    //         List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+    //         scores=new ArrayList[documents.size()];
+    //         int itr=0;
+    //         for (QueryDocumentSnapshot doc : documents) {
+    //             System.out.println("Document ID: " + doc.getId());
+    //             HashMap<String, Object> data = (HashMap<String, Object>) doc.getData();
+    //             String name=(String)( data.get ("name") != null ? data.get("name") :"User");
+    //            ArrayList<Object> score = (ArrayList<Object>) data.get("quiz1");
+              
+    //             long totalScore = (Long)score.get(0)+ (Long)score.get(1)+
+    //                     (Long)score.get(2)+
+    //                     (Long)score.get(3)+
+    //                     (Long)score.get(4)+
+    //                     (Long)score.get(5);
+    //             score.add(0,name);
+    //             score.add(totalScore);
+    //             scores[itr] = score;
+    //             itr++;
+    //         }
+
+    //     } catch (InterruptedException | ExecutionException e) {
+    //         scores = new ArrayList[0];
+    //         e.printStackTrace();
+    //     }
+    //     return scores;
+    // }
+    //========
     public ArrayList<Object>[] getAllStudentsQuiz(String collectionName) {
-        Firestore db=FirebaseInitializer.db;
-        if(db==null){
-                db = FirebaseInitializer.getFirestore();
-                FirebaseInitializer.db=db;
-        }
-        ApiFuture<QuerySnapshot> future = db.collection(collectionName).get();
-            ArrayList<Object>[] scores;
-        try {
-            List<QueryDocumentSnapshot> documents = future.get().getDocuments();
-            scores=new ArrayList[documents.size()];
-            int itr=0;
-            for (QueryDocumentSnapshot doc : documents) {
-                System.out.println("Document ID: " + doc.getId());
-                HashMap<String, Object> data = (HashMap<String, Object>) doc.getData();
-                String name=(String)( data.get ("name") != null ? data.get("name") :"User");
-                ArrayList<Object> score = (ArrayList<Object>) data.get("quiz1");
-                long totalScore = (Long)score.get(0)+ (Long)score.get(1)+
-                        (Long)score.get(2)+
-                        (Long)score.get(3)+
-                        (Long)score.get(4)+
-                        (Long)score.get(5);
-                score.add(0,name);
-                score.add(totalScore);
-                scores[itr] = score;
-                itr++;
+    Firestore db = FirebaseInitializer.db;
+    if (db == null) {
+        db = FirebaseInitializer.getFirestore();
+        FirebaseInitializer.db = db;
+    }
+
+    ApiFuture<QuerySnapshot> future = db.collection(collectionName).get();
+    ArrayList<Object>[] scores;
+
+    try {
+        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+        scores = new ArrayList[documents.size()];
+        int itr = 0;
+
+        for (QueryDocumentSnapshot doc : documents) {
+            HashMap<String, Object> data = (HashMap<String, Object>) doc.getData();
+
+            String name = (String)(data.get("name") != null ? data.get("name") : "User");
+
+            ArrayList<Object> quizScores = new ArrayList<>();
+            long totalScore = 0;
+
+            // Fetch quiz1 to quiz6
+            for (int i = 1; i <= 6; i++) {
+                String key = "quiz" + i;
+                Object scoreObj = data.get(key);
+                long score = (scoreObj instanceof Number) ? ((Number) scoreObj).longValue() : 0L;
+                quizScores.add(score);
+                totalScore += score;
             }
 
-        } catch (InterruptedException | ExecutionException e) {
-            scores = new ArrayList[0];
-            e.printStackTrace();
+            // Prepend name and append totalScore
+            quizScores.add(0, name);         // Add name at the start
+            quizScores.add(totalScore);      // Add total score at the end
+
+            scores[itr] = quizScores;
+            itr++;
         }
-        return scores;
+    } catch (InterruptedException | ExecutionException e) {
+        e.printStackTrace();
+        scores = new ArrayList[0];
     }
-    public void updateGameScore(String key,int value) {
-        Firestore db=FirebaseInitializer.db;
-        if(db==null){
-                db = FirebaseInitializer.getFirestore();
-                FirebaseInitializer.db=db;
-        }
-         try {
-        String docId = POJO.instance.getEmail(); // Replace with actual user ID
+
+    return scores;
+}
+
+    //======
+    // public void updateGameScore(String key,int value) {
+    //     Firestore db=FirebaseInitializer.db;
+    //     if(db==null){
+    //             db = FirebaseInitializer.getFirestore();
+    //             FirebaseInitializer.db=db;
+    //     }
+    //      try {
+    //     String docId = POJO.instance.getEmail(); // Replace with actual user ID
+    //     String collection = "Student"; // Replace with actual collection name
+    //     DocumentReference docRef = db.collection(collection).document(docId);
+    //      ApiFuture<DocumentSnapshot> future = docRef.get();
+    //     DocumentSnapshot document = future.get();
+    //      long score=(Long)document.getData().get(key);
+    //       score=Long.max(score,value);
+   
+
+    //     Map<String, Object> updates = new HashMap<>();
+    //     updates.put(key, score);
+    //     ApiFuture<WriteResult> writeResult = docRef.update(updates);
+       
+    //         writeResult.get();  // Wait for update to complete
+    //         System.out.println("Updated " + key + " successfully!");
+    //     } catch (InterruptedException | ExecutionException e) {
+    //         e.printStackTrace();
+    //     }
+    //prafull update
+    public void updateGameScore(String key, int value) {
+    Firestore db = FirebaseInitializer.db;
+    if (db == null) {
+        db = FirebaseInitializer.getFirestore();
+        FirebaseInitializer.db = db;
+    }
+
+    try {
+        String docId = POJO.instance.getEmail(); // Replace with actual user ID/email
         String collection = "Student"; // Replace with actual collection name
         DocumentReference docRef = db.collection(collection).document(docId);
-         ApiFuture<DocumentSnapshot> future = docRef.get();
+        ApiFuture<DocumentSnapshot> future = docRef.get();
         DocumentSnapshot document = future.get();
-        long score=(Long)document.getData().get(key);
-        score=Long.max(score,value);
-        Map<String, Object> updates = new HashMap<>();
-        updates.put(key, score);
-        ApiFuture<WriteResult> writeResult = docRef.update(updates);
-       
-            writeResult.get();  // Wait for update to complete
-            System.out.println("Updated " + key + " successfully!");
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        }
 
-        
+        Object scoreObj = document.getData().get(key);
+        long currentScore = (scoreObj instanceof Number) ? ((Number) scoreObj).longValue() : 0L;
+        long updatedScore = Long.max(currentScore, value);
+
+        Map<String, Object> updates = new HashMap<>();
+        updates.put(key, updatedScore);
+
+        ApiFuture<WriteResult> writeResult = docRef.update(updates);
+        writeResult.get();  // Wait for update to complete
+        System.out.println("Updated " + key + " successfully!");
+    } catch (InterruptedException | ExecutionException e) {
+        e.printStackTrace();
     }
+    // prafull update
 }
+
+ }
+
