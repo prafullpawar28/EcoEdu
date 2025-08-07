@@ -21,14 +21,14 @@ public class DashboardService {
         notifications.addAll("Welcome to EcoEdu Admin!", "New user registered.", "Module updated: Recycling");
         recentActivity.addAll("Quiz submitted for review", "Badge awarded: Eco Star");
         topStudents.addAll(
-            new TopStudent("Lucas Jones", "/Assets/Images/face1.png"),
-            new TopStudent("Emma Smith", "/Assets/Images/face2.png"),
-            new TopStudent("Olivia Brown", "/Assets/Images/face3.png"),
-            new TopStudent("Noah Lee", "/Assets/Images/face1.png")
+            new TopStudent("Neev Bagal", "/Assets/Images/face1.png"),
+            new TopStudent("Rushi Pawar", "/Assets/Images/face2.png"),
+            new TopStudent("Tanmay Bodhale", "/Assets/Images/face3.png"),
+            new TopStudent("Smita Shinde", "/Assets/Images/face1.png")
         );
-        studentCount = 1256;
-        teacherCount = 102;
-        privateTeacherCount = 102;
+        studentCount = 10;
+        teacherCount = 3;
+        privateTeacherCount = 0;
         // Simulate real-time updates
         startSimulatedUpdates();
     }

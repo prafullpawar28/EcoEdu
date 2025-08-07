@@ -24,16 +24,15 @@ import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import java.util.*;
+
+import com.ecoedu.auth.FirebaseAuthService;
+
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
-import javafx.scene.layout.Region;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.Stop;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
-import javafx.scene.layout.HBox;
 import javafx.scene.control.Label;
 import javafx.scene.text.FontWeight;
 import javafx.scene.shape.SVGPath;
@@ -42,6 +41,7 @@ import javafx.animation.AnimationTimer;
 
 public class TrashSortingGame extends VBox {
     private Stage primaryStage;
+    private int finalScore = 0;
     private int score = 0;
     private Label scoreLabel;
     private GridPane trashGrid;
@@ -187,6 +187,7 @@ public class TrashSortingGame extends VBox {
     }
 
     private void resetGame() {
+        finalScore =Integer.max(score, finalScore);
         score = 0;
         updateScore(0);
         trashGrid.getChildren().clear();
@@ -298,6 +299,12 @@ public class TrashSortingGame extends VBox {
         backBtn.setOnMouseEntered(e -> backBtn.setStyle("-fx-background-color: #00c6ff; -fx-text-fill: #fffde7; -fx-background-radius: 20; -fx-padding: 8 24; -fx-cursor: hand; -fx-scale-x:1.07;-fx-scale-y:1.07;"));
         backBtn.setOnMouseExited(e -> backBtn.setStyle("-fx-background-color: #0288d1; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 8 24; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, #0288d1, 4, 0.2, 0, 1);"));
         backBtn.setOnAction(e -> {
+             finalScore=Integer.max(score,finalScore);
+            new Thread(() -> {
+                FirebaseAuthService fb = new FirebaseAuthService();
+                fb.updateGameScore("game1",finalScore);
+               System.out.println("game1 score updated");
+            }).start();
             javafx.stage.Stage stage = (javafx.stage.Stage) getScene().getWindow();
             com.ecoedu.minigames.MinigamesPage.show(stage);
         });

@@ -1,31 +1,330 @@
+// package com.ecoedu.leaderboard;
+
+// import javafx.collections.FXCollections;
+// import javafx.collections.ObservableList;
+// import javafx.geometry.Insets;
+// import javafx.geometry.Pos;
+// import javafx.scene.Scene;
+// import javafx.scene.control.*;
+// import javafx.scene.layout.*;
+// import javafx.scene.paint.Color;
+// import javafx.scene.text.Font;
+// import javafx.scene.text.FontWeight;
+// import javafx.stage.Stage;
+
+// import java.util.ArrayList;
+// import java.util.Arrays;
+
+// import com.ecoedu.auth.FirebaseAuthService;
+
+// public class LeaderboardAndBadgesPage extends VBox {
+
+//     private TableView<StudentScore> leaderboardTable;
+//     private TableView<StudentScore> leaderboardTableQuiz;
+//     private TextField searchField;
+//     private ComboBox<String> sortBox;
+//     private Label lastUpdatedLabel;
+
+//     public LeaderboardAndBadgesPage() {
+//         setSpacing(24);
+//         setPadding(new Insets(32, 40, 24, 40));
+//         setAlignment(Pos.TOP_CENTER);
+//         setStyle("-fx-background-color: linear-gradient(to bottom right, #e0f7fa 60%, #fffde7 100%);");
+
+//         // Header
+//         HBox header = new HBox(18);
+//         header.setAlignment(Pos.CENTER_LEFT);
+//         Label title = new Label("Leaderboard & Badges");
+//         title.setFont(Font.font("Quicksand", FontWeight.BOLD, 32));
+//         title.setTextFill(Color.web("#0288d1"));
+
+//         Button refreshBtn = new Button("⟳ Refresh");
+//         refreshBtn.setFont(Font.font("Quicksand", FontWeight.BOLD, 16));
+//         refreshBtn.setStyle("-fx-background-radius: 16; -fx-background-color: linear-gradient(to right, #b2ff59, #81d4fa); -fx-text-fill: #0288d1;");
+//         refreshBtn.setOnAction(e -> refreshLeaderboard());
+
+//         lastUpdatedLabel = new Label();
+//         lastUpdatedLabel.setFont(Font.font("Quicksand", 13));
+//         lastUpdatedLabel.setTextFill(Color.web("#388e3c"));
+
+//         HBox.setMargin(refreshBtn, new Insets(0, 0, 0, 24));
+//         HBox.setMargin(lastUpdatedLabel, new Insets(0, 0, 0, 18));
+//         header.getChildren().addAll(title, refreshBtn, lastUpdatedLabel);
+//         getChildren().add(header);
+
+//         // Controls
+//         HBox controls = new HBox(16);
+//         controls.setAlignment(Pos.CENTER_LEFT);
+//         searchField = new TextField();
+//         searchField.setPromptText("Search user...");
+//         searchField.setFont(Font.font("Quicksand", 15));
+//         searchField.textProperty().addListener((obs, oldVal, newVal) -> refreshLeaderboard());
+
+//         sortBox = new ComboBox<>();
+//         sortBox.getItems().addAll("Games","Quiz");
+//         sortBox.setValue("Games");
+//         sortBox.setOnAction(e -> refreshLeaderboard());
+
+//         controls.getChildren().addAll(new Label("Sort by:"), sortBox, searchField);
+//         getChildren().add(controls);
+
+//         // Table setup
+//         leaderboardTable = new TableView<>();
+//         leaderboardTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+//         leaderboardTable.setPrefHeight(500);
+
+//         TableColumn<StudentScore, String> nameCol = new TableColumn<>("Name");
+//         nameCol.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(data.getValue().getName()));
+
+//         TableColumn<StudentScore, Number> game1Col = new TableColumn<>("Game 1");
+//         game1Col.setCellValueFactory(data -> new javafx.beans.property.SimpleIntegerProperty(data.getValue().getGame1()));
+
+//         TableColumn<StudentScore, Number> game2Col = new TableColumn<>("Game 2");
+//         game2Col.setCellValueFactory(data -> new javafx.beans.property.SimpleIntegerProperty(data.getValue().getGame2()));
+
+//         TableColumn<StudentScore, Number> game3Col = new TableColumn<>("Game 3");
+//         game3Col.setCellValueFactory(data -> new javafx.beans.property.SimpleIntegerProperty(data.getValue().getGame3()));
+
+//         TableColumn<StudentScore, Number> totalCol = new TableColumn<>("Total");
+//         totalCol.setCellValueFactory(data -> new javafx.beans.property.SimpleIntegerProperty(data.getValue().getTotal()));
+
+//         TableColumn<StudentScore, Number> rankCol = new TableColumn<>("Rank");
+//         rankCol.setCellValueFactory(data -> new javafx.beans.property.SimpleIntegerProperty(data.getValue().getRank()));
+
+//         leaderboardTable.getColumns().addAll(nameCol, game1Col, game2Col, game3Col, totalCol, rankCol);
+
+//         getChildren().add(leaderboardTable);
+//         refreshLeaderboard();
+//     }
+
+//     public void refreshLeaderboard() {
+//         String[][] list = new FirebaseAuthService().getAllStudents("Student");
+//         if (list == null || list.length == 0) return;
+
+//         // Sort by total score descending (assuming total is at index 5)
+//         Arrays.sort(list, (a, b) -> Integer.compare(Integer.parseInt(b[5]), Integer.parseInt(a[5])));
+
+//         String searchText = searchField.getText() == null ? "" : searchField.getText().toLowerCase();
+
+//         ObservableList<StudentScore> tableData = FXCollections.observableArrayList();
+//         for (int i = 0, rank = 1; i < list.length; i++) {
+//             String[] s = list[i];
+//             String name = s[0];
+//             if (!name.toLowerCase().contains(searchText)) continue;
+//             int game1 = Integer.parseInt(s[2]);
+//             int game2 = Integer.parseInt(s[3]);
+//             int game3 = Integer.parseInt(s[4]);
+//             int total = Integer.parseInt(s[5]);
+
+//             tableData.add(new StudentScore(name, game1, game2, game3, total, rank++));
+//         }
+
+//         // Sort based on selected field
+//         String sortField = sortBox.getValue();
+//         switch (sortField) {
+//             case "Quiz":
+//                 //tableData.sort((a, b) -> Integer.compare(b.getGame1(), a.getGame1()));
+//                 if(leaderboardTableQuiz!=null) {
+//                     getChildren().remove(leaderboardTable);
+//                     getChildren().add(leaderboardTableQuiz);
+//                     break;
+//                 }
+//                ArrayList<Object>[] al=new FirebaseAuthService().getAllStudentsQuiz("Student");
+//                Arrays.sort(al, (a, b) ->(Integer)b.get(7)- (Integer)a.get(7));
+//                 leaderboardTableQuiz = new TableView<>();
+//                 getChildren().remove(leaderboardTable);
+//                 getChildren().add(leaderboardTableQuiz);
+//                 break;
+//             case "Games":
+//                 getChildren().add(leaderboardTable);
+//                 break;
+//             case "Game3":
+//                 tableData.sort((a, b) -> Integer.compare(b.getGame3(), a.getGame3()));
+//                 break;
+//             default:
+//                 tableData.sort((a, b) -> Integer.compare(b.getTotal(), a.getTotal()));
+//         }
+
+//         // Reassign ranks after sorting
+//         for (int i = 0; i < tableData.size(); i++) {
+//             tableData.get(i).setRank(i + 1);
+//         }
+
+//         leaderboardTable.setItems(tableData);
+//         lastUpdatedLabel.setText("Last updated: " + java.time.LocalTime.now().withNano(0));
+//     }
+//     private TableView createQuizeTable(ArrayList<Object>[] list){
+//         TableView<StudentScore> leaderboardTable = new TableView<>();
+//         leaderboardTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+//         leaderboardTable.setPrefHeight(500);
+
+//         TableColumn<StudentScore, String> nameCol = new TableColumn<>("Name");
+//         nameCol.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(data.getValue().getName()));
+
+//         TableColumn<StudentScore, Number> game1Col = new TableColumn<>("Quiz 1");
+//         game1Col.setCellValueFactory(data -> new javafx.beans.property.SimpleIntegerProperty(data.getValue().getQuiz1()));
+
+//         TableColumn<StudentScore, Number> game2Col = new TableColumn<>("Quiz 2");
+//         game2Col.setCellValueFactory(data -> new javafx.beans.property.SimpleIntegerProperty(data.getValue().getQuiz2()));
+
+//         TableColumn<StudentScore, Number> game3Col = new TableColumn<>("Quiz 3");
+//         game3Col.setCellValueFactory(data -> new javafx.beans.property.SimpleIntegerProperty(data.getValue().getQuiz3()));
+
+//         TableColumn<StudentScore, Number> game4Col = new TableColumn<>("Quiz 4");
+//         game3Col.setCellValueFactory(data -> new javafx.beans.property.SimpleIntegerProperty(data.getValue().getQuiz4()));
+
+//         TableColumn<StudentScore, Number> game5Col = new TableColumn<>("Quiz 5");
+//         game3Col.setCellValueFactory(data -> new javafx.beans.property.SimpleIntegerProperty(data.getValue().getQuiz5()));
+
+//         TableColumn<StudentScore, Number> game6Col = new TableColumn<>("Quiz 6");
+//         game3Col.setCellValueFactory(data -> new javafx.beans.property.SimpleIntegerProperty(data.getValue().getQuiz6()));
+
+//         TableColumn<StudentScore, Number> totalCol = new TableColumn<>("Total");
+//         totalCol.setCellValueFactory(data -> new javafx.beans.property.SimpleIntegerProperty(data.getValue().getQuizTotal()));
+
+//         TableColumn<StudentScore, Number> rankCol = new TableColumn<>("Rank");
+//         rankCol.setCellValueFactory(data -> new javafx.beans.property.SimpleIntegerProperty(data.getValue().getRank()));
+
+//         leaderboardTable.getColumns().addAll(nameCol, game1Col, game2Col, game3Col,game4Col,game5Col,game6Col, totalCol, rankCol);
+//           ObservableList<StudentScore> tableData = FXCollections.observableArrayList();
+//         for (int i = 0, rank = 1; i < list.length; i++) {
+//             ArrayList<Object> s = list[i];
+//             String name = (String)s.get(0);
+//           //  if (!name.toLowerCase().contains(searchText)) continue;
+//             int quiz1 =(Integer)s.get(1);
+//             int quiz2 =(Integer)s.get(2);
+//             int quiz3 =(Integer)s.get(3);
+//             int quiz4 =(Integer)s.get(4);
+//             int quiz5 =(Integer)s.get(5);
+//             int quiz6 =(Integer)s.get(6);
+//             int total =quiz1+quiz2+quiz3+quiz4+quiz5+quiz6;
+//             tableData.add(new StudentScore(name,quiz1,quiz2,quiz3,quiz4,quiz5,quiz6,total, rank++));
+//         }
+
+//         // Sort based on selected field
+//         String sortField = sortBox.getValue();
+//         switch (sortField) {
+//             case "Quiz":
+//                 //tableData.sort((a, b) -> Integer.compare(b.getGame1(), a.getGame1()));
+//                 if(leaderboardTableQuiz!=null) {
+//                     getChildren().remove(leaderboardTableQuiz);
+//                     getChildren().add(leaderboardTableQuiz);
+//                     break;
+//                 }
+//                  ArrayList<Object>[] al=new FirebaseAuthService().getAllStudentsQuiz("Student");
+//                Arrays.sort(al, (a, b) ->(Integer)b.get(7)- (Integer)a.get(7));
+//                 leaderboardTableQuiz = createQuizeTable(al);
+//                 getChildren().remove(leaderboardTable);
+//                 getChildren().add(leaderboardTableQuiz);
+//                 break;
+//             case "Games":
+//                 getChildren().add(leaderboardTable);
+//                 break;
+//             case "Game3":
+//                 tableData.sort((a, b) -> Integer.compare(b.getGame3(), a.getGame3()));
+//                 break;
+//             default:
+//                 tableData.sort((a, b) -> Integer.compare(b.getTotal(), a.getTotal()));
+//         }
+
+//         // Reassign ranks after sorting
+//         for (int i = 0; i < tableData.size(); i++) {
+//             tableData.get(i).setRank(i + 1);
+//         }
+
+//         leaderboardTable.setItems(tableData);
+//         lastUpdatedLabel.setText("Last updated: " + java.time.LocalTime.now().withNano(0));
+//         return leaderboardTable;
+
+//     }
+
+//     // Table model
+//     public static class StudentScore {
+//         private  String name;
+//         private  int game1;
+//         private  int game2;
+//         private  int game3;
+//         private  int quiz1;
+//         private  int quiz2;
+//         private  int quiz3;
+//         private  int quiz4;
+//         private  int quiz5;
+//         private  int quiz6;
+//         private  int total;
+//         private  int quizTotal;
+//         private int rank;
+
+//         public StudentScore(String name, int game1, int game2, int game3, int total, int rank) {
+//             this.name = name;
+//             this.game1 = game1;
+//             this.game2 = game2;
+//             this.game3 = game3;
+
+//             this.total = total;
+//             this.rank = rank;
+//         }
+//         public StudentScore(String name, int quiz1, int quiz2, int quiz3, int quiz4, int quiz5, int quiz6,int quizTotal, int rank) {
+//             this.quiz1=quiz1;
+//             this.quiz2=quiz2;
+//             this.quiz3=quiz3;
+//             this.quiz4=quiz4;
+//             this.quiz5=quiz5;
+//             this.quiz6=quiz6;
+//             this.name = name;
+//             this.quizTotal = quizTotal;
+
+//         }
+//         public String getName() { return name; }
+//         public int getGame1() { return game1; }
+//         public int getGame2() { return game2; }
+//         public int getGame3() { return game3; }
+//         public int getTotal() { return total; }
+//         public int getRank() { return rank; }
+//         public int getQuiz1() { return quiz1; }
+//         public int getQuiz2() { return quiz2; }
+//         public int getQuiz3() { return quiz3; }
+//         public int getQuiz4() { return quiz4; }
+//         public int getQuiz5() { return quiz5; }
+//         public int getQuiz6() { return quiz6; }
+//         public int getQuizTotal() { return quizTotal; }
+//         public void setRank(int rank) { this.rank = rank; }
+//     }
+
+//     // Launch page
+//     public static void show(Stage primaryStage) {
+//         LeaderboardAndBadgesPage page = new LeaderboardAndBadgesPage();
+//         Scene scene = new Scene(page, 1366, 768);
+//         primaryStage.setScene(scene);
+//         primaryStage.setTitle("EcoEdu - Leaderboard Table");
+//         primaryStage.show();
+//     }
+// }
 package com.ecoedu.leaderboard;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Locale;
-import java.util.stream.Collectors;
-import javafx.animation.FadeTransition;
-import javafx.collections.ListChangeListener;
-import javafx.scene.control.ProgressIndicator;
+import javafx.stage.Stage;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import com.ecoedu.auth.FirebaseAuthService;
 
 public class LeaderboardAndBadgesPage extends VBox {
-    private FlowPane leaderboardFlow;
-    private ScrollPane leaderboardScroll;
+
+    private TableView<StudentScore> leaderboardTable;
+    private TableView<StudentScore> leaderboardTableQuiz;
     private TextField searchField;
     private ComboBox<String> sortBox;
-    private Button refreshBtn;
     private Label lastUpdatedLabel;
-    private ProgressIndicator loadingSpinner;
-    private VBox myRankBox;
 
     public LeaderboardAndBadgesPage() {
         setSpacing(24);
@@ -36,23 +335,22 @@ public class LeaderboardAndBadgesPage extends VBox {
         // Header
         HBox header = new HBox(18);
         header.setAlignment(Pos.CENTER_LEFT);
-        Label trophy = new Label("Trophy:");
-        trophy.setFont(Font.font("Quicksand", FontWeight.EXTRA_BOLD, 38));
         Label title = new Label("Leaderboard & Badges");
         title.setFont(Font.font("Quicksand", FontWeight.BOLD, 32));
         title.setTextFill(Color.web("#0288d1"));
-        refreshBtn = new Button("⟳ Refresh");
+
+        Button refreshBtn = new Button("⟳ Refresh");
         refreshBtn.setFont(Font.font("Quicksand", FontWeight.BOLD, 16));
-        refreshBtn.setStyle("-fx-background-radius: 16; -fx-background-color: linear-gradient(to right, #b2ff59, #81d4fa); -fx-text-fill: #0288d1; -fx-cursor: hand;");
-        refreshBtn.setOnAction(e -> {
-            refreshLeaderboard();
-        });
+        refreshBtn.setStyle("-fx-background-radius: 16; -fx-background-color: linear-gradient(to right, #b2ff59, #81d4fa); -fx-text-fill: #0288d1;");
+        refreshBtn.setOnAction(e -> refreshLeaderboard());
+
         lastUpdatedLabel = new Label();
         lastUpdatedLabel.setFont(Font.font("Quicksand", 13));
         lastUpdatedLabel.setTextFill(Color.web("#388e3c"));
+
         HBox.setMargin(refreshBtn, new Insets(0, 0, 0, 24));
         HBox.setMargin(lastUpdatedLabel, new Insets(0, 0, 0, 18));
-        header.getChildren().addAll(trophy, title, refreshBtn, lastUpdatedLabel);
+        header.getChildren().addAll(title, refreshBtn, lastUpdatedLabel);
         getChildren().add(header);
 
         // Controls
@@ -62,184 +360,194 @@ public class LeaderboardAndBadgesPage extends VBox {
         searchField.setPromptText("Search user...");
         searchField.setFont(Font.font("Quicksand", 15));
         searchField.textProperty().addListener((obs, oldVal, newVal) -> refreshLeaderboard());
+
         sortBox = new ComboBox<>();
-        sortBox.getItems().addAll("Score", "Quizzes", "Minigames");
-        sortBox.setValue("Score");
+        sortBox.getItems().addAll("Games", "Quiz");
+        sortBox.setValue("Games");
         sortBox.setOnAction(e -> refreshLeaderboard());
+
         controls.getChildren().addAll(new Label("Sort by:"), sortBox, searchField);
         getChildren().add(controls);
 
-        // Leaderboard section
-        leaderboardFlow = new FlowPane();
-        leaderboardFlow.setHgap(32);
-        leaderboardFlow.setVgap(32);
-        leaderboardFlow.setPadding(new Insets(16, 0, 16, 0));
-        leaderboardFlow.setAlignment(Pos.TOP_CENTER);
-        leaderboardFlow.setPrefWrapLength(900);
-        leaderboardScroll = new ScrollPane(leaderboardFlow);
-        leaderboardScroll.setFitToWidth(true);
-        leaderboardScroll.setPrefHeight(420);
-        leaderboardScroll.setStyle("-fx-background: transparent; -fx-background-color: transparent; -fx-border-radius: 18;");
-        StackPane leaderboardSection = new StackPane(leaderboardScroll);
-        leaderboardSection.setStyle("-fx-background-radius: 24; -fx-background-color: linear-gradient(to bottom right, #e1f5fe 60%, #fffde7 100%); -fx-padding: 18 0 18 0;");
-        // Loading spinner
-        loadingSpinner = new ProgressIndicator();
-        loadingSpinner.setMaxSize(60, 60);
-        leaderboardSection.getChildren().add(loadingSpinner);
-        getChildren().add(leaderboardSection);
-        // Sticky My Rank card
-        myRankBox = new VBox();
-        myRankBox.setAlignment(Pos.CENTER);
-        myRankBox.setPadding(new Insets(8));
-        getChildren().add(2, myRankBox);
-        // Listen for real-time updates
-        LeaderboardService.getInstance().getLeaderboardUsers().addListener((ListChangeListener<LeaderboardService.LeaderboardUserStats>) c -> {
-            refreshLeaderboard();
-        });
+        // Game Table setup (initially visible)
+        leaderboardTable = createGameTable();
+        getChildren().add(leaderboardTable);
+
         refreshLeaderboard();
     }
 
+    private TableView<StudentScore> createGameTable() {
+        TableView<StudentScore> table = new TableView<>();
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        table.setPrefHeight(500);
+
+        TableColumn<StudentScore, String> nameCol = new TableColumn<>("Name");
+        nameCol.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(data.getValue().getName()));
+
+        TableColumn<StudentScore, Number> game1Col = new TableColumn<>("Game 1");
+        game1Col.setCellValueFactory(data -> new javafx.beans.property.SimpleIntegerProperty(data.getValue().getGame1()));
+
+        TableColumn<StudentScore, Number> game2Col = new TableColumn<>("Game 2");
+        game2Col.setCellValueFactory(data -> new javafx.beans.property.SimpleIntegerProperty(data.getValue().getGame2()));
+
+        TableColumn<StudentScore, Number> game3Col = new TableColumn<>("Game 3");
+        game3Col.setCellValueFactory(data -> new javafx.beans.property.SimpleIntegerProperty(data.getValue().getGame3()));
+
+        TableColumn<StudentScore, Number> totalCol = new TableColumn<>("Total");
+        totalCol.setCellValueFactory(data -> new javafx.beans.property.SimpleIntegerProperty(data.getValue().getTotal()));
+
+        TableColumn<StudentScore, Number> rankCol = new TableColumn<>("Rank");
+        rankCol.setCellValueFactory(data -> new javafx.beans.property.SimpleIntegerProperty(data.getValue().getRank()));
+
+        table.getColumns().addAll(nameCol, game1Col, game2Col, game3Col, totalCol, rankCol);
+        return table;
+    }
+
+    private void switchTableView(TableView<?> newTable) {
+        getChildren().remove(leaderboardTable);
+        if (leaderboardTableQuiz != null) {
+            getChildren().remove(leaderboardTableQuiz);
+        }
+        getChildren().add(newTable);
+    }
+
     public void refreshLeaderboard() {
-        leaderboardFlow.getChildren().clear();
-        myRankBox.getChildren().clear();
-        List<LeaderboardService.LeaderboardUserStats> users = LeaderboardService.getInstance().getLeaderboardUsers();
-        if (users.isEmpty()) {
-            loadingSpinner.setVisible(true);
-            return;
+        String sortField = sortBox.getValue();
+        String searchText = searchField.getText() == null ? "" : searchField.getText().toLowerCase();
+
+        if ("Quiz".equals(sortField)) {
+            ArrayList<Object>[] al = new FirebaseAuthService().getAllStudentsQuiz("Student");
+            Arrays.sort(al, (a, b) ->Long.compare((Long)b.get(7), (Long)a.get(7)));
+            leaderboardTableQuiz = createQuizTable(al);
+            switchTableView(leaderboardTableQuiz);
         } else {
-            loadingSpinner.setVisible(false);
+            String[][] list = new FirebaseAuthService().getAllStudents("Student");
+            if (list == null || list.length == 0) return;
+
+            Arrays.sort(list, (a, b) -> Integer.compare(Integer.parseInt(b[5]), Integer.parseInt(a[5])));
+
+            ObservableList<StudentScore> tableData = FXCollections.observableArrayList();
+            for (int i = 0, rank = 1; i < list.length; i++) {
+                String[] s = list[i];
+                String name = s[0];
+                if (!name.toLowerCase().contains(searchText)) continue;
+                int game1 = Integer.parseInt(s[2]);
+                int game2 = Integer.parseInt(s[3]);
+                int game3 = Integer.parseInt(s[4]);
+                int total = Integer.parseInt(s[5]);
+
+                tableData.add(new StudentScore(name, game1, game2, game3, total, rank++));
+            }
+
+            for (int i = 0; i < tableData.size(); i++) {
+                tableData.get(i).setRank(i + 1);
+            }
+
+            leaderboardTable.setItems(tableData);
+            switchTableView(leaderboardTable);
         }
-        String search = searchField.getText() == null ? "" : searchField.getText().toLowerCase(Locale.ROOT);
-        String sort = sortBox.getValue();
-        // Filter
-        users = users.stream().filter(u -> u.username != null && u.username.toLowerCase(Locale.ROOT).contains(search)).collect(Collectors.toList());
-        // Sort
-        if ("Quizzes".equals(sort)) {
-            users.sort(Comparator.comparingInt((LeaderboardService.LeaderboardUserStats u) -> u.quizzesCompleted).reversed());
-        } else if ("Minigames".equals(sort)) {
-            users.sort(Comparator.comparingInt((LeaderboardService.LeaderboardUserStats u) -> u.minigamesPlayed).reversed());
-        } else {
-            users.sort(Comparator.comparingInt((LeaderboardService.LeaderboardUserStats u) -> u.score).reversed());
-        }
+
         lastUpdatedLabel.setText("Last updated: " + java.time.LocalTime.now().withNano(0));
-        // Sticky My Rank card
-        LeaderboardService.LeaderboardUserStats me = users.stream().filter(u -> u.isCurrentUser).findFirst().orElse(null);
-        if (me != null) {
-            VBox myCard = makeCard(me, me.rank - 1);
-            myCard.setStyle(myCard.getStyle() + "-fx-border-color: #ffb300; -fx-border-width: 4; -fx-border-radius: 22; -fx-effect: dropshadow(gaussian, #ffb300, 32, 0.38, 0, 8);");
-            Label sticky = new Label("My Rank");
-            sticky.setFont(Font.font("Quicksand", FontWeight.BOLD, 15));
-            sticky.setTextFill(Color.web("#ffb300"));
-            myRankBox.getChildren().addAll(sticky, myCard);
-        }
-        // Animate cards
-        for (int i = 0; i < users.size(); i++) {
-            LeaderboardService.LeaderboardUserStats user = users.get(i);
-            if (me != null && user.username.equals(me.username)) continue; // Already shown as sticky
-            VBox card = makeCard(user, i);
-            FadeTransition ft = new FadeTransition(javafx.util.Duration.millis(500), card);
-            ft.setFromValue(0);
-            ft.setToValue(1);
-            ft.play();
-            leaderboardFlow.getChildren().add(card);
-        }
     }
 
-    private VBox makeCard(LeaderboardService.LeaderboardUserStats user, int index) {
-        VBox card = new VBox(10);
-        card.setAlignment(Pos.CENTER);
-        String gradient = index == 0 ? "linear-gradient(to bottom right, #fffde7, #ffd700 90%)" :
-                index == 1 ? "linear-gradient(to bottom right, #fffde7, #b0bec5 90%)" :
-                index == 2 ? "linear-gradient(to bottom right, #fffde7, #cd7f32 90%)" :
-                "linear-gradient(to bottom right, #e0f7fa, #b2dfdb 90%)";
-        card.setStyle("-fx-background-radius: 22; -fx-background-color: " + gradient + "; -fx-effect: dropshadow(gaussian, #43e97b, 16, 0.18, 0, 4);");
-        if (user.isCurrentUser) {
-            card.setStyle(card.getStyle() + "-fx-border-color: #43e97b; -fx-border-width: 3; -fx-border-radius: 22; -fx-effect: dropshadow(gaussian, #43e97b, 32, 0.38, 0, 8);");
+    private TableView<StudentScore> createQuizTable(ArrayList<Object>[] list) {
+        TableView<StudentScore> table = new TableView<>();
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        table.setPrefHeight(500);
+
+        TableColumn<StudentScore, String> nameCol = new TableColumn<>("Name");
+        nameCol.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(data.getValue().getName()));
+
+        TableColumn<StudentScore, Number> q1 = new TableColumn<>("Quiz 1");
+        q1.setCellValueFactory(data -> new javafx.beans.property.SimpleIntegerProperty((int)data.getValue().getQuiz1()));
+        TableColumn<StudentScore, Number> q2 = new TableColumn<>("Quiz 2");
+        q2.setCellValueFactory(data -> new javafx.beans.property.SimpleIntegerProperty((int)data.getValue().getQuiz2()));
+        TableColumn<StudentScore, Number> q3 = new TableColumn<>("Quiz 3");
+        q3.setCellValueFactory(data -> new javafx.beans.property.SimpleIntegerProperty((int)data.getValue().getQuiz3()));
+        TableColumn<StudentScore, Number> q4 = new TableColumn<>("Quiz 4");
+        q4.setCellValueFactory(data -> new javafx.beans.property.SimpleIntegerProperty((int)data.getValue().getQuiz4()));
+        TableColumn<StudentScore, Number> q5 = new TableColumn<>("Quiz 5");
+        q5.setCellValueFactory(data -> new javafx.beans.property.SimpleIntegerProperty((int)data.getValue().getQuiz5()));
+        TableColumn<StudentScore, Number> q6 = new TableColumn<>("Quiz 6");
+        q6.setCellValueFactory(data -> new javafx.beans.property.SimpleIntegerProperty((int)data.getValue().getQuiz6()));
+
+        TableColumn<StudentScore, Number> totalCol = new TableColumn<>("Total");
+        totalCol.setCellValueFactory(data -> new javafx.beans.property.SimpleIntegerProperty((int)data.getValue().getQuizTotal()));
+
+        TableColumn<StudentScore, Number> rankCol = new TableColumn<>("Rank");
+        rankCol.setCellValueFactory(data -> new javafx.beans.property.SimpleIntegerProperty(data.getValue().getRank()));
+
+        table.getColumns().addAll(nameCol, q1, q2, q3, q4, q5, q6, totalCol, rankCol);
+
+        ObservableList<StudentScore> tableData = FXCollections.observableArrayList();
+        for (int i = 0, rank = 1; i < list.length; i++) {
+            ArrayList<Object> s = list[i];
+            String name = (String) s.get(0);
+            long quiz1 = (Long) s.get(1);
+            long quiz2 = (Long) s.get(2);
+            long quiz3 = (Long) s.get(3);
+            long quiz4 = (Long) s.get(4);
+            long quiz5 = (Long) s.get(5);
+            long quiz6 = (Long) s.get(6);
+            long total = quiz1 + quiz2 + quiz3 + quiz4 + quiz5 + quiz6;
+            tableData.add(new StudentScore(name, quiz1, quiz2, quiz3, quiz4, quiz5, quiz6, total, rank++));
         }
-        card.setPadding(new Insets(16));
-        card.setMinWidth(260);
-        card.setMaxWidth(260);
-        card.setMinHeight(220);
-        card.setMaxHeight(220);
-        // Rank
-        Label rankLabel = new Label("#" + (index + 1));
-        rankLabel.setFont(Font.font("Quicksand", FontWeight.BOLD, 26));
-        rankLabel.setTextFill(Color.web("#388e3c"));
-        // Avatar (use initials)
-        Circle avatarCircle = new Circle(27, Color.web("#b2dfdb"));
-        Label initials = new Label(user.username.substring(0, 1).toUpperCase());
-        initials.setFont(Font.font("Quicksand", FontWeight.BOLD, 24));
-        initials.setTextFill(Color.web("#0288d1"));
-        StackPane avatar = new StackPane(avatarCircle, initials);
-        // Name
-        Label nameLabel = new Label(user.username);
-        nameLabel.setFont(Font.font("Quicksand", FontWeight.BOLD, 20));
-        nameLabel.setTextFill(Color.web("#22223b"));
-        // Score
-        HBox scoreBox = new HBox(6);
-        scoreBox.setAlignment(Pos.CENTER);
-        Label scoreIcon = new Label("XP");
-        scoreIcon.setFont(Font.font("Quicksand", FontWeight.BOLD, 18));
-        Label scoreLabel = new Label(user.score + " XP");
-        scoreLabel.setFont(Font.font("Quicksand", FontWeight.BOLD, 24));
-        scoreLabel.setTextFill(Color.web("#3a86ff"));
-        scoreBox.getChildren().addAll(scoreIcon, scoreLabel);
-        // Badges
-        HBox badgesBox = new HBox(10);
-        badgesBox.setAlignment(Pos.CENTER);
-        for (String badge : user.badges) {
-            Label badgeIcon = new Label(badge.equals("Quiz Master") ? "📝" : badge.equals("Minigame Master") ? "🎮" : "🏅");
-            badgeIcon.setFont(Font.font(20));
-            badgeIcon.setTooltip(new Tooltip(badge));
-            badgesBox.getChildren().add(badgeIcon);
+
+        for (int i = 0; i < tableData.size(); i++) {
+            tableData.get(i).setRank(i + 1);
         }
-        // Progress bar
-        ProgressBar xpBar = new ProgressBar(user.progress);
-        xpBar.setPrefWidth(160);
-        xpBar.setStyle("-fx-accent: #43e97b; -fx-background-radius: 8; -fx-border-radius: 8;");
-        Label xpLabel = new Label((int)(user.progress * 100) + "% XP");
-        xpLabel.setFont(Font.font("Quicksand", FontWeight.BOLD, 13));
-        xpLabel.setTextFill(Color.web("#388e3c"));
-        HBox xpBox = new HBox(8, xpBar, xpLabel);
-        xpBox.setAlignment(Pos.CENTER);
-        // Quizzes/Minigames
-        HBox statsBox = new HBox(16);
-        statsBox.setAlignment(Pos.CENTER);
-        Label quizLabel = new Label("📝 " + user.quizzesCompleted);
-        quizLabel.setFont(Font.font("Quicksand", FontWeight.BOLD, 15));
-        quizLabel.setTooltip(new Tooltip("Quizzes Completed"));
-        Label minigameLabel = new Label("🎮 " + user.minigamesPlayed);
-        minigameLabel.setFont(Font.font("Quicksand", FontWeight.BOLD, 15));
-        minigameLabel.setTooltip(new Tooltip("Minigames Played"));
-        statsBox.getChildren().addAll(quizLabel, minigameLabel);
-        // View Profile button
-        Button profileBtn = new Button("View Profile");
-        profileBtn.setFont(Font.font("Quicksand", FontWeight.BOLD, 14));
-        profileBtn.setStyle("-fx-background-radius: 12; -fx-background-color: linear-gradient(to right, #b2ff59, #81d4fa); -fx-text-fill: #0288d1; -fx-cursor: hand;");
-        profileBtn.setOnAction(e -> showProfileDialog(user));
-        VBox content = new VBox(8, rankLabel, avatar, nameLabel, scoreBox, badgesBox, statsBox, xpBox, profileBtn);
-        content.setAlignment(Pos.CENTER);
-        card.getChildren().add(content);
-        // Hover animation
-        card.setOnMouseEntered(e -> card.setStyle(card.getStyle() + "-fx-scale-x:1.06;-fx-scale-y:1.06;-fx-effect: dropshadow(gaussian, #43e97b, 32, 0.28, 0, 8);"));
-        card.setOnMouseExited(e -> card.setStyle(card.getStyle().replaceAll("-fx-scale-x:1.06;-fx-scale-y:1.06;", "")));
-        return card;
+
+        table.setItems(tableData);
+        return table;
     }
 
-    private void showProfileDialog(LeaderboardService.LeaderboardUserStats user) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("User Profile");
-        alert.setHeaderText(user.username + "'s Profile");
-        alert.setContentText("Rank: #" + user.rank + "\nScore: " + user.score + " XP\nQuizzes: " + user.quizzesCompleted + "\nMinigames: " + user.minigamesPlayed + "\nBadges: " + String.join(", ", user.badges));
-        alert.showAndWait();
+    public static class StudentScore {
+        private String name;
+        private int game1, game2, game3, total, rank;
+        private long quiz1, quiz2, quiz3, quiz4, quiz5, quiz6, quizTotal;
+
+        public StudentScore(String name, int game1, int game2, int game3, int total, int rank) {
+            this.name = name;
+            this.game1 = game1;
+            this.game2 = game2;
+            this.game3 = game3;
+            this.total = total;
+            this.rank = rank;
+        }
+        public StudentScore(String name, long quiz1, long quiz2, long quiz3, long quiz4,long quiz5, long quiz6, long quizTotal, int rank) {
+            this.name = name;
+            this.quiz1 = quiz1;
+            this.quiz2 = quiz2;
+            this.quiz3 = quiz3;
+            this.quiz4 = quiz4;
+            this.quiz5 = quiz5;
+            this.quiz6 = quiz6;
+            this.quizTotal = quizTotal;
+            this.rank = rank;
+        }
+
+        public String getName() { return name; }
+        public int getGame1() { return game1; }
+        public int getGame2() { return game2; }
+        public int getGame3() { return game3; }
+        public int getTotal() { return total; }
+        public int getRank() { return rank; }
+        public void setRank(int rank) { this.rank = rank; }
+
+        public long getQuiz1() { return quiz1; }
+        public long getQuiz2() { return quiz2; }
+        public long getQuiz3() { return quiz3; }
+        public long getQuiz4() { return quiz4; }
+        public long getQuiz5() { return quiz5; }
+        public long getQuiz6() { return quiz6; }
+        public long getQuizTotal() { return quizTotal; }
     }
 
-    // If you have a static show method, set the scene size to 1366x768
-    public static void show(javafx.stage.Stage primaryStage) {
+    public static void show(Stage primaryStage) {
         LeaderboardAndBadgesPage page = new LeaderboardAndBadgesPage();
-        javafx.scene.Scene scene = new javafx.scene.Scene(page, 1366, 768);
+        Scene scene = new Scene(page, 1366, 768);
         primaryStage.setScene(scene);
-        primaryStage.setTitle("EcoEdu - Leaderboard & Badges");
+        primaryStage.setTitle("EcoEdu - Leaderboard Table");
         primaryStage.show();
     }
-} 
+}

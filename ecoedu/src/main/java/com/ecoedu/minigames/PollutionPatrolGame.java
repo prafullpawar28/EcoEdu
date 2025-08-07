@@ -15,6 +15,9 @@ import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Random;
+
+import com.ecoedu.auth.FirebaseAuthService;
+
 import javafx.animation.FadeTransition;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -31,6 +34,7 @@ public class PollutionPatrolGame extends StackPane {
     private ArrayList<ImageView> trashItems = new ArrayList<>();
     private Random random = new Random();
     private int score = 0;
+    private int finalScore=0;
     private int missedTrash = 0;
     private final int maxMissedTrash = 5;
     private int timeRemaining = 60;
@@ -358,6 +362,7 @@ public class PollutionPatrolGame extends StackPane {
         restartButton.setLayoutX(WIDTH / 2.0 - 50);
         restartButton.setLayoutY(HEIGHT / 2.0 + 20);
         restartButton.setOnAction(e -> {
+            finalScore=Integer.max(score,finalScore);
             overlayPane.setVisible(true);
             gameStarted = false;
             setupGame(primaryStage);
@@ -366,9 +371,18 @@ public class PollutionPatrolGame extends StackPane {
         Button backButton = new Button("Back to Minigames");
         backButton.setLayoutX(WIDTH / 2.0 - 50);
         backButton.setLayoutY(HEIGHT / 2.0 + 60);
-        backButton.setOnAction(e -> MinigamesPage.show(primaryStage));
+        backButton.setOnAction(e -> {
+             finalScore=Integer.max(score,finalScore);
+            new Thread(() -> {
+                FirebaseAuthService fb = new FirebaseAuthService();
+                fb.updateGameScore("game3", finalScore);
+               System.out.println("game3 score updated");
+            }).start();
+            MinigamesPage.show(primaryStage);
+        });
         gamePane.getChildren().addAll(gameOverText, restartButton, backButton);
         // Update leaderboard and show
+
         leaderboard.add(score);
         leaderboard.sort((a, b) -> b - a);
         while (leaderboard.size() > 5) leaderboard.remove(leaderboard.size() - 1);
